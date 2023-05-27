@@ -1,0 +1,6 @@
+{
+    "apiToken": "test_ey",
+    "apiVersion" : "2",
+    "apiUrl": "http://127.0.0.1:57780",
+    "apiTimeout": 4
+}
