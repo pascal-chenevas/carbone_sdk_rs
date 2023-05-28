@@ -10,6 +10,8 @@ pub enum CarboneSdkError {
     MissingArgument(String, String),
     #[error("Carbone SDK {0:?} error: file {1:?} not found")]
     FileNotFound(String, String),
+    #[error("Carbone SDK {0:?} {1:?} is a directory")]
+    IsADirectory(String, String),
     #[error("Carbone SDK IoError {0:?}")]
     IoError(std::io::Error),
     #[error("Carbone SDK RequestError {0:?}")]

@@ -35,6 +35,13 @@ impl CarboneSDK {
             ));
         }
 
+        if Path::new(template_file_name.as_str()).is_dir() {
+            return Err(CarboneSdkError::IsADirectory(
+                "add_template".to_string(),
+                template_file_name.to_string(),
+            ));
+        }
+        
         if !Path::new(template_file_name.as_str()).is_file() {
             return Err(CarboneSdkError::FileNotFound(
                 "add_template".to_string(),
