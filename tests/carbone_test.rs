@@ -10,7 +10,19 @@ use carbone_rs::carbone_sdk::config::Config;
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+    use carbone_rs::carbone_sdk::carbone::CARBONE_API_URL;
+
+    #[test]
+    fn test_default() {
+
+        let carbone_sdk: CarboneSDK = Default::default();
+
+        assert_eq!(carbone_sdk.config.api_timeout, 60);
+        assert_eq!(carbone_sdk.config.api_url, CARBONE_API_URL.to_string());
+        assert_eq!(carbone_sdk.config.api_token.is_empty(), true);
+        assert_eq!(carbone_sdk.config.api_version, "4".to_string());
+    }
+
     #[test]
     fn test_add_template() -> Result<(), CarboneSdkError>{
 
