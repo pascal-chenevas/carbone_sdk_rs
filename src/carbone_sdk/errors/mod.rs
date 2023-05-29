@@ -6,6 +6,8 @@ pub enum CarboneSdkError {
     Error(String, String),
     #[error("CarboneSDK: \"API access token\" is missing")]
     MissingApiToken(String),
+    #[error("CarboneSDK: \"API URL\" is missing")]
+    MissingApiUrl(String),
     #[error("Carbone SDK {0:?} error: argument is missing: {1:?}")]
     MissingArgument(String, String),
     #[error("Carbone SDK {0:?} error: file {1:?} not found")]

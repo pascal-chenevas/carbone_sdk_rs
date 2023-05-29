@@ -21,8 +21,14 @@ pub struct CarboneSDK {
 }
 
 impl CarboneSDK {
-    pub fn new(config: Config) -> Self {
-        Self { config }
+    pub fn new(config: Config) -> Result<Self> {
+        if config.api_token.is_empty() {
+            return Err(CarboneSdkError::MissingApiToken("CarboneSDK::new()".to_string()));
+        }
+        if config.api_url.is_empty() {
+            return Err(CarboneSdkError::MissingApiUrl("CarboneSDK::new()".to_string()));
+        }
+        Ok(Self { config })
     }
 
     pub fn add_template(
@@ -248,7 +254,7 @@ impl CarboneSDK {
         // convert [u8] to String
         let result: String = format!("{:X}", sha256.finalize());
 
-        Ok(result)
+        Ok(result.to_lowercase())
     }
 
     pub fn set_access_token(&mut self, api_token: String) -> Result<()> {
