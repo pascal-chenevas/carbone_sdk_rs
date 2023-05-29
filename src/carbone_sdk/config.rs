@@ -1,8 +1,11 @@
 use crate::carbone_sdk::errors::CarboneSdkError;
 use serde::Deserialize;
 use std::fs;
+use std::str::FromStr;
 
-#[derive(Debug, Deserialize)]
+use crate::carbone_sdk::carbone::CARBONE_API_URL;
+
+#[derive(Debug, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct Config {
     pub api_token: String,
@@ -11,8 +14,11 @@ pub struct Config {
     pub api_version: String,
 }
 
+pub type Result<Config> = std::result::Result<Config, CarboneSdkError>;
+
 impl Config {
-    pub fn from_file(path: &str) -> Result<Self, CarboneSdkError> {
+
+    pub fn from_file(path: &str) -> Result<Self> {
         let file = fs::read_to_string(path).or(Err(CarboneSdkError::FileNotFound(
             "from_file()".to_string(),
             path.to_string(),
@@ -38,6 +44,40 @@ impl Config {
                 ));
             }
         };
+
+        if config.api_token.is_empty() {
+            return Err(CarboneSdkError::MissingApiToken("from_file()".to_string()));
+        }
+
         Ok(config)
+    }
+}
+
+impl Default for Config {
+    fn default() -> Self { 
+       Self{
+            api_url: CARBONE_API_URL.to_string(),
+            api_timeout: 60,
+            api_token: "".to_string(),
+            api_version: "4".to_string(),
+        }
+    }
+}
+
+impl FromStr for Config {
+
+    type Err = CarboneSdkError;
+
+    fn from_str(s: &str) -> Result<Self> {
+
+        match serde_json::from_str(&s) {
+            Ok(config) => Ok(config),
+            Err(e) => {
+                return Err(CarboneSdkError::ParseError(
+                    "from_str".to_string(),
+                    e.to_string(),
+                ));
+            }
+        }
     }
 }

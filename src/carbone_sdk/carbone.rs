@@ -319,16 +319,3 @@ impl CarboneSDK {
         }
     }
 }
-
-impl Default for CarboneSDK {
-    fn default() -> Self { 
-       Self{
-            config:Config {
-            api_url: CARBONE_API_URL.to_string(),
-            api_timeout: 60,
-            api_token: "".to_string(),
-            api_version: "4".to_string(),
-            }
-        }
-    }
-}
