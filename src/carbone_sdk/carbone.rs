@@ -10,12 +10,14 @@ use std::fs;
 use std::path::Path;
 use std::str;
 
+pub const CARBONE_API_URL: &str = "https://api.carbone.io";
+
 pub type Result<T> = std::result::Result<T, CarboneSdkError>;
 
 
 #[derive(Debug)]
 pub struct CarboneSDK {
-    config: Config,
+    pub config: Config,
 }
 
 impl CarboneSDK {
@@ -41,7 +43,7 @@ impl CarboneSDK {
                 template_file_name.to_string(),
             ));
         }
-        
+
         if !Path::new(template_file_name.as_str()).is_file() {
             return Err(CarboneSdkError::FileNotFound(
                 "add_template".to_string(),
@@ -314,6 +316,19 @@ impl CarboneSDK {
         match response {
             Ok(response) => Ok(response.text()?),
             Err(e) => Err(CarboneSdkError::ResponseError(e.to_string())),
+        }
+    }
+}
+
+impl Default for CarboneSDK {
+    fn default() -> Self { 
+       Self{
+            config:Config {
+            api_url: CARBONE_API_URL.to_string(),
+            api_timeout: 60,
+            api_token: "".to_string(),
+            api_version: "4".to_string(),
+            }
         }
     }
 }
