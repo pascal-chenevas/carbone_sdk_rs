@@ -9,6 +9,8 @@ use carbone_rs::carbone_sdk::config::Config;
 
 #[cfg(test)]
 mod tests {
+    use serde::de::value::Error;
+
     use super::*;
 
     #[test]
@@ -296,6 +298,30 @@ mod tests {
         let expected_error = CarboneSdkError::IsADirectory("add_template".to_string(), "tests".to_string()); 
         
         assert_eq!(expected_error.to_string(), result);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_get_report_error_missing_render_id() -> Result<(), CarboneSdkError> {
+
+        let config = Config{
+            api_token: "test_q".to_string(),
+            api_url: "http://127.0.0.1".to_string(),
+            api_timeout: 4,
+            api_version: "2".to_string(),
+        };
+    
+        let carbone_sdk = CarboneSDK::new(config)?;
+
+        let error = match carbone_sdk.get_report(&"".to_string()) {
+            Ok(_) => panic!("the function doesn't return an error"),
+            Err(e) => e.to_string()
+        };
+
+        let expected_error = CarboneSdkError::MissingArgument("get_report".to_string(), "render_id".to_string()); 
+        
+        assert_eq!(expected_error.to_string(), error);
 
         Ok(())
     }
