@@ -6,34 +6,16 @@ use carbone_rs::carbone_sdk::carbone::CarboneSDK;
 use carbone_rs::carbone_sdk::errors::CarboneSdkError;
 use carbone_rs::carbone_sdk::config::Config;
 
-
 #[cfg(test)]
 mod tests {
-    use serde::de::value::Error;
 
     use super::*;
 
     #[test]
-    fn test_init_sdk_error_missing_token() {
-
-        let config = Default::default();
-    
-        let error = match CarboneSDK::new(config) {
-            Ok(_) => panic!("the function doesn't return an error"),
-            Err(e) => e.to_string(),
-        };
-
-        let expected_error = CarboneSdkError::MissingApiToken("CarboneSDK::new()".to_string()); 
-        
-        assert_eq!(expected_error.to_string(), error);
-
-    }
-
-    #[test]
     fn test_generate_template_id_odt_1() -> Result<(), CarboneSdkError> {
 
-        let mut config: Config = Default::default();
-        config.api_token = "test_a".to_string();
+        let config: Config = Default::default();
+        config.clone().set_api_token("test_a".to_string())?;
         let cabone_sdk = CarboneSDK::new(config)?;
 
         let file_name = "tests/template.test.odt".to_string();
@@ -42,14 +24,13 @@ mod tests {
         let expected_template_id = "0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string();
         assert_eq!(expected_template_id, template_id);
         Ok(())
-
     }
 
     #[test]
     fn test_generate_template_id_odt_2_payload_1() -> Result<(), CarboneSdkError> {
 
-        let mut config: Config = Default::default();
-        config.api_token = "test_a".to_string();
+        let config: Config = Default::default();
+        config.clone().set_api_token("test_a".to_string())?;
         let cabone_sdk = CarboneSDK::new(config)?;
 
         let file_name = "tests/template.test.odt".to_string();
@@ -64,8 +45,8 @@ mod tests {
     #[test]
     fn test_generate_template_id_odt_3_payload_2() -> Result<(), CarboneSdkError> {
 
-        let mut config: Config = Default::default();
-        config.api_token = "test_a".to_string();
+        let config: Config = Default::default();
+        config.clone().set_api_token("test_a".to_string())?;
         let cabone_sdk = CarboneSDK::new(config)?;
 
         let file_name = "tests/template.test.odt".to_string();
@@ -81,8 +62,8 @@ mod tests {
     #[test]
     fn test_generate_template_id_html_1() -> Result<(), CarboneSdkError> {
 
-        let mut config: Config = Default::default();
-        config.api_token = "test_a".to_string();
+        let config: Config = Default::default();
+        config.clone().set_api_token("test_a".to_string())?;
         let cabone_sdk = CarboneSDK::new(config)?;
 
         let file_name = "tests/template.test.html".to_string();
@@ -98,8 +79,8 @@ mod tests {
     #[test]
     fn test_generate_template_id_html_2_payload_1() -> Result<(), CarboneSdkError> {
 
-        let mut config: Config = Default::default();
-        config.api_token = "test_a".to_string();
+        let config: Config = Default::default();
+        config.clone().set_api_token("test_a".to_string())?;
         let cabone_sdk = CarboneSDK::new(config)?;
 
         let file_name = "tests/template.test.html".to_string();
@@ -116,19 +97,19 @@ mod tests {
     #[test]
     fn test_generate_template_id_error() -> Result<(), CarboneSdkError> {
 
-        let mut config: Config = Default::default();
-        config.api_token = "test_a".to_string();
+        let config: Config = Default::default();
+        config.clone().set_api_token("test_a".to_string())?;
         let cabone_sdk = CarboneSDK::new(config)?;
 
         let file_name = "".to_string();
         let payload = "";
        
         let error = match cabone_sdk.generate_template_id(&file_name, payload) {
-            Ok(_) => panic!("the function doesn't return an error"),
+            Ok(template_id) => template_id,
             Err(e) => e.to_string(),
         };
 
-        let expected_error = CarboneSdkError::MissingArgument("generate_template_id".to_string(), "template_file_name".to_string()); 
+        let expected_error = CarboneSdkError::MissingTemplateFileName.to_string(); 
 
         assert_eq!(expected_error.to_string(), error);
 
@@ -161,12 +142,12 @@ mod tests {
                 .json_body_obj(&body);
         });
 
-        let config = Config{
-            api_token: "test_q".to_string(),
-            api_url: format!("{}{}", "http://127.0.0.1:", server.port()), // port changes each run
-            api_timeout: 4,
-            api_version: "2".to_string(),
-        };
+        let config = Config::new(
+            "test_q".to_string(),
+            format!("{}{}", "http://127.0.0.1:", server.port()), // port changes each run
+            4,
+            "2".to_string()
+        )?;
     
         let carbone_sdk = CarboneSDK::new(config)?;
 
@@ -205,12 +186,12 @@ mod tests {
                 .json_body_obj(&body);
         });
 
-        let config = Config{
-            api_token: "test_q".to_string(),
-            api_url: format!("{}{}", "http://127.0.0.1:", server.port()), // port change each run
-            api_timeout: 4,
-            api_version: "2".to_string(),
-        };
+        let config = Config::new(
+            "test_q".to_string(),
+            format!("{}{}", "http://127.0.0.1:", server.port()), // port changes each run
+            4,
+            "2".to_string()
+        )?;
     
         let carbone_sdk = CarboneSDK::new(config)?;
 
@@ -227,23 +208,24 @@ mod tests {
     #[test]
     fn template_file_name() -> Result<(), CarboneSdkError> {
 
-        let config = Config{
-            api_token: "test_q".to_string(),
-            api_url: "http://127.0.0.1".to_string(),
-            api_timeout: 4,
-            api_version: "2".to_string(),
-        };
+        let config = Config::new(
+            "test_q".to_string(),
+            "http://127.0.0.1".to_string(),
+            4,
+            "2".to_string()
+        )?;
+
     
         let carbone_sdk = CarboneSDK::new(config)?;
 
         let template_file = String::from("");
 
         let result = match carbone_sdk.add_template(&template_file, "".to_string()) {
-            Ok(_) => panic!("the function doesn't return an error"),
+            Ok(template_id) => template_id,
             Err(e) => e.to_string(),
         };
 
-        let expected_error = CarboneSdkError::MissingArgument("add_template".to_string(), "template_file_name".to_string());    
+        let expected_error = CarboneSdkError::MissingTemplateFileName.to_string();    
        
         assert_eq!(expected_error.to_string(), result);
 
@@ -253,12 +235,12 @@ mod tests {
     #[test]
     fn test_add_template_error_with_a_non_existing_file() -> Result<(), CarboneSdkError> {
 
-        let config = Config{
-            api_token: "test_q".to_string(),
-            api_url: "http://127.0.0.1".to_string(),
-            api_timeout: 4,
-            api_version: "2".to_string(),
-        };
+        let config = Config::new(
+            "test_q".to_string(),
+            "http://127.0.0.1".to_string(),
+            4,
+            "2".to_string()
+        )?;
     
         let carbone_sdk = CarboneSDK::new(config)?;
 
@@ -279,12 +261,12 @@ mod tests {
     #[test]
     fn test_add_template_error_with_directory() -> Result<(), CarboneSdkError> {
 
-        let config = Config{
-            api_token: "test_q".to_string(),
-            api_url: "http://127.0.0.1".to_string(),
-            api_timeout: 4,
-            api_version: "2".to_string(),
-        };
+        let config = Config::new(
+            "test_q".to_string(),
+            "http://127.0.0.1".to_string(),
+            4,
+            "2".to_string()
+        )?;
     
         let carbone_sdk = CarboneSDK::new(config)?;
 
@@ -295,7 +277,7 @@ mod tests {
             Err(e) => e.to_string(),
         };
 
-        let expected_error = CarboneSdkError::IsADirectory("add_template".to_string(), "tests".to_string()); 
+        let expected_error = CarboneSdkError::IsADirectory("tests".to_string()); 
         
         assert_eq!(expected_error.to_string(), result);
 
@@ -305,12 +287,12 @@ mod tests {
     #[test]
     fn test_get_report_error_missing_render_id() -> Result<(), CarboneSdkError> {
 
-        let config = Config{
-            api_token: "test_q".to_string(),
-            api_url: "http://127.0.0.1".to_string(),
-            api_timeout: 4,
-            api_version: "2".to_string(),
-        };
+        let config = Config::new(
+            "test_q".to_string(),
+            "http://127.0.0.1".to_string(),
+            4,
+            "2".to_string()
+        )?;
     
         let carbone_sdk = CarboneSDK::new(config)?;
 
@@ -319,10 +301,11 @@ mod tests {
             Err(e) => e.to_string()
         };
 
-        let expected_error = CarboneSdkError::MissingArgument("get_report".to_string(), "render_id".to_string()); 
+        let expected_error = CarboneSdkError::MissingRenderId.to_string(); 
         
         assert_eq!(expected_error.to_string(), error);
 
         Ok(())
     }
+
 }

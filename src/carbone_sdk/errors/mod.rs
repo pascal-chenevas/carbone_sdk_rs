@@ -2,18 +2,28 @@ use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum CarboneSdkError {
-    #[error("Carbone SDK {0:?} error: {1:?}")]
-    Error(String, String),
+    #[error("Carbone SDK error: {0:?}")]
+    Error(String),
     #[error("CarboneSDK: \"API access token\" is missing")]
-    MissingApiToken(String),
+    MissingApiToken,
     #[error("CarboneSDK: \"API URL\" is missing")]
-    MissingApiUrl(String),
-    #[error("Carbone SDK {0:?} error: argument is missing: {1:?}")]
-    MissingArgument(String, String),
+    MissingApiUrl,
+    #[error("CarboneSDK: \"API VERSION\" is missing")]
+    MissingApiVersion,
+    #[error("CarboneSDK: \"template_id\" is missing")]
+    MissingTemplateId,
+    #[error("CarboneSDK: \"template_file_name\" is missing")]
+    MissingTemplateFileName,
+    #[error("CarboneSDK: \"render_id\" is missing")]
+    MissingRenderId,
+    #[error("CarboneSDK: \"render_options\" is missing")]
+    MissingRenderOptions,
+    #[error("Carbone SDK error: argument is missing: {0:?}")]
+    MissingArgument(String),
     #[error("Carbone SDK {0:?} error: file {1:?} not found")]
     FileNotFound(String, String),
-    #[error("Carbone SDK {0:?} {1:?} is a directory")]
-    IsADirectory(String, String),
+    #[error("Carbone SDK {0:?} is a directory")]
+    IsADirectory(String),
     #[error("Carbone SDK IoError {0:?}")]
     IoError(std::io::Error),
     #[error("Carbone SDK RequestError {0:?}")]

@@ -9,14 +9,57 @@ mod tests {
     use carbone_rs::carbone_sdk::carbone::CARBONE_API_URL;
 
     #[test]
+    fn test_api_token_not_given() {
+
+        let error = match Config::new("".to_string(), "http://localhost".to_string(), 2 as u8, "2".to_string()) {
+            Ok(config) => config.to_string(),
+            Err(e) => e.to_string(),
+        };
+
+        let expected_error = CarboneSdkError::MissingApiToken.to_string();
+
+        assert_eq!(expected_error, error);
+    }
+
+    #[test]
+    fn test_api_url_not_given() {
+
+        let error = match Config::new("test_token".to_string(), "".to_string(), 2 as u8, "2".to_string()) {
+            Ok(config) => config.to_string(),
+            Err(e) => e.to_string(),
+        };
+
+        let expected_error = CarboneSdkError::MissingApiUrl.to_string();
+
+        assert_eq!(expected_error, error);
+    }
+
+    #[test]
+    fn test_api_version_not_given() {
+
+        let error = match Config::new("test_token".to_string(), "http://localhost".to_string(), 2 as u8, "".to_string()) {
+            Ok(config) => config.to_string(),
+            Err(e) => e.to_string(),
+        };
+
+        let expected_error = CarboneSdkError::MissingApiVersion.to_string();
+
+        assert_eq!(expected_error, error);
+    }
+
+    #[test]
     fn test_default() {
 
         let config: Config = Default::default();
 
-        assert_eq!(config.api_timeout, 60);
-        assert_eq!(config.api_url, CARBONE_API_URL.to_string());
-        assert_eq!(config.api_token.is_empty(), true);
-        assert_eq!(config.api_version, "4".to_string());
+        let timeout: u8 = 60;
+        let api_url = CARBONE_API_URL.to_string();
+        let api_version = "4".to_string();
+
+        assert_eq!(config.get_api_timeout(), &timeout);
+        assert_eq!(config.get_api_url(), &api_url);
+        assert_eq!(config.get_api_token().is_empty(), true);
+        assert_eq!(config.get_api_version(), &api_version);
     }
 
     #[test]
@@ -29,12 +72,11 @@ mod tests {
             "apiVersion" : "2"
         }"#)?;
 
-        let expected = Config {
-            api_timeout: 4,
-            api_url: "http://127.0.0.1".to_string(),
-            api_token: "test_abcd".to_string(),
-            api_version: "2".to_string(),
-        };
+        let expected = Config::new(
+            "test_abcd".to_string(),
+            "http://127.0.0.1".to_string(), 
+            4 as u8,
+            "2".to_string())?;
 
         assert_eq!(expected, config);
 

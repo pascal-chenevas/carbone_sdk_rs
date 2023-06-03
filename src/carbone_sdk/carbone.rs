@@ -16,18 +16,12 @@ pub type Result<T> = std::result::Result<T, CarboneSdkError>;
 
 
 #[derive(Debug)]
-pub struct CarboneSDK {
-    pub config: Config,
+pub struct CarboneSDK{
+    config: Config,
 }
 
 impl CarboneSDK {
     pub fn new(config: Config) -> Result<Self> {
-        if config.api_token.is_empty() {
-            return Err(CarboneSdkError::MissingApiToken("CarboneSDK::new()".to_string()));
-        }
-        if config.api_url.is_empty() {
-            return Err(CarboneSdkError::MissingApiUrl("CarboneSDK::new()".to_string()));
-        }
         Ok(Self { config })
     }
 
@@ -37,17 +31,11 @@ impl CarboneSDK {
         salt: String,
     ) -> Result<String> {
         if template_file_name.is_empty() {
-            return Err(CarboneSdkError::MissingArgument(
-                "add_template".to_string(),
-                "template_file_name".to_string(),
-            ));
+            return Err(CarboneSdkError::MissingTemplateFileName);
         }
 
         if Path::new(template_file_name.as_str()).is_dir() {
-            return Err(CarboneSdkError::IsADirectory(
-                "add_template".to_string(),
-                template_file_name.to_string(),
-            ));
+            return Err(CarboneSdkError::IsADirectory(template_file_name.to_string()));
         }
 
         if !Path::new(template_file_name.as_str()).is_file() {
@@ -62,7 +50,7 @@ impl CarboneSDK {
             .file("template", template_file_name)?;
 
         let client = reqwest::blocking::Client::new();
-        let url = format!("{}/template", self.config.api_url);
+        let url = format!("{}/template", self.config.get_api_url());
 
         // TODO move new client to new() method
         let response = client
@@ -70,9 +58,9 @@ impl CarboneSDK {
             .multipart(form)
             .header(
                 "carbone-version",
-                HeaderValue::from_str(&self.config.api_version).unwrap(),
+                HeaderValue::from_str(self.config.get_api_version()).unwrap(),
             )
-            .bearer_auth(self.config.api_token.to_string())
+            .bearer_auth(self.config.get_api_token().to_string())
             .send();
 
         match response {
@@ -93,23 +81,20 @@ impl CarboneSDK {
 
     pub fn get_template(&self, template_id: &String) -> Result<Bytes> {
         if template_id.is_empty() {
-            return Err(CarboneSdkError::MissingArgument(
-                "get_template".to_string(),
-                "template_id".to_string(),
-            ));
+            return Err(CarboneSdkError::MissingTemplateId);
         }
 
         let client = reqwest::blocking::Client::new();
-        let url = format!("{}/template/{}", self.config.api_url, template_id);
+        let url = format!("{}/template/{}", self.config.get_api_url(), template_id);
 
         // TODO move new client to new() method
         let response = client
             .get(url)
             .header(
                 "carbone-version",
-                HeaderValue::from_str(&self.config.api_version).unwrap(),
+                HeaderValue::from_str(self.config.get_api_version()).unwrap(),
             )
-            .bearer_auth(self.config.api_token.to_string())
+            .bearer_auth(self.config.get_api_token().to_string())
             .send();
 
         match response {
@@ -120,23 +105,20 @@ impl CarboneSDK {
 
     pub fn delete_template(&self, template_id: &String) -> Result<()> {
         if template_id.is_empty() {
-            return Err(CarboneSdkError::MissingArgument(
-                "delete_template".to_string(),
-                "template_id".to_string(),
-            ));
+            return Err(CarboneSdkError::MissingTemplateId);
         }
 
         let client = reqwest::blocking::Client::new();
-        let url = format!("{}/template/{}", self.config.api_url, template_id);
+        let url = format!("{}/template/{}", self.config.get_api_url(), template_id);
 
         // TODO move new client to new() method
         let response = client
             .delete(url)
             .header(
                 "carbone-version",
-                HeaderValue::from_str(&self.config.api_version).unwrap(),
+                HeaderValue::from_str(self.config.get_api_version()).unwrap(),
             )
-            .bearer_auth(self.config.api_token.to_string())
+            .bearer_auth(self.config.get_api_token().to_string())
             .send();
 
         match response {
@@ -160,30 +142,24 @@ impl CarboneSDK {
         render_options: String,
     ) -> Result<String> {
         if template_id.is_empty() {
-            return Err(CarboneSdkError::MissingArgument(
-                "render_report".to_string(),
-                "template_id".to_string(),
-            ));
+            return Err(CarboneSdkError::MissingTemplateId);
         }
         if render_options.is_empty() {
-            return Err(CarboneSdkError::MissingArgument(
-                "render_report".to_string(),
-                "json_data".to_string(),
-            ));
+            return Err(CarboneSdkError::MissingRenderOptions);
         }
 
         let client = reqwest::blocking::Client::new();
-        let url = format!("{}/render/{}", self.config.api_url, template_id);
+        let url = format!("{}/render/{}", self.config.get_api_url(), template_id);
 
         // TODO move new client to new() method
         let response = client
             .post(url)
             .header(
                 "carbone-version",
-                HeaderValue::from_str(&self.config.api_version).unwrap(),
+                HeaderValue::from_str(self.config.get_api_version()).unwrap(),
             )
             .header("Content-Type", "application/json")
-            .bearer_auth(self.config.api_token.to_string())
+            .bearer_auth(self.config.get_api_token().to_string())
             .body(render_options)
             .send();
 
@@ -206,23 +182,20 @@ impl CarboneSDK {
     // TODO return also name of the report from headers
     pub fn get_report(&self, render_id: &String) -> Result<Bytes> {
         if render_id.is_empty() {
-            return Err(CarboneSdkError::MissingArgument(
-                "get_report".to_string(),
-                "render_id".to_string(),
-            ));
+            return Err(CarboneSdkError::MissingRenderId);
         }
 
         let client = reqwest::blocking::Client::new();
-        let url = format!("{}/render/{}", self.config.api_url, render_id);
+        let url = format!("{}/render/{}", self.config.get_api_url(), render_id);
 
         // TODO move new client to new() method
         let response = client
             .get(url)
             .header(
                 "carbone-version",
-                HeaderValue::from_str(&self.config.api_version).unwrap(),
+                HeaderValue::from_str(self.config.get_api_version()).unwrap(),
             )
-            .bearer_auth(self.config.api_token.to_string())
+            .bearer_auth(self.config.get_api_token().to_string())
             .send();
 
         match response {
@@ -238,10 +211,7 @@ impl CarboneSDK {
         payload: &str,
     ) -> Result<String> {
         if template_file_name.is_empty() {
-            return Err(CarboneSdkError::MissingArgument(
-                "generate_template_id".to_string(),
-                "template_file_name".to_string(),
-            ));
+            return Err(CarboneSdkError::MissingTemplateFileName);
         }
 
         let file_content = fs::read(template_file_name)?;
@@ -257,47 +227,13 @@ impl CarboneSDK {
         Ok(result.to_lowercase())
     }
 
-    pub fn set_access_token(&mut self, api_token: String) -> Result<()> {
-        if api_token.is_empty() {
-            return Err(CarboneSdkError::MissingArgument(
-                "set_access_token".to_string(),
-                "api_token".to_string(),
-            ));
-        }
-        self.config.api_token = api_token;
-        Ok(())
-    }
-
-    pub fn set_api_version(&mut self, api_version: String) -> Result<()> {
-        if api_version.is_empty() {
-            return Err(CarboneSdkError::MissingArgument(
-                "set_api_version".to_string(),
-                "api_version".to_string(),
-            ));
-        }
-        self.config.api_version = api_version;
-        Ok(())
-    }
-
     pub fn render(
         &self,
         file_or_template_id: &str,
         json_data: &str,
         payload: &str,
     ) -> Result<()> {
-        if file_or_template_id.is_empty() {
-            return Err(CarboneSdkError::MissingArgument(
-                "render".to_string(),
-                "file_or_template_id".to_string(),
-            ));
-        }
-        if json_data.is_empty() {
-            return Err(CarboneSdkError::MissingArgument(
-                "render".to_string(),
-                "json_data".to_string(),
-            ));
-        }
-        Ok(())
+       panic!("function not implemented");
     }
 
     pub fn get_report_name_from_header(&self) -> String {
@@ -306,17 +242,17 @@ impl CarboneSDK {
 
     pub fn get_status(&self) -> Result<String> {
         let client = reqwest::blocking::Client::new();
-        let url = format!("{}/status", self.config.api_url);
+        let url = format!("{}/status", self.config.get_api_url());
 
         // TODO move new client to new() method
         let response = client
             .get(url)
             .header(
                 "carbone-version",
-                HeaderValue::from_str(&self.config.api_version).unwrap(),
+                HeaderValue::from_str(self.config.get_api_version()).unwrap(),
             )
             .header("Content-Type", "application/json")
-            .bearer_auth(self.config.api_token.to_string())
+            .bearer_auth(self.config.get_api_token().to_string())
             .send();
 
         match response {
@@ -324,4 +260,5 @@ impl CarboneSDK {
             Err(e) => Err(CarboneSdkError::ResponseError(e.to_string())),
         }
     }
+
 }
