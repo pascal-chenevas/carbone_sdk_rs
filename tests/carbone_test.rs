@@ -9,14 +9,18 @@ use carbone_rs::carbone_sdk::config::Config;
 #[cfg(test)]
 mod tests {
 
+    fn create_default_config() -> Result<Config, CarboneSdkError> {
+        let mut config: Config = Default::default();
+        config.set_api_token("test_token".to_string())?;
+        Ok(config)
+    }
+
     use super::*;
 
     #[test]
     fn test_generate_template_id_odt_1() -> Result<(), CarboneSdkError> {
 
-        let mut config: Config = Default::default();
-
-        config.set_api_token("test_a".to_string())?;
+        let config = create_default_config()?;
         let cabone_sdk = CarboneSDK::new(&config)?;
 
         let file_name = "tests/template.test.odt".to_string();
@@ -30,8 +34,7 @@ mod tests {
     #[test]
     fn test_generate_template_id_odt_2_payload_1() -> Result<(), CarboneSdkError> {
 
-        let mut config: Config = Default::default();
-        config.set_api_token("test_a".to_string())?;
+        let config = create_default_config()?;
         let cabone_sdk = CarboneSDK::new(&config)?;
 
         let file_name = "tests/template.test.odt".to_string();
@@ -46,8 +49,7 @@ mod tests {
     #[test]
     fn test_generate_template_id_odt_3_payload_2() -> Result<(), CarboneSdkError> {
 
-        let mut config: Config = Default::default();
-        config.set_api_token("test_a".to_string())?;
+        let config = create_default_config()?;
         let cabone_sdk = CarboneSDK::new(&config)?;
 
         let file_name = "tests/template.test.odt".to_string();
@@ -63,8 +65,7 @@ mod tests {
     #[test]
     fn test_generate_template_id_html_1() -> Result<(), CarboneSdkError> {
 
-        let mut config: Config = Default::default();
-        config.set_api_token("test_a".to_string())?;
+        let config = create_default_config()?;
         let cabone_sdk = CarboneSDK::new(&config)?;
 
         let file_name = "tests/template.test.html".to_string();
@@ -80,8 +81,7 @@ mod tests {
     #[test]
     fn test_generate_template_id_html_2_payload_1() -> Result<(), CarboneSdkError> {
 
-        let mut config: Config = Default::default();
-        config.set_api_token("test_a".to_string())?;
+        let config = create_default_config()?;
         let cabone_sdk = CarboneSDK::new(&config)?;
 
         let file_name = "tests/template.test.html".to_string();
@@ -98,8 +98,7 @@ mod tests {
     #[test]
     fn test_generate_template_id_error() -> Result<(), CarboneSdkError> {
 
-        let mut config: Config = Default::default();
-        config.set_api_token("test_a".to_string())?;
+        let config = create_default_config()?;
         let cabone_sdk = CarboneSDK::new(&config)?;
 
         let file_name = "".to_string();
@@ -143,7 +142,7 @@ mod tests {
                 .json_body_obj(&body);
         });
 
-        let mut config = Config::new(
+        let config = Config::new(
             "test_q".to_string(),
             format!("{}{}", "http://127.0.0.1:", server.port()), // port changes each run
             4,
@@ -236,7 +235,7 @@ mod tests {
     #[test]
     fn test_add_template_error_with_a_non_existing_file() -> Result<(), CarboneSdkError> {
 
-        let mut config = Config::new(
+        let config = Config::new(
             "test_q".to_string(),
             "http://127.0.0.1".to_string(),
             4,
@@ -262,7 +261,7 @@ mod tests {
     #[test]
     fn test_add_template_error_with_directory() -> Result<(), CarboneSdkError> {
 
-        let mut config = Config::new(
+        let config = Config::new(
             "test_q".to_string(),
             "http://127.0.0.1".to_string(),
             4,
@@ -288,7 +287,7 @@ mod tests {
     #[test]
     fn test_get_report_error_missing_render_id() -> Result<(), CarboneSdkError> {
 
-        let mut config = Config::new(
+        let config = Config::new(
             "test_q".to_string(),
             "http://127.0.0.1".to_string(),
             4,
