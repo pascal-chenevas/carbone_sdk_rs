@@ -21,6 +21,7 @@ pub type Result<Config> = std::result::Result<Config, CarboneSdkError>;
 impl Config {
 
     pub fn new(api_token: String, api_url: String, api_timeout: u8, api_version: String) -> Result<Self> {
+
        Self::assert_api_token(&api_token)?;
        Self::assert_api_url(&api_url)?;
        Self::assert_api_version(&api_version)?;
@@ -68,7 +69,7 @@ impl Config {
         &self.api_token
     }
 
-    pub fn set_api_token(mut self, api_token: String) -> Result<()> {
+    pub fn set_api_token(&mut self, api_token: String) -> Result<()> {
         Self::assert_api_token(&api_token)?;
         self.api_token = api_token;
         Ok(())

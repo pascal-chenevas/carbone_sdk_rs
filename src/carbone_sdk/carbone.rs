@@ -16,12 +16,12 @@ pub type Result<T> = std::result::Result<T, CarboneSdkError>;
 
 
 #[derive(Debug)]
-pub struct CarboneSDK{
-    config: Config,
+pub struct CarboneSDK<'a>{
+    config: &'a Config,
 }
 
-impl CarboneSDK {
-    pub fn new(config: Config) -> Result<Self> {
+impl <'a>CarboneSDK<'a> {
+    pub fn new(config: &'a Config) -> Result<Self> {
         Ok(Self { config })
     }
 
