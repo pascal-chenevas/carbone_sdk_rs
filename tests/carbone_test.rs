@@ -1,10 +1,10 @@
 use std::collections::HashMap;
 use httpmock::prelude::*;
 
-use carbone_rs::carbone_sdk::carbone_response::CarboneSDKResponse;
-use carbone_rs::carbone_sdk::carbone::CarboneSDK;
-use carbone_rs::carbone_sdk::errors::CarboneSdkError;
-use carbone_rs::carbone_sdk::config::Config;
+use carbone_sdk_rs::carbone_response::CarboneSDKResponse;
+use carbone_sdk_rs::carbone::CarboneSDK;
+use carbone_sdk_rs::errors::CarboneSdkError;
+use carbone_sdk_rs::config::Config;
 
 #[cfg(test)]
 mod tests {

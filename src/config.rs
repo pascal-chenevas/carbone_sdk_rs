@@ -1,11 +1,11 @@
 use std::fmt;
 
-use crate::carbone_sdk::errors::CarboneSdkError;
+use crate::errors::CarboneSdkError;
 use serde::Deserialize;
 use std::fs;
 use std::str::FromStr;
 
-use crate::carbone_sdk::carbone::CARBONE_API_URL;
+use crate::carbone::CARBONE_API_URL;
 
 #[derive(Debug, Clone, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]

@@ -1,7 +1,7 @@
 //use serde_json::{Value};
-use crate::carbone_sdk::carbone_response::CarboneSDKResponse;
-use crate::carbone_sdk::config::Config;
-use crate::carbone_sdk::errors::*;
+use crate::carbone_response::CarboneSDKResponse;
+use crate::config::Config;
+use crate::errors::*;
 use bytes::Bytes;
 use reqwest::blocking::multipart;
 use reqwest::header::HeaderValue;

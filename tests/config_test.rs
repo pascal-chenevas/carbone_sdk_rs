@@ -1,12 +1,12 @@
-use carbone_rs::carbone_sdk::config::Config;
-use carbone_rs::carbone_sdk::errors::CarboneSdkError;
+use carbone_sdk_rs::config::Config;
+use carbone_sdk_rs::errors::CarboneSdkError;
 
 #[cfg(test)]
 mod tests {
     use std::str::FromStr;
 
     use super::*;
-    use carbone_rs::carbone_sdk::carbone::CARBONE_API_URL;
+    use carbone_sdk_rs::carbone::CARBONE_API_URL;
 
     #[test]
     fn test_api_token_not_given() {
