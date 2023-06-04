@@ -9,13 +9,30 @@ use carbone_rs::carbone_sdk::config::Config;
 #[cfg(test)]
 mod tests {
 
+    use super::*;
+
     fn create_default_config() -> Result<Config, CarboneSdkError> {
         let mut config: Config = Default::default();
         config.set_api_token("test_token".to_string())?;
         Ok(config)
     }
 
-    use super::*;
+    fn create_config_for_mock_server(server: Option<&MockServer>) -> Result<Config, CarboneSdkError> {
+
+        let port = match server {
+            Some(s) => s.port(),
+            None => 8080
+        };
+
+        let config = Config::new(
+            "test_token".to_string(),
+            format!("{}{}", "http://127.0.0.1:", port), // port changes each run when used with the MockServer
+            4,
+            "2".to_string()
+        )?;
+        Ok(config)
+    }
+
 
     #[test]
     fn test_generate_template_id_odt_1() -> Result<(), CarboneSdkError> {
@@ -142,12 +159,7 @@ mod tests {
                 .json_body_obj(&body);
         });
 
-        let config = Config::new(
-            "test_q".to_string(),
-            format!("{}{}", "http://127.0.0.1:", server.port()), // port changes each run
-            4,
-            "2".to_string()
-        )?;
+        let config = create_config_for_mock_server(Some(&server))?;
     
         let carbone_sdk = CarboneSDK::new(&config)?;
 
@@ -186,12 +198,7 @@ mod tests {
                 .json_body_obj(&body);
         });
 
-        let config = Config::new(
-            "test_q".to_string(),
-            format!("{}{}", "http://127.0.0.1:", server.port()), // port changes each run
-            4,
-            "2".to_string()
-        )?;
+        let config = create_config_for_mock_server(Some(&server))?;
     
         let carbone_sdk = CarboneSDK::new(&config)?;
 
@@ -208,14 +215,7 @@ mod tests {
     #[test]
     fn template_file_name() -> Result<(), CarboneSdkError> {
 
-        let config = Config::new(
-            "test_q".to_string(),
-            "http://127.0.0.1".to_string(),
-            4,
-            "2".to_string()
-        )?;
-
-    
+        let config = create_config_for_mock_server(None)?;
         let carbone_sdk = CarboneSDK::new(&config)?;
 
         let template_file = String::from("");
@@ -235,13 +235,7 @@ mod tests {
     #[test]
     fn test_add_template_error_with_a_non_existing_file() -> Result<(), CarboneSdkError> {
 
-        let config = Config::new(
-            "test_q".to_string(),
-            "http://127.0.0.1".to_string(),
-            4,
-            "2".to_string()
-        )?;
-    
+        let config = create_config_for_mock_server(None)?;
         let carbone_sdk = CarboneSDK::new(&config)?;
 
         let template_file = String::from("/wrong/path/to/template.odt");
@@ -261,13 +255,7 @@ mod tests {
     #[test]
     fn test_add_template_error_with_directory() -> Result<(), CarboneSdkError> {
 
-        let config = Config::new(
-            "test_q".to_string(),
-            "http://127.0.0.1".to_string(),
-            4,
-            "2".to_string()
-        )?;
-    
+        let config = create_config_for_mock_server(None)?;
         let carbone_sdk = CarboneSDK::new(&config)?;
 
         let template_file = String::from("tests");
@@ -286,14 +274,8 @@ mod tests {
 
     #[test]
     fn test_get_report_error_missing_render_id() -> Result<(), CarboneSdkError> {
-
-        let config = Config::new(
-            "test_q".to_string(),
-            "http://127.0.0.1".to_string(),
-            4,
-            "2".to_string()
-        )?;
-    
+        
+        let config = create_config_for_mock_server(None)?;
         let carbone_sdk = CarboneSDK::new(&config)?;
 
         let error = match carbone_sdk.get_report(&"".to_string()) {
