@@ -20,8 +20,8 @@ pub enum CarboneSdkError {
     MissingRenderOptions,
     #[error("Carbone SDK error: argument is missing: {0:?}")]
     MissingArgument(String),
-    #[error("Carbone SDK {0:?} error: file {1:?} not found")]
-    FileNotFound(String, String),
+    #[error("Carbone SDK error: file {0:?} not found")]
+    FileNotFound(String),
     #[error("Carbone SDK {0:?} is a directory")]
     IsADirectory(String),
     #[error("Carbone SDK IoError {0:?}")]

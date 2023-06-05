@@ -11,11 +11,7 @@ mod tests {
 
     use super::*;
 
-    fn create_default_config() -> Result<Config, CarboneSdkError> {
-        let mut config: Config = Default::default();
-        config.set_api_token("test_token".to_string())?;
-        Ok(config)
-    }
+    const TOKEN_TEST: &str = "test_32u1i3ui121233439534985dsaowe9123843784p213894309dhsudausdasda72q37q783hy3243829434gdgadghads89de8e93hj123iowa21023113i12u32i1321io";
 
     fn create_config_for_mock_server(server: Option<&MockServer>) -> Result<Config, CarboneSdkError> {
 
@@ -25,10 +21,9 @@ mod tests {
         };
 
         let config = Config::new(
-            "test_token".to_string(),
             format!("{}{}", "http://127.0.0.1:", port), // port changes each run when used with the MockServer
             4,
-            "2".to_string()
+            2
         )?;
         Ok(config)
     }
@@ -37,8 +32,8 @@ mod tests {
     #[test]
     fn test_generate_template_id_odt_1() -> Result<(), CarboneSdkError> {
 
-        let config = create_default_config()?;
-        let cabone_sdk = CarboneSDK::new(&config)?;
+        let config: Config = Default::default();
+        let cabone_sdk = CarboneSDK::new(&config, TOKEN_TEST.to_string())?;
 
         let file_name = "tests/template.test.odt".to_string();
         let template_id = cabone_sdk.generate_template_id(&file_name, "")?;
@@ -51,8 +46,8 @@ mod tests {
     #[test]
     fn test_generate_template_id_odt_2_payload_1() -> Result<(), CarboneSdkError> {
 
-        let config = create_default_config()?;
-        let cabone_sdk = CarboneSDK::new(&config)?;
+        let config: Config = Default::default();
+        let cabone_sdk = CarboneSDK::new(&config, TOKEN_TEST.to_string())?;
 
         let file_name = "tests/template.test.odt".to_string();
         let template_id = cabone_sdk.generate_template_id(&file_name, "ThisIsAPayload")?;
@@ -66,8 +61,8 @@ mod tests {
     #[test]
     fn test_generate_template_id_odt_3_payload_2() -> Result<(), CarboneSdkError> {
 
-        let config = create_default_config()?;
-        let cabone_sdk = CarboneSDK::new(&config)?;
+        let config: Config = Default::default();
+        let cabone_sdk = CarboneSDK::new(&config, TOKEN_TEST.to_string())?;
 
         let file_name = "tests/template.test.odt".to_string();
         let template_id = cabone_sdk.generate_template_id(&file_name, "8B5PmafbjdRqHuksjHNw83mvPiGj7WTE")?;
@@ -82,8 +77,8 @@ mod tests {
     #[test]
     fn test_generate_template_id_html_1() -> Result<(), CarboneSdkError> {
 
-        let config = create_default_config()?;
-        let cabone_sdk = CarboneSDK::new(&config)?;
+        let config: Config = Default::default();
+        let cabone_sdk = CarboneSDK::new(&config, TOKEN_TEST.to_string())?;
 
         let file_name = "tests/template.test.html".to_string();
         let template_id = cabone_sdk.generate_template_id(&file_name, "")?;
@@ -98,8 +93,8 @@ mod tests {
     #[test]
     fn test_generate_template_id_html_2_payload_1() -> Result<(), CarboneSdkError> {
 
-        let config = create_default_config()?;
-        let cabone_sdk = CarboneSDK::new(&config)?;
+        let config: Config = Default::default();
+        let cabone_sdk = CarboneSDK::new(&config, TOKEN_TEST.to_string())?;
 
         let file_name = "tests/template.test.html".to_string();
         let payload = "This is a long payload with different characters 1 *5 &*9 %$ 3%&@9 @(( 3992288282 29299 9299929";
@@ -115,8 +110,8 @@ mod tests {
     #[test]
     fn test_generate_template_id_error() -> Result<(), CarboneSdkError> {
 
-        let config = create_default_config()?;
-        let cabone_sdk = CarboneSDK::new(&config)?;
+        let config: Config = Default::default();
+        let cabone_sdk = CarboneSDK::new(&config, TOKEN_TEST.to_string())?;
 
         let file_name = "".to_string();
         let payload = "";
@@ -161,7 +156,7 @@ mod tests {
 
         let config = create_config_for_mock_server(Some(&server))?;
     
-        let carbone_sdk = CarboneSDK::new(&config)?;
+        let carbone_sdk = CarboneSDK::new(&config, TOKEN_TEST.to_string())?;
 
         let template_file = String::from("template.odt");
         let template_id = carbone_sdk.add_template(&template_file, "".to_string())?;
@@ -200,7 +195,7 @@ mod tests {
 
         let config = create_config_for_mock_server(Some(&server))?;
     
-        let carbone_sdk = CarboneSDK::new(&config)?;
+        let carbone_sdk = CarboneSDK::new(&config, TOKEN_TEST.to_string())?;
 
         let template_file = String::from("template.odt");
         let template_id = carbone_sdk.add_template(&template_file, "salt1234".to_string())?;
@@ -216,7 +211,7 @@ mod tests {
     fn template_file_name() -> Result<(), CarboneSdkError> {
 
         let config = create_config_for_mock_server(None)?;
-        let carbone_sdk = CarboneSDK::new(&config)?;
+        let carbone_sdk = CarboneSDK::new(&config, TOKEN_TEST.to_string())?;
 
         let template_file = String::from("");
 
@@ -236,7 +231,7 @@ mod tests {
     fn test_add_template_error_with_a_non_existing_file() -> Result<(), CarboneSdkError> {
 
         let config = create_config_for_mock_server(None)?;
-        let carbone_sdk = CarboneSDK::new(&config)?;
+        let carbone_sdk = CarboneSDK::new(&config, TOKEN_TEST.to_string())?;
 
         let template_file = String::from("/wrong/path/to/template.odt");
 
@@ -245,7 +240,7 @@ mod tests {
             Err(e) => e.to_string(),
         };
 
-        let expected_error = CarboneSdkError::FileNotFound("add_template".to_string(), "/wrong/path/to/template.odt".to_string()); 
+        let expected_error = CarboneSdkError::FileNotFound("/wrong/path/to/template.odt".to_string()); 
         
         assert_eq!(expected_error.to_string(), result);
 
@@ -256,7 +251,7 @@ mod tests {
     fn test_add_template_error_with_directory() -> Result<(), CarboneSdkError> {
 
         let config = create_config_for_mock_server(None)?;
-        let carbone_sdk = CarboneSDK::new(&config)?;
+        let carbone_sdk = CarboneSDK::new(&config, TOKEN_TEST.to_string())?;
 
         let template_file = String::from("tests");
 
@@ -276,7 +271,7 @@ mod tests {
     fn test_get_report_error_missing_render_id() -> Result<(), CarboneSdkError> {
         
         let config = create_config_for_mock_server(None)?;
-        let carbone_sdk = CarboneSDK::new(&config)?;
+        let carbone_sdk = CarboneSDK::new(&config, TOKEN_TEST.to_string())?;
 
         let error = match carbone_sdk.get_report(&"".to_string()) {
             Ok(_) => panic!("the function doesn't return an error"),

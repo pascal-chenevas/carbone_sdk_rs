@@ -1,4 +1,4 @@
-//use serde_json::{Value};
+
 use crate::carbone_response::CarboneSDKResponse;
 use crate::config::Config;
 use crate::errors::*;
@@ -9,20 +9,23 @@ use sha2::{Digest, Sha256};
 use std::fs;
 use std::path::Path;
 use std::str;
+use validator::Validate;
 
 pub const CARBONE_API_URL: &str = "https://api.carbone.io";
 
 pub type Result<T> = std::result::Result<T, CarboneSdkError>;
 
 
-#[derive(Debug)]
+#[derive(Debug, Validate, PartialEq, Eq)]
 pub struct CarboneSDK<'a>{
-    config: &'a Config,
+    pub config: &'a Config,
+    #[validate(length(min = 300))]
+    api_token: String,
 }
 
 impl <'a>CarboneSDK<'a> {
-    pub fn new(config: &'a Config) -> Result<Self> {
-        Ok(Self { config })
+    pub fn new(config: &'a Config, api_token: String) -> Result<Self> {
+        Ok(Self { config: config, api_token: api_token })
     }
 
     pub fn add_template(
@@ -39,10 +42,7 @@ impl <'a>CarboneSDK<'a> {
         }
 
         if !Path::new(template_file_name.as_str()).is_file() {
-            return Err(CarboneSdkError::FileNotFound(
-                "add_template".to_string(),
-                template_file_name.to_string(),
-            ));
+            return Err(CarboneSdkError::FileNotFound(template_file_name.to_string()));
         }
 
         let form = multipart::Form::new()
@@ -50,7 +50,7 @@ impl <'a>CarboneSDK<'a> {
             .file("template", template_file_name)?;
 
         let client = reqwest::blocking::Client::new();
-        let url = format!("{}/template", self.config.get_api_url());
+        let url = format!("{}/template", self.config.api_url);
 
         // TODO move new client to new() method
         let response = client
@@ -58,9 +58,9 @@ impl <'a>CarboneSDK<'a> {
             .multipart(form)
             .header(
                 "carbone-version",
-                HeaderValue::from_str(self.config.get_api_version()).unwrap(),
+                HeaderValue::from_str(&self.config.api_version.to_string()).unwrap(),
             )
-            .bearer_auth(self.config.get_api_token().to_string())
+            .bearer_auth(&self.api_token)
             .send();
 
         match response {
@@ -85,16 +85,16 @@ impl <'a>CarboneSDK<'a> {
         }
 
         let client = reqwest::blocking::Client::new();
-        let url = format!("{}/template/{}", self.config.get_api_url(), template_id);
+        let url = format!("{}/template/{}", self.config.api_url, template_id);
 
         // TODO move new client to new() method
         let response = client
             .get(url)
             .header(
                 "carbone-version",
-                HeaderValue::from_str(self.config.get_api_version()).unwrap(),
+                HeaderValue::from_str(&self.config.api_version.to_string()).unwrap(),
             )
-            .bearer_auth(self.config.get_api_token().to_string())
+            .bearer_auth(&self.api_token)
             .send();
 
         match response {
@@ -109,16 +109,16 @@ impl <'a>CarboneSDK<'a> {
         }
 
         let client = reqwest::blocking::Client::new();
-        let url = format!("{}/template/{}", self.config.get_api_url(), template_id);
+        let url = format!("{}/template/{}", self.config.api_url, template_id);
 
         // TODO move new client to new() method
         let response = client
             .delete(url)
             .header(
                 "carbone-version",
-                HeaderValue::from_str(self.config.get_api_version()).unwrap(),
+                HeaderValue::from_str(&self.config.api_version.to_string()).unwrap(),
             )
-            .bearer_auth(self.config.get_api_token().to_string())
+            .bearer_auth(&self.api_token)
             .send();
 
         match response {
@@ -149,17 +149,17 @@ impl <'a>CarboneSDK<'a> {
         }
 
         let client = reqwest::blocking::Client::new();
-        let url = format!("{}/render/{}", self.config.get_api_url(), template_id);
+        let url = format!("{}/render/{}", self.config.api_url, template_id);
 
         // TODO move new client to new() method
         let response = client
             .post(url)
             .header(
                 "carbone-version",
-                HeaderValue::from_str(self.config.get_api_version()).unwrap(),
+                HeaderValue::from_str(&self.config.api_version.to_string()).unwrap(),
             )
             .header("Content-Type", "application/json")
-            .bearer_auth(self.config.get_api_token().to_string())
+            .bearer_auth(&self.api_token)
             .body(render_options)
             .send();
 
@@ -186,16 +186,16 @@ impl <'a>CarboneSDK<'a> {
         }
 
         let client = reqwest::blocking::Client::new();
-        let url = format!("{}/render/{}", self.config.get_api_url(), render_id);
+        let url = format!("{}/render/{}", self.config.api_url, render_id);
 
         // TODO move new client to new() method
         let response = client
             .get(url)
             .header(
                 "carbone-version",
-                HeaderValue::from_str(self.config.get_api_version()).unwrap(),
+                HeaderValue::from_str(&self.config.api_version.to_string()).unwrap(),
             )
-            .bearer_auth(self.config.get_api_token().to_string())
+            .bearer_auth(&self.api_token)
             .send();
 
         match response {
@@ -242,17 +242,17 @@ impl <'a>CarboneSDK<'a> {
 
     pub fn get_status(&self) -> Result<String> {
         let client = reqwest::blocking::Client::new();
-        let url = format!("{}/status", self.config.get_api_url());
+        let url = format!("{}/status", self.config.api_url);
 
         // TODO move new client to new() method
         let response = client
             .get(url)
             .header(
                 "carbone-version",
-                HeaderValue::from_str(self.config.get_api_version()).unwrap(),
+                HeaderValue::from_str(&self.config.api_version.to_string()).unwrap(),
             )
             .header("Content-Type", "application/json")
-            .bearer_auth(self.config.get_api_token().to_string())
+            .bearer_auth(&self.api_token)
             .send();
 
         match response {

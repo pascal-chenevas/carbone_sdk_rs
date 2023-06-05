@@ -1,5 +1,7 @@
 use std::fmt;
 
+use validator::Validate;
+
 use crate::errors::CarboneSdkError;
 use serde::Deserialize;
 use std::fs;
@@ -7,28 +9,23 @@ use std::str::FromStr;
 
 use crate::carbone::CARBONE_API_URL;
 
-#[derive(Debug, Clone, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Deserialize, Validate, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct Config {
-    api_token: String,
-    api_url: String,
-    api_timeout: u8,
-    api_version: String,
+    #[validate(url)]
+    pub api_url: String,
+    pub api_timeout: u8,
+    pub api_version: u32,
 }
 
 pub type Result<Config> = std::result::Result<Config, CarboneSdkError>;
 
 impl Config {
 
-    pub fn new(api_token: String, api_url: String, api_timeout: u8, api_version: String) -> Result<Self> {
-
-       Self::assert_api_token(&api_token)?;
-       Self::assert_api_url(&api_url)?;
-       Self::assert_api_version(&api_version)?;
+    pub fn new(api_url: String, api_timeout: u8, api_version: u32) -> Result<Self> {
 
        Ok(
         Self {
-                api_token,
                 api_url,
                 api_timeout,
                 api_version
@@ -37,10 +34,7 @@ impl Config {
     }
 
     pub fn from_file(path: &str) -> Result<Self> {
-        let file = fs::read_to_string(path).or(Err(CarboneSdkError::FileNotFound(
-            "from_file()".to_string(),
-            path.to_string(),
-        )));
+        let file = fs::read_to_string(path).or(Err(CarboneSdkError::FileNotFound(path.to_string())));
 
         let file_content = match file {
             Ok(content) => content,
@@ -57,73 +51,8 @@ impl Config {
             }
         };
 
-        if config.api_token.is_empty() {
-            return Err(CarboneSdkError::MissingApiToken);
-        }
-
         Ok(config)
     }
-
-
-    pub fn get_api_token(&self) -> &String {
-        &self.api_token
-    }
-
-    pub fn set_api_token(&mut self, api_token: String) -> Result<()> {
-        Self::assert_api_token(&api_token)?;
-        self.api_token = api_token;
-        Ok(())
-    }
-
-    pub fn get_api_url(&self) -> &String {
-        &self.api_url
-    } 
-    
-    pub fn set_api_url(&mut self, api_url: String) -> Result<()> {
-        Self::assert_api_url(&api_url)?;
-        self.api_url = api_url;
-        Ok(())
-    }
-
-    pub fn get_api_timeout(&self) -> &u8 {
-        &self.api_timeout
-    } 
-
-    pub fn set_api_timeout(&mut self, api_timeout: u8) {
-        self.api_timeout = api_timeout;
-    }
-    
-    pub fn get_api_version(&self) -> &String {
-        &self.api_version
-    }
-
-    pub fn set_api_version(&mut self, api_version: String) -> Result<()> {
-        Self::assert_api_version(&api_version)?;
-        self.api_version = api_version;
-        Ok(())
-    }
-
-    fn assert_api_token(field: &String) -> Result<()>{
-        if field.is_empty() {
-            return Err(CarboneSdkError::MissingApiToken);
-        }
-        Ok(())
-    }
-
-    fn assert_api_url(field: &String) -> Result<()>{
-        if field.is_empty() {
-            return Err(CarboneSdkError::MissingApiUrl);
-        }
-        Ok(())
-    }
-
-    fn assert_api_version(field: &String) -> Result<()>{
-        if field.is_empty() {
-            return Err(CarboneSdkError::MissingApiVersion);
-        }
-        Ok(())
-    }
-
 }
 
 impl Default for Config {
@@ -131,8 +60,7 @@ impl Default for Config {
        Self{
             api_url: CARBONE_API_URL.to_string(),
             api_timeout: 60,
-            api_token: "".to_string(),
-            api_version: "4".to_string(),
+            api_version: 4,
         }
     }
 }
@@ -157,6 +85,6 @@ impl FromStr for Config {
 
 impl fmt::Display for Config {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Config {{ api_token: {}, api_url: {} , api_timeout: {}, api_version: {} }}", self.api_token, self.api_url, self.api_timeout, self.api_version)
+        write!(f, "Config {{ api_url: {} , api_timeout: {}, api_version: {} }}", self.api_url, self.api_timeout, self.api_version)
     }
 }
