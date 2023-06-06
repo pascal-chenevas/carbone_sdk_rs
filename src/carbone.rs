@@ -34,7 +34,7 @@ impl <'a>CarboneSDK<'a> {
     /// ```no_run
     ///   use std::env;
     ///   use carbone_sdk_rs::carbone::CarboneSDK;
-    //    use carbone_sdk_rs::errors::CarboneSdkError;
+    ///   use carbone_sdk_rs::errors::CarboneSdkError;
     ///
     /// fn main() -> Result<(), CarboneSdkError> {
     ///    
@@ -112,7 +112,7 @@ impl <'a>CarboneSDK<'a> {
     /// ```no_run
     ///   use std::env;
     ///   use carbone_sdk_rs::carbone::CarboneSDK;
-    //    use carbone_sdk_rs::errors::CarboneSdkError;
+    ///   use carbone_sdk_rs::errors::CarboneSdkError;
     ///
     /// fn main() -> Result<(), CarboneSdkError> {
     ///    
@@ -163,7 +163,7 @@ impl <'a>CarboneSDK<'a> {
     /// ```no_run
     ///   use std::env;
     ///   use carbone_sdk_rs::carbone::CarboneSDK;
-    //    use carbone_sdk_rs::errors::CarboneSdkError;
+    ///   use carbone_sdk_rs::errors::CarboneSdkError;
     ///
     /// fn main() -> Result<(), CarboneSdkError> {
     ///    
