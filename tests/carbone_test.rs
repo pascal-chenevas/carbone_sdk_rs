@@ -159,8 +159,8 @@ mod tests {
         let carbone_sdk = CarboneSDK::new(&config, TOKEN_TEST.to_string())?;
 
         let template_file = String::from("template.odt");
-        let template_id = carbone_sdk.add_template(&template_file, "".to_string())?;
-
+        let template_id = carbone_sdk.upload_template(&template_file, "".to_string())?;
+        
         // Assert
         m.assert();
         assert_eq!(template_id_expected,template_id);
@@ -198,7 +198,7 @@ mod tests {
         let carbone_sdk = CarboneSDK::new(&config, TOKEN_TEST.to_string())?;
 
         let template_file = String::from("template.odt");
-        let template_id = carbone_sdk.add_template(&template_file, "salt1234".to_string())?;
+        let template_id = carbone_sdk.upload_template(&template_file, "salt1234".to_string())?;
 
         // Assert
         m.assert();
@@ -215,7 +215,7 @@ mod tests {
 
         let template_file = String::from("");
 
-        let result = match carbone_sdk.add_template(&template_file, "".to_string()) {
+        let result = match carbone_sdk.upload_template(&template_file, "".to_string()) {
             Ok(template_id) => template_id,
             Err(e) => e.to_string(),
         };
@@ -235,7 +235,7 @@ mod tests {
 
         let template_file = String::from("/wrong/path/to/template.odt");
 
-        let result = match carbone_sdk.add_template(&template_file, "".to_string()) {
+        let result = match carbone_sdk.upload_template(&template_file, "".to_string()) {
             Ok(_) => panic!("the function doesn't return an error"),
             Err(e) => e.to_string(),
         };
@@ -255,7 +255,7 @@ mod tests {
 
         let template_file = String::from("tests");
 
-        let result = match carbone_sdk.add_template(&template_file, "".to_string()) {
+        let result = match carbone_sdk.upload_template(&template_file, "".to_string()) {
             Ok(_) => panic!("the function doesn't return an error"),
             Err(e) => e.to_string(),
         };

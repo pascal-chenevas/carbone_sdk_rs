@@ -11,8 +11,6 @@ use std::path::Path;
 use std::str;
 use validator::Validate;
 
-pub const CARBONE_API_URL: &str = "https://api.carbone.io";
-
 pub type Result<T> = std::result::Result<T, CarboneSdkError>;
 
 
@@ -28,7 +26,34 @@ impl <'a>CarboneSDK<'a> {
         Ok(Self { config: config, api_token: api_token })
     }
 
-    pub fn add_template(
+    /// Upload a template to the Carbone Service.
+    /// 
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    ///   use std::env;
+    ///   use carbone_sdk_rs::carbone::CarboneSDK;
+    //    use carbone_sdk_rs::errors::CarboneSdkError;
+    ///
+    /// fn main() -> Result<(), CarboneSdkError> {
+    ///    
+    ///     let token =  match env::var("CARBONE_TOKEN") {
+    ///             Ok(v) => v,
+    ///             Err(e) => "".to_string())
+    ///     };
+    /// 
+    ///     let carbone_sdk = CarboneSDK::new(&config, token)?;
+    ///
+    ///     let template_file = String::from("template.odt");
+    ///     let template_id = carbone_sdk.upload_template(&template_file, "".to_string())?;
+    /// 
+    ///     assert_eq!(template_id.is_empty(),false);
+    /// 
+    ///     Ok(())
+    /// }
+    /// ```
+    pub fn upload_template(
         &self,
         template_file_name: &String,
         salt: String,
@@ -79,7 +104,34 @@ impl <'a>CarboneSDK<'a> {
         }
     }
 
-    pub fn get_template(&self, template_id: &String) -> Result<Bytes> {
+    // Download a template from the Carbone Service.
+    /// 
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    ///   use std::env;
+    ///   use carbone_sdk_rs::carbone::CarboneSDK;
+    //    use carbone_sdk_rs::errors::CarboneSdkError;
+    ///
+    /// fn main() -> Result<(), CarboneSdkError> {
+    ///    
+    ///     let token =  match env::var("CARBONE_TOKEN") {
+    ///             Ok(v) => v,
+    ///             Err(e) => "".to_string())
+    ///     };
+    /// 
+    ///     let carbone_sdk = CarboneSDK::new(&config, token)?;
+    ///
+    ///     let template_file = String::from("template.odt");
+    ///     let template_content = carbone_sdk.download_template(&template_file, "".to_string())?;
+    /// 
+    ///     assert_eq!(template_content.is_empty(),false);
+    /// 
+    ///     Ok(())
+    /// }
+    /// ```
+    pub fn download_template(&self, template_id: &String) -> Result<Bytes> {
         if template_id.is_empty() {
             return Err(CarboneSdkError::MissingTemplateId);
         }
@@ -103,7 +155,34 @@ impl <'a>CarboneSDK<'a> {
         }
     }
 
-    pub fn delete_template(&self, template_id: &String) -> Result<()> {
+    // Download a template from the Carbone Service.
+    /// 
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    ///   use std::env;
+    ///   use carbone_sdk_rs::carbone::CarboneSDK;
+    //    use carbone_sdk_rs::errors::CarboneSdkError;
+    ///
+    /// fn main() -> Result<(), CarboneSdkError> {
+    ///    
+    ///     let token =  match env::var("CARBONE_TOKEN") {
+    ///             Ok(v) => v,
+    ///             Err(e) => "".to_string())
+    ///     };
+    /// 
+    ///     let carbone_sdk = CarboneSDK::new(&config, token)?;
+    ///
+    ///     let template_file = String::from("template.odt");
+    ///     let is_deleted = carbone_sdk.delete_template(&template_file, "".to_string())?;
+    /// 
+    ///     assert_eq!(is_deleted,true);
+    /// 
+    ///     Ok(())
+    /// }
+    /// ```
+    pub fn delete_template(&self, template_id: &String) -> Result<bool> {
         if template_id.is_empty() {
             return Err(CarboneSdkError::MissingTemplateId);
         }
@@ -127,7 +206,7 @@ impl <'a>CarboneSDK<'a> {
                 let error_msg = json.get_error_message();
 
                 if json.success {
-                    Ok(())
+                    Ok(true)
                 } else {
                     Err(CarboneSdkError::ResponseError(error_msg))
                 }

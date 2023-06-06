@@ -1,13 +1,15 @@
 use std::fmt;
 
+pub const CARBONE_API_URL: &str = "https://api.carbone.io";
+
+use anyhow::{Result, anyhow};
+
 use validator::Validate;
 
 use crate::errors::CarboneSdkError;
 use serde::Deserialize;
 use std::fs;
 use std::str::FromStr;
-
-use crate::carbone::CARBONE_API_URL;
 
 #[derive(Debug, Clone, Deserialize, Validate, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -18,43 +20,77 @@ pub struct Config {
     pub api_version: u32,
 }
 
-pub type Result<Config> = std::result::Result<Config, CarboneSdkError>;
-
 impl Config {
 
+    /// Create a new Configuraiton.
+    ///
+    /// This function will create new Config.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    ///
+    /// fn main() -> Result<(), CarboneSdkError> {
+    ///     let config = Config::new( 
+    ///        "http://127.0.0.1:57780".to_string(), 
+    ///        4,
+    ///        2)?;
+    ///     Ok(())
+    /// }
+    /// ```
     pub fn new(api_url: String, api_timeout: u8, api_version: u32) -> Result<Self> {
 
-       Ok(
-        Self {
-                api_url,
-                api_timeout,
-                api_version
-            }
-        )
+        let config = Self {
+            api_url,
+            api_timeout,
+            api_version
+        };
+
+       config.validate()?;
+       Ok(config)
+       
     }
 
+    /// Load a Configuraiton from a file.
+    ///
+    /// This function will create new Config struct with,
+    /// the values from the file.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    ///
+    /// fn main() -> Result<(), CarboneSdkError> {
+    ///     let config = Config::from_file("tests/config.test.json")?;
+    ///     Ok(())
+    /// }
+    /// ```
     pub fn from_file(path: &str) -> Result<Self> {
-        let file = fs::read_to_string(path).or(Err(CarboneSdkError::FileNotFound(path.to_string())));
-
-        let file_content = match file {
-            Ok(content) => content,
-            Err(e) => {
-                return Err(CarboneSdkError::Error(e.to_string()));
-            }
-        };
-        //println!("{:#?}", file_content);
-        // Read the JSON contents of the file as an instance of `Config`.
-        let config: Self = match serde_json::from_str(file_content.as_str()) {
-            Ok(config) => config,
-            Err(e) => {
-                return Err(CarboneSdkError::Error(e.to_string()));
-            }
-        };
-
+        let file_content = fs::read_to_string(path).or(Err(CarboneSdkError::FileNotFound(path.to_string())))?;
+        let config: Self = Self::from_str(file_content.as_str())?;
+        config.validate()?;
         Ok(config)
     }
 }
 
+/// Load a Default Configuraiton.
+/// 
+/// This function will create new Config struct the with,
+/// the default values.
+///
+/// # Example
+///
+/// ```no_run
+///
+/// fn main() -> Result<(), CarboneSdkError> {
+/// 
+///    let config: Config = Default::default();
+///    
+///     assert_eq!(config.api_url, "https://api.carbone.io".to_string());
+/// 
+///     Ok(())
+/// }
+/// ```
 impl Default for Config {
     fn default() -> Self { 
        Self{
@@ -65,23 +101,37 @@ impl Default for Config {
     }
 }
 
+/// Load a Configuraiton from a str.
+/// 
+/// This function will create new Config struct with,
+/// the values from the str given.
+///
+/// # Example
+///
+/// ```no_run
+///
+/// fn main() -> Result<(), CarboneSdkError> {
+///     let config = Config::from_str(r#"{
+///         "apiUrl": "http://127.0.0.1",
+///         "apiTimeout": 4,
+///         "apiVersion" : 2
+///     }"#)?;
+///     Ok(())
+/// }
+/// ```
 impl FromStr for Config {
 
-    type Err = CarboneSdkError;
+    type Err = anyhow::Error;
 
     fn from_str(s: &str) -> Result<Self> {
 
         match serde_json::from_str(s) {
             Ok(config) => Ok(config),
-            Err(e) => {
-                Err(CarboneSdkError::ParseError(
-                    "from_str".to_string(),
-                    e.to_string(),
-                ))
-            }
+            Err(e) => Err(anyhow!(format!("CarboneSDK FromStr JsonParseError: {}", e.to_string()))),
         }
     }
 }
+
 
 impl fmt::Display for Config {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

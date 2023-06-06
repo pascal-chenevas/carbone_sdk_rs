@@ -1,5 +1,5 @@
 use thiserror::Error;
-
+use validator::ValidationErrors;
 #[derive(Error, Debug)]
 pub enum CarboneSdkError {
     #[error("Carbone SDK error: {0:?}")]
@@ -28,12 +28,13 @@ pub enum CarboneSdkError {
     IoError(std::io::Error),
     #[error("Carbone SDK RequestError {0:?}")]
     RequestError(reqwest::Error),
-    #[error("Carbone SDK ResponseError {0:?}")]
+    #[error("Carbone SDK ValidationError {0:?}")]
     ResponseError(String),
     #[error("Carbone SDK RequestBodyNotWellFormedJsonError")]
     RequestBodyNotWellFormedJsonError,
     #[error("Carbone SDK {0:?} ParseError {1:?}")]
     ParseError(String, String)
+    
 }
 
 impl From<std::io::Error> for CarboneSdkError {
@@ -45,5 +46,11 @@ impl From<std::io::Error> for CarboneSdkError {
 impl From<reqwest::Error> for CarboneSdkError {
     fn from(err: reqwest::Error) -> Self {
         CarboneSdkError::RequestError(err)
+    }
+}
+
+impl From<anyhow::Error> for CarboneSdkError {
+    fn from(err: anyhow::Error) -> Self {
+        CarboneSdkError::Error(err.to_string())
     }
 }
