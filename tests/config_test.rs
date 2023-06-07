@@ -90,7 +90,6 @@ mod tests {
     #[test]
     fn test_from_file_wrong_path_given() -> Result<(), CarboneSdkError> {
 
-
         let error = match Config::from_file("tests/bad/path/config.test.json") {
             Ok(c) => c.to_string(),
             Err(e) => e.to_string()

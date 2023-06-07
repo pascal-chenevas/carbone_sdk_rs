@@ -1,18 +1,22 @@
 
+use std::str;
+use std::fs;
+use std::path::Path;
+
+use bytes::Bytes;
+
+use reqwest::blocking::multipart;
+use reqwest::header::HeaderValue;
+
+use sha2::{Digest, Sha256};
+
+use validator::Validate;
+
 use crate::carbone_response::CarboneSDKResponse;
 use crate::config::Config;
 use crate::errors::*;
-use bytes::Bytes;
-use reqwest::blocking::multipart;
-use reqwest::header::HeaderValue;
-use sha2::{Digest, Sha256};
-use std::fs;
-use std::path::Path;
-use std::str;
-use validator::Validate;
 
 pub type Result<T> = std::result::Result<T, CarboneSdkError>;
-
 
 #[derive(Debug, Validate, PartialEq, Eq)]
 pub struct CarboneSDK<'a>{
@@ -32,17 +36,20 @@ impl <'a>CarboneSDK<'a> {
     /// # Example
     ///
     /// ```no_run
-    ///   use std::env;
-    ///   use carbone_sdk_rs::carbone::CarboneSDK;
-    ///   use carbone_sdk_rs::errors::CarboneSdkError;
+    /// use std::env;
+    /// 
+    /// use carbone_sdk_rs::config::Config;
+    /// use carbone_sdk_rs::errors::CarboneSdkError;
+    /// use carbone_sdk_rs::carbone::CarboneSDK;
     ///
     /// fn main() -> Result<(), CarboneSdkError> {
     ///    
     ///     let token =  match env::var("CARBONE_TOKEN") {
     ///             Ok(v) => v,
-    ///             Err(e) => "".to_string())
+    ///             Err(e) => "".to_string()
     ///     };
     /// 
+    ///     let config = Config::new("http://127.0.0.1".to_string(), 4, 2)?;
     ///     let carbone_sdk = CarboneSDK::new(&config, token)?;
     ///
     ///     let template_file = String::from("template.odt");
@@ -110,23 +117,27 @@ impl <'a>CarboneSDK<'a> {
     /// # Example
     ///
     /// ```no_run
-    ///   use std::env;
-    ///   use carbone_sdk_rs::carbone::CarboneSDK;
-    ///   use carbone_sdk_rs::errors::CarboneSdkError;
+    /// use std::env;
+    /// 
+    /// use carbone_sdk_rs::config::Config;
+    /// use carbone_sdk_rs::carbone::CarboneSDK;
+    /// use carbone_sdk_rs::errors::CarboneSdkError;
     ///
     /// fn main() -> Result<(), CarboneSdkError> {
     ///    
     ///     let token =  match env::var("CARBONE_TOKEN") {
     ///             Ok(v) => v,
-    ///             Err(e) => "".to_string())
+    ///             Err(e) => "".to_string()
     ///     };
     /// 
+    ///     let config = Config::new("http://127.0.0.1".to_string(), 4, 2)?;
     ///     let carbone_sdk = CarboneSDK::new(&config, token)?;
-    ///
+    ///     
     ///     let template_file = String::from("template.odt");
-    ///     let template_content = carbone_sdk.download_template(&template_file, "".to_string())?;
+    ///     let template_id = carbone_sdk.upload_template(&template_file, "".to_string())?;
+    ///     let template_content = carbone_sdk.download_template(&template_id)?;
     /// 
-    ///     assert_eq!(template_content.is_empty(),false);
+    ///     assert_eq!(template_content.is_empty(), false);
     /// 
     ///     Ok(())
     /// }
@@ -161,21 +172,24 @@ impl <'a>CarboneSDK<'a> {
     /// # Example
     ///
     /// ```no_run
-    ///   use std::env;
-    ///   use carbone_sdk_rs::carbone::CarboneSDK;
-    ///   use carbone_sdk_rs::errors::CarboneSdkError;
+    /// use std::env;
+    /// 
+    /// use carbone_sdk_rs::config::Config;
+    /// use carbone_sdk_rs::carbone::CarboneSDK;
+    /// use carbone_sdk_rs::errors::CarboneSdkError;
     ///
     /// fn main() -> Result<(), CarboneSdkError> {
     ///    
     ///     let token =  match env::var("CARBONE_TOKEN") {
     ///             Ok(v) => v,
-    ///             Err(e) => "".to_string())
+    ///             Err(e) => "".to_string()
     ///     };
     /// 
+    ///     let config = Config::new("http://127.0.0.1".to_string(), 4, 2)?;
     ///     let carbone_sdk = CarboneSDK::new(&config, token)?;
     ///
-    ///     let template_file = String::from("template.odt");
-    ///     let is_deleted = carbone_sdk.delete_template(&template_file, "".to_string())?;
+    ///     let template_id = "cb03f7676ef0fbe5d7824a64676166ac2c7c789d9e6da5b7c0c46794911ee7a7".to_string();
+    ///     let is_deleted = carbone_sdk.delete_template(&template_id)?;
     /// 
     ///     assert_eq!(is_deleted,true);
     /// 

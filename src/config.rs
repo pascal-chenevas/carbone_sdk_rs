@@ -29,6 +29,9 @@ impl Config {
     /// # Example
     ///
     /// ```no_run
+    /// 
+    /// use carbone_sdk_rs::config::Config;
+    /// use carbone_sdk_rs::errors::CarboneSdkError;
     ///
     /// fn main() -> Result<(), CarboneSdkError> {
     ///     let config = Config::new( 
@@ -59,6 +62,9 @@ impl Config {
     /// # Example
     ///
     /// ```no_run
+    /// 
+    /// use carbone_sdk_rs::config::Config;
+    /// use carbone_sdk_rs::errors::CarboneSdkError;
     ///
     /// fn main() -> Result<(), CarboneSdkError> {
     ///     let config = Config::from_file("tests/config.test.json")?;
@@ -81,7 +87,10 @@ impl Config {
 /// # Example
 ///
 /// ```no_run
-///
+/// 
+/// use carbone_sdk_rs::config::Config;
+/// use carbone_sdk_rs::errors::CarboneSdkError;
+/// 
 /// fn main() -> Result<(), CarboneSdkError> {
 /// 
 ///    let config: Config = Default::default();
@@ -109,13 +118,19 @@ impl Default for Config {
 /// # Example
 ///
 /// ```no_run
-///
+/// 
+/// use std::str::FromStr;
+/// use carbone_sdk_rs::config::Config;
+/// use carbone_sdk_rs::errors::CarboneSdkError;
+/// 
 /// fn main() -> Result<(), CarboneSdkError> {
+/// 
 ///     let config = Config::from_str(r#"{
 ///         "apiUrl": "http://127.0.0.1",
 ///         "apiTimeout": 4,
 ///         "apiVersion" : 2
 ///     }"#)?;
+/// 
 ///     Ok(())
 /// }
 /// ```
