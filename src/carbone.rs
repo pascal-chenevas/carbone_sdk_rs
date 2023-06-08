@@ -96,28 +96,6 @@ impl <'a>CarboneSDK<'a> {
         }
     }
 
-    pub fn generate_template_id(
-        &self,
-        template_file_name: &String,
-        payload: &str,
-    ) -> Result<String> {
-        if template_file_name.is_empty() {
-            return Err(CarboneSdkError::MissingTemplateFileName);
-        }
-
-        let file_content = fs::read(template_file_name)?;
-
-        let mut sha256 = Sha256::new();
-
-        sha256.update(payload);
-        sha256.update(file_content);
-
-        // convert [u8] to String
-        let result: String = format!("{:X}", sha256.finalize());
-
-        Ok(result.to_lowercase())
-    }
-
     pub fn render(
         &self,
         file_or_template_id: &str,

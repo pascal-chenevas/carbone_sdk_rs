@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod tests {
 
+    use  std::matches;
     use carbone_sdk_rs::types::ApiJsonToken;
 
     use anyhow::Result;
@@ -20,14 +21,14 @@ mod tests {
     fn test_api_token_short_token_given() -> Result<()> {
 
         let api_token_value = "test_";
-        let error = match ApiJsonToken::new(api_token_value.to_string()) {
-            Ok(_) => api_token_value.to_string(),
-            Err(e) => e.to_string(),
-        };
 
+        let result = ApiJsonToken::new(api_token_value.to_string());
+        let is_err = result.is_err();
+        let error = result.unwrap_err().to_string();
         let expected_error = "api_token: Validation error: length [{\"min\": Number(357), \"value\": String(\"test_\")}]".to_string();
 
-        assert_eq!(expected_error, error);
+        assert!(is_err);
+        assert!(matches!(error, expected_error));
 
         Ok(())
     }
