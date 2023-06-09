@@ -11,13 +11,14 @@ mod tests {
     #[test]
     fn test_api_url_not_given() {
 
-        let error = match Config::new("".to_string(), 6, 2) {
-            Ok(_) => "".to_string(),
-            Err(e) => e.to_string(),
-        };
+        let result = Config::new("".to_string(), 6, 2);
+
+        let is_err = result.is_err();
+        let error = result.unwrap_err().to_string();
 
         let expected_error = "api_url: Validation error: url [{\"value\": String(\"\")}]".to_string();
 
+        assert!(is_err);
         assert_eq!(expected_error, error);
     }
 
@@ -57,17 +58,18 @@ mod tests {
     #[test]
     fn test_from_str_bad_format_given() {
 
-        let error = match Config::from_str(r#"{
+        let result = Config::from_str(r#"{
             "apiTimeout": 4,
             "apiUr" "http://127.0.0.1",
             "apiVersion" : 2
-        }"#) {
-            Ok(c) => c.to_string(),
-            Err(e) => e.to_string()
-        };
+        }"#);
 
+        let is_err = result.is_err();
+        let error = result.unwrap_err().to_string();
+        
         let expected_error = "CarboneSDK FromStr JsonParseError: expected `:` at line 3 column 21".to_string(); 
 
+        assert!(is_err);
         assert_eq!(expected_error, error);
 
     }
@@ -90,14 +92,16 @@ mod tests {
     #[test]
     fn test_from_file_wrong_path_given() -> Result<(), CarboneSdkError> {
 
-        let error = match Config::from_file("tests/bad/path/config.test.json") {
-            Ok(c) => c.to_string(),
-            Err(e) => e.to_string()
-        };
+        let result = Config::from_file("tests/bad/path/config.test.json") ;
+
+        let is_err = result.is_err();
+        let error = result.unwrap_err().to_string();
 
         let expected_error = "Carbone SDK error: file \"tests/bad/path/config.test.json\" not found".to_string(); 
 
+        assert!(is_err);
         assert_eq!(expected_error, error);
+
         Ok(())
     }
 

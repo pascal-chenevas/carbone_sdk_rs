@@ -33,13 +33,14 @@ mod tests {
         let config = create_config_for_mock_server(None)?;
         let carbone_sdk = CarboneSDK::new(&config, TOKEN_TEST.to_string())?;
 
-        let error = match carbone_sdk.get_report(&"".to_string()) {
-            Ok(_) => panic!("the function doesn't return an error"),
-            Err(e) => e.to_string()
-        };
+        let result = carbone_sdk.get_report(&"".to_string());
+
+        let is_err = result.is_err();
+        let error = result.unwrap_err().to_string();
 
         let expected_error = CarboneSdkError::MissingRenderId.to_string(); 
         
+        assert!(is_err);
         assert_eq!(expected_error.to_string(), error);
 
         Ok(())
