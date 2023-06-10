@@ -3,7 +3,7 @@ use httpmock::prelude::*;
 use carbone_sdk_rs::render::Render;
 use carbone_sdk_rs::errors::CarboneSdkError;
 
-use serde_json::{Value, json};
+use serde_json::json;
 
 mod helper;
 
@@ -26,14 +26,19 @@ mod tests {
         // Start a lightweight mock server.
         let server = MockServer::start();
 
-        let expected_result = r#"{"success": True, "data": {"renderId": "MTAuMjAuMjEuMTAgICAg01E98H4R7PMC2H6XSE5Z6J8XYQ.odt", "inputFileExtension": "odt"}}"#;
-
+        let expected_render_id = "MTAuMjAuMjEuMTAgICAg01E98H4R7PMC2H6XSE5Z6J8XYQ.odt".to_string();
         // Create a mock on the server.
         let mock_server = server.mock(|when, then| {
             when.method("POST")
                 .path(format!("/render/{}", template_id.as_str()));
             then.status(200)
-                .json_body(json!(expected_result));
+                .json_body(json!({
+                    "success": true,
+                    "data": {
+                        "renderId": expected_render_id.clone(),
+                        "inputFileExtension": "odt"
+                    }
+                }));
         });
 
         let config = helper.create_config_for_mock_server(Some(&server))?;
@@ -52,7 +57,7 @@ mod tests {
         let resp = render.render_report(template_id, render_options)?;
 
         mock_server.assert();
-        assert_eq!("".to_string(), resp);
+        assert_eq!(resp, expected_render_id);
         Ok(())
     }
 }
