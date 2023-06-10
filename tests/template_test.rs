@@ -361,4 +361,81 @@ mod tests {
         Ok(())
     }
 
+    #[test]
+    fn test_delete() -> Result<(), CarboneSdkError> {
+
+        let template_id = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
+
+        // Start a lightweight mock server.
+        let server = MockServer::start();
+
+        let body = CarboneSDKResponse{
+            success: true,
+            data: None,
+            error: None,
+        };
+
+        // Create a mock on the server.
+        let mock_server = server.mock(|when, then| {
+            when.method("DELETE")
+                .path(format!("/template/{}", template_id.as_str()));
+            then.status(200)
+                .json_body_obj(&body);
+        });
+
+        let config = create_config_for_mock_server(Some(&server))?;
+
+        let api_token = create_api_token()?;
+
+        let template: Template = Template::new(config, api_token);
+
+        let is_deleted = template.delete(template_id)?;
+
+        mock_server.assert();
+
+        assert_eq!(is_deleted, true);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_delete_unknown_template_id_given() -> Result<(), CarboneSdkError> {
+
+        let template_id = TemplateId::new("unknown_template_id".to_string())?;
+
+        // Start a lightweight mock server.
+        let server = MockServer::start();
+
+        let body = CarboneSDKResponse{
+            success: false,
+            data: None,
+            error: None,
+        };
+
+        // Create a mock on the server.
+        let mock_server = server.mock(|when, then| {
+            when.method("DELETE")
+                .path(format!("/template/{}", template_id.as_str()));
+            then.status(200)
+                .json_body_obj(&body);
+        });
+
+        let config = create_config_for_mock_server(Some(&server))?;
+
+        let api_token = create_api_token()?;
+
+        let template: Template = Template::new(config, api_token);
+
+        let result = template.delete(template_id);
+
+        let expected_error = CarboneSdkError::Error("ResponseError: Cannot remove template, does it exist ?".to_string());
+
+        mock_server.assert();
+
+        assert!(result.is_err());
+        assert_eq!(expected_error.to_string(), result.unwrap_err().to_string());
+
+        Ok(())
+    }
+
 }
