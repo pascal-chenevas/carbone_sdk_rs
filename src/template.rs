@@ -1,3 +1,4 @@
+use std::borrow::Borrow;
 use std::str;
 use std::fs;
 use std::path::Path;
@@ -6,6 +7,7 @@ use bytes::Bytes;
 
 use reqwest::blocking::multipart;
 use reqwest::header::HeaderValue;
+use reqwest::header::CONTENT_TYPE;
 
 use sha2::{Digest, Sha256};
 
@@ -198,7 +200,7 @@ impl Template {
         let url = format!("{}/template/{}", self.config.api_url, template_id.as_str());
 
         // TODO move new client to new() method
-        let response = client
+        let response_result = client
             .get(url)
             .header(
                 "carbone-version",
@@ -207,9 +209,25 @@ impl Template {
             .bearer_auth(self.api_token.as_str())
             .send();
 
-        match response {
-            Ok(response) => Ok(response.bytes()?),
-            Err(e) => Err(CarboneSdkError::ResponseError(e.to_string())),
+        if response_result.is_err() {
+            return Err(CarboneSdkError::RequestError(response_result.unwrap_err()));
+        } else {
+
+            let response = response_result.unwrap();
+            if let Some(content_type) = response.headers().get(CONTENT_TYPE) {
+                if content_type == "application/json" {
+                    let json = response.json::<CarboneSDKResponse>()?;
+                    let error_msg = json.get_error_message();
+                    Err(CarboneSdkError::ResponseError(error_msg))
+                } else {
+                    match content_type.to_str() {
+                        Ok(v) =>  Err(CarboneSdkError::Error(format!("Content-Type `{}` not supported", v))),
+                        Err(e) => Err(CarboneSdkError::Error(e.to_string())),
+                    }
+                }
+            } else {
+                Ok(response.bytes()?)
+            }
         }
     }
 

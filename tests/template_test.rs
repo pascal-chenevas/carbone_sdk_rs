@@ -53,7 +53,6 @@ mod tests {
             when.method("GET")
                 .path(format!("/template/{}", template_id.as_str()));
             then.status(200)
-                .header("content-type", "application/json")
                 .body(template_file_content.clone());
         });
 
@@ -61,12 +60,54 @@ mod tests {
 
         let api_token = create_api_token()?;
 
-        let template = Template::new(config, api_token);
+        let template: Template = Template::new(config, api_token);
 
         let template_content = template.download(template_id)?;
 
         mock_server.assert();
+
         assert_eq!(template_file_content, template_content.to_vec());
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_downaload_unknown_template_id_given() -> Result<(), CarboneSdkError> {
+
+        let template_id = TemplateId::new("unknown_template_id".to_string())?;
+
+        let body = CarboneSDKResponse{
+            success: false,
+            data: None,
+            error: Some("Error: Cannot remove template, does it exist ?".to_string()),
+        };
+
+        // Start a lightweight mock server.
+        let server = MockServer::start();
+
+        // Create a mock on the server.
+        let mock_server = server.mock(|when, then| {
+            when.method("GET")
+                .path(format!("/template/{}", template_id.as_str()));
+            then.status(200)
+                .header("content-type", "application/json")
+                .json_body_obj(&body);
+        });
+
+        let config = create_config_for_mock_server(Some(&server))?;
+
+        let api_token = create_api_token()?;
+
+        let template: Template = Template::new(config, api_token);
+
+        let result = template.download(template_id);
+
+        let expected_error = CarboneSdkError::ResponseError("Error: Cannot remove template, does it exist ?".to_string());
+
+        mock_server.assert();
+
+        assert!(result.is_err());
+        assert_eq!(expected_error.to_string(), result.unwrap_err().to_string());
 
         Ok(())
     }
@@ -77,7 +118,7 @@ mod tests {
         let config: Config = Default::default();
     
         let api_token = create_api_token()?;
-        let template = Template::new(config, api_token);
+        let template: Template = Template::new(config, api_token);
 
         let file_name = "tests/template.test.odt".to_string();
         let template_id = template.generate_id(&file_name, "")?;
@@ -94,7 +135,7 @@ mod tests {
         let config: Config = Default::default();
     
         let api_token = create_api_token()?;
-        let template = Template::new(config, api_token);
+        let template: Template = Template::new(config, api_token);
 
         let file_name = "tests/template.test.odt".to_string();
         let template_id = template.generate_id(&file_name, "ThisIsAPayload")?;
@@ -111,7 +152,7 @@ mod tests {
         let config: Config = Default::default();
     
         let api_token = create_api_token()?;
-        let template = Template::new(config, api_token);
+        let template: Template = Template::new(config, api_token);
 
         let file_name = "tests/template.test.odt".to_string();
         let template_id = template.generate_id(&file_name, "8B5PmafbjdRqHuksjHNw83mvPiGj7WTE")?;
@@ -129,7 +170,7 @@ mod tests {
         let config: Config = Default::default();
     
         let api_token = create_api_token()?;
-        let template = Template::new(config, api_token);
+        let template: Template = Template::new(config, api_token);
 
         let file_name = "tests/template.test.html".to_string();
         let template_id = template.generate_id(&file_name, "")?;
@@ -147,7 +188,7 @@ mod tests {
         let config: Config = Default::default();
     
         let api_token = create_api_token()?;
-        let template = Template::new(config, api_token);
+        let template: Template = Template::new(config, api_token);
 
         let file_name = "tests/template.test.html".to_string();
         let payload = "This is a long payload with different characters 1 *5 &*9 %$ 3%&@9 @(( 3992288282 29299 9299929";
@@ -166,7 +207,7 @@ mod tests {
         let config: Config = Default::default();
     
         let api_token = create_api_token()?;
-        let template = Template::new(config, api_token);
+        let template: Template = Template::new(config, api_token);
 
         let file_name = "".to_string();
         let payload = "";
@@ -210,7 +251,7 @@ mod tests {
         let config = create_config_for_mock_server(Some(&server))?;
     
         let api_token = create_api_token()?;
-        let template = Template::new(config, api_token);
+        let template: Template = Template::new(config, api_token);
 
         let template_file = String::from("template.odt");
         let template_id = template.upload(&template_file, "".to_string())?;
@@ -250,7 +291,7 @@ mod tests {
         let config = create_config_for_mock_server(Some(&server))?;
     
         let api_token = create_api_token()?;
-        let template = Template::new(config, api_token);
+        let template: Template = Template::new(config, api_token);
 
         let template_file = String::from("template.odt");
         let template_id = template.upload(&template_file, "salt1234".to_string())?;
@@ -268,7 +309,7 @@ mod tests {
         let config = create_config_for_mock_server(None)?;
 
         let api_token = create_api_token()?;
-        let template = Template::new(config, api_token);
+        let template: Template = Template::new(config, api_token);
 
         let template_file = String::from("");
 
@@ -286,7 +327,7 @@ mod tests {
         let config = create_config_for_mock_server(None)?;
         
         let api_token = create_api_token()?;
-        let template = Template::new(config, api_token);
+        let template: Template = Template::new(config, api_token);
 
         let template_file = String::from("/wrong/path/to/template.odt");
 
@@ -306,7 +347,7 @@ mod tests {
         let config = create_config_for_mock_server(None)?;
         
         let api_token = create_api_token()?;
-        let template = Template::new(config, api_token);
+        let template: Template = Template::new(config, api_token);
 
         let template_file = String::from("tests");
 
