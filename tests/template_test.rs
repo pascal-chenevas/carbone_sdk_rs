@@ -76,10 +76,12 @@ mod tests {
 
         let template_id = TemplateId::new("unknown_template_id".to_string())?;
 
+        let error_msg = "Error: Cannot remove template, does it exist ?".to_string();
+
         let body = CarboneSDKResponse{
             success: false,
             data: None,
-            error: Some("Error: Cannot remove template, does it exist ?".to_string()),
+            error: Some(error_msg.clone()),
         };
 
         // Start a lightweight mock server.
@@ -102,7 +104,7 @@ mod tests {
 
         let result = template.download(template_id);
 
-        let expected_error = CarboneSdkError::ResponseError("Error: Cannot remove template, does it exist ?".to_string());
+        let expected_error = CarboneSdkError::ResponseError(error_msg);
 
         mock_server.assert();
 
@@ -406,10 +408,12 @@ mod tests {
         // Start a lightweight mock server.
         let server = MockServer::start();
 
+        let error_msg = "ResponseError: Cannot remove template, does it exist ?".to_string();
+
         let body = CarboneSDKResponse{
             success: false,
             data: None,
-            error: None,
+            error: Some(error_msg.clone()),
         };
 
         // Create a mock on the server.
@@ -428,7 +432,7 @@ mod tests {
 
         let result = template.delete(template_id);
 
-        let expected_error = CarboneSdkError::Error("ResponseError: Cannot remove template, does it exist ?".to_string());
+        let expected_error = CarboneSdkError::ResponseError(error_msg);
 
         mock_server.assert();
 
