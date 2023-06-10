@@ -1,3 +1,5 @@
+use std::fs;
+
 use std::collections::HashMap;
 use httpmock::prelude::*;
 
@@ -12,6 +14,7 @@ mod tests {
 
     use super::*;
     use anyhow::Result;
+    use carbone_sdk_rs::template::TemplateId;
 
     const TOKEN_TEST: &str = "test_32u1i3ui1212334395349dsaowe912384ads89de8e93hj123iowa21085dsaowe91843784p213894dsa912384ads89de8e93hj123iowa210309dhsudausdasda72q37q783hy3243829434gdgadghdsaowe912384ads89de8e93hj1owa21023113i12u32i1321io39534985dsaowe9123843784p213894309dhsudausdasda72q37q783h43784p213894309dhsuda4gdgadghdsaow2384ads89de8e93hj123iowa21023113i12u32i1321io39534985dsa";
 
@@ -33,6 +36,39 @@ mod tests {
     fn create_api_token() -> Result<ApiJsonToken> {
         let api_token = ApiJsonToken::new(TOKEN_TEST.to_string())?;
         Ok(api_token)
+    }
+
+    #[test]
+    fn test_downaload() -> Result<(), CarboneSdkError> {
+
+        let template_id = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
+
+        let template_file_content = fs::read("tests/template.test.odt")?;
+
+        // Start a lightweight mock server.
+        let server = MockServer::start();
+
+        // Create a mock on the server.
+        let mock_server = server.mock(|when, then| {
+            when.method("GET")
+                .path(format!("/template/{}", template_id.as_str()));
+            then.status(200)
+                .header("content-type", "application/json")
+                .body(template_file_content.clone());
+        });
+
+        let config = create_config_for_mock_server(Some(&server))?;
+
+        let api_token = create_api_token()?;
+
+        let template = Template::new(config, api_token);
+
+        let template_content = template.download(template_id)?;
+
+        mock_server.assert();
+        assert_eq!(template_file_content, template_content.to_vec());
+
+        Ok(())
     }
 
     #[test]
@@ -134,14 +170,12 @@ mod tests {
         let file_name = "".to_string();
         let payload = "";
        
-        let error = match template.generate_id(&file_name, payload) {
-            Ok(template_id) => template_id,
-            Err(e) => e.to_string(),
-        };
+        let result = template.generate_id(&file_name, payload);
 
         let expected_error = CarboneSdkError::MissingTemplateFileName.to_string(); 
 
-        assert_eq!(expected_error.to_string(), error);
+        assert!(result.is_err());
+        assert_eq!(expected_error.to_string(), result.unwrap_err().to_string());
 
         Ok(())
 
@@ -164,7 +198,7 @@ mod tests {
         let server = MockServer::start();
 
         // Create a mock on the server.
-        let m = server.mock(|when, then| {
+        let mock_server: httpmock::Mock = server.mock(|when, then| {
             when.method("POST")
                 .path("/template");
             then.status(200)
@@ -181,14 +215,14 @@ mod tests {
         let template_id = template.upload(&template_file, "".to_string())?;
         
         // Assert
-        m.assert();
+        mock_server.assert();
         assert_eq!(template_id_expected,template_id);
 
         Ok(())
     }
 
     #[test]
-    fn test_add_template_with_payload() -> Result<(), CarboneSdkError> {
+    fn test_upload_template_with_payload() -> Result<(), CarboneSdkError> {
 
         let mut data = HashMap::new();
         let template_id_expected = "cb03f7676ef0fbe5d7824a64676166ac2c7c789d9e6da5b7c0c46794911ee7a7".to_string();
@@ -228,7 +262,7 @@ mod tests {
     }
 
     #[test]
-    fn template_file_name() -> Result<(), CarboneSdkError> {
+    fn test_upload_template_template_file_path_not_given() -> Result<(), CarboneSdkError> {
 
         let config = create_config_for_mock_server(None)?;
 
@@ -237,14 +271,10 @@ mod tests {
 
         let template_file = String::from("");
 
-        let result = match template.upload(&template_file, "".to_string()) {
-            Ok(template_id) => template_id,
-            Err(e) => e.to_string(),
-        };
-
-        let expected_error = CarboneSdkError::MissingTemplateFileName.to_string();    
+        let error = template.upload(&template_file, "".to_string());
        
-        assert_eq!(expected_error.to_string(), result);
+        assert!(error.is_err());
+        assert_eq!(CarboneSdkError::MissingTemplateFileName.to_string(), error.unwrap_err().to_string());
 
         Ok(())
     }
@@ -259,14 +289,12 @@ mod tests {
 
         let template_file = String::from("/wrong/path/to/template.odt");
 
-        let result = match template.upload(&template_file, "".to_string()) {
-            Ok(_) => panic!("the function doesn't return an error"),
-            Err(e) => e.to_string(),
-        };
+        let result = template.upload(&template_file, "".to_string());
 
         let expected_error = CarboneSdkError::FileNotFound("/wrong/path/to/template.odt".to_string()); 
         
-        assert_eq!(expected_error.to_string(), result);
+        assert!(result.is_err());
+        assert_eq!(expected_error.to_string(), result.unwrap_err().to_string());
 
         Ok(())
     }
@@ -281,14 +309,12 @@ mod tests {
 
         let template_file = String::from("tests");
 
-        let result = match template.upload(&template_file, "".to_string()) {
-            Ok(_) => panic!("the function doesn't return an error"),
-            Err(e) => e.to_string(),
-        };
+        let result = template.upload(&template_file, "".to_string());
 
         let expected_error = CarboneSdkError::IsADirectory("tests".to_string()); 
         
-        assert_eq!(expected_error.to_string(), result);
+        assert!(result.is_err());
+        assert_eq!(expected_error.to_string(), result.unwrap_err().to_string());
 
         Ok(())
     }

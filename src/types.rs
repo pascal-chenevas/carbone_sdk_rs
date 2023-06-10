@@ -12,7 +12,7 @@ impl ApiJsonToken {
 
         let api_token = Self {api_token: s};
         api_token.validate()?;
-        Ok(api_token)
+        Ok(api_token)  
     }
   
     pub fn as_str(&self) -> &str { &self.api_token }

@@ -4,8 +4,8 @@ use validator::ValidationErrors;
 pub enum CarboneSdkError {
     #[error("Carbone SDK error: {0:?}")]
     Error(String),
-    #[error("CarboneSDK: \"API access token\" is missing")]
-    MissingApiToken,
+    #[error("CarboneSDK: error: {0:?} can not be empty")]
+    EmptyString(String),
     #[error("CarboneSDK: \"API URL\" is missing")]
     MissingApiUrl,
     #[error("CarboneSDK: \"API VERSION\" is missing")]

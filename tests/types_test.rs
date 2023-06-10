@@ -25,6 +25,7 @@ mod tests {
         let result = ApiJsonToken::new(api_token_value.to_string());
         let is_err = result.is_err();
         let error = result.unwrap_err().to_string();
+
         let expected_error = "api_token: Validation error: length [{\"min\": Number(357), \"value\": String(\"test_\")}]".to_string();
 
         assert!(is_err);

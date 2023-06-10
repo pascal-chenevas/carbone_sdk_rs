@@ -1,6 +1,7 @@
 use std::fmt;
 
 pub const CARBONE_API_URL: &str = "https://api.carbone.io";
+pub const CARBONE_API_VERSION: u32 = 4;
 
 use anyhow::{Result, anyhow};
 
@@ -105,7 +106,7 @@ impl Default for Config {
        Self{
             api_url: CARBONE_API_URL.to_string(),
             api_timeout: 60,
-            api_version: 4,
+            api_version: CARBONE_API_VERSION,
         }
     }
 }

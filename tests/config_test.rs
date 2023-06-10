@@ -6,6 +6,7 @@ mod tests {
 
     use super::*;
     use carbone_sdk_rs::config::CARBONE_API_URL;
+    use carbone_sdk_rs::config::CARBONE_API_VERSION;
     use std::str::FromStr;
 
     #[test]
@@ -13,13 +14,10 @@ mod tests {
 
         let result = Config::new("".to_string(), 6, 2);
 
-        let is_err = result.is_err();
-        let error = result.unwrap_err().to_string();
-
         let expected_error = "api_url: Validation error: url [{\"value\": String(\"\")}]".to_string();
 
-        assert!(is_err);
-        assert_eq!(expected_error, error);
+        assert!(result.is_err());
+        assert_eq!(expected_error, result.unwrap_err().to_string());
     }
 
     #[test]
@@ -29,7 +27,7 @@ mod tests {
 
         let timeout: u8 = 60;
         let api_url = CARBONE_API_URL.to_string();
-        let api_version = 4;
+        let api_version = CARBONE_API_VERSION;
 
         assert_eq!(config.api_timeout, timeout);
         assert_eq!(config.api_url, api_url);
@@ -63,14 +61,11 @@ mod tests {
             "apiUr" "http://127.0.0.1",
             "apiVersion" : 2
         }"#);
-
-        let is_err = result.is_err();
-        let error = result.unwrap_err().to_string();
         
         let expected_error = "CarboneSDK FromStr JsonParseError: expected `:` at line 3 column 21".to_string(); 
 
-        assert!(is_err);
-        assert_eq!(expected_error, error);
+        assert!(result.is_err());
+        assert_eq!(expected_error, result.unwrap_err().to_string());
 
     }
 
@@ -94,13 +89,10 @@ mod tests {
 
         let result = Config::from_file("tests/bad/path/config.test.json") ;
 
-        let is_err = result.is_err();
-        let error = result.unwrap_err().to_string();
-
         let expected_error = "Carbone SDK error: file \"tests/bad/path/config.test.json\" not found".to_string(); 
 
-        assert!(is_err);
-        assert_eq!(expected_error, error);
+        assert!(result.is_err());
+        assert_eq!(expected_error, result.unwrap_err().to_string());
 
         Ok(())
     }

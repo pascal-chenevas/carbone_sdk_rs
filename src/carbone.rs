@@ -1,12 +1,8 @@
-
 use std::str;
-use std::fs;
 
 use bytes::Bytes;
 
 use reqwest::header::HeaderValue;
-
-use sha2::{Digest, Sha256};
 
 use validator::Validate;
 

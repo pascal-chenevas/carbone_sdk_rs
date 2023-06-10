@@ -16,6 +16,24 @@ use crate::carbone_response::CarboneSDKResponse;
 
 use crate::carbone::Result;
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TemplateId {
+    id: String,
+}
+
+impl TemplateId {
+    pub fn new(s: String) -> Result<Self> {
+        if s.is_empty() {
+            return Err(CarboneSdkError::EmptyString("template_id".to_string()));
+        }
+        let template_id = Self {id: s};
+        Ok(template_id)  
+    }
+  
+    pub fn as_str(&self) -> &str { &self.id }
+
+  }
+
 pub struct Template {
     config: Config,
     api_token: ApiJsonToken,
@@ -69,7 +87,7 @@ impl Template {
     ///    
     ///     let token =  match env::var("CARBONE_TOKEN") {
     ///             Ok(v) => v,
-    ///             Err(e) => "".to_string()
+    ///             Err(e) => panic!("{}", e.to_string())
     ///     };
     /// 
     ///     let config = Config::new("http://127.0.0.1".to_string(), 4, 2)?;
@@ -145,6 +163,7 @@ impl Template {
     /// ```no_run
     /// use std::env;
     /// 
+    /// use carbone_sdk_rs::template::TemplateId;
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::types::ApiJsonToken;
     /// use carbone_sdk_rs::template::Template;
@@ -152,9 +171,9 @@ impl Template {
     ///
     /// fn main() -> Result<(), CarboneSdkError> {
     ///    
-    ///     let token =  match env::var("CARBONE_TOKEN") {
+    ///     let token = match env::var("CARBONE_TOKEN") {
     ///             Ok(v) => v,
-    ///             Err(e) => "".to_string()
+    ///             Err(e) => panic!("{}", e.to_string())
     ///     };
     /// 
     ///     let config = Config::new("http://127.0.0.1".to_string(), 4, 2)?;
@@ -163,22 +182,20 @@ impl Template {
     /// 
     ///     let template_file = String::from("template.odt");
     /// 
+    ///     let template_id = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
     ///     let template = Template::new(config, api_token);
-    ///     let template_id = "0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string();
-    ///     let template_content = template.download(&template_id)?;
+    ///     
+    ///     let template_content = template.download(template_id)?;
     /// 
     ///     assert_eq!(template_content.is_empty(), false);
     /// 
     ///     Ok(())
     /// }
     /// ```
-    pub fn download(&self, template_id: &String) -> Result<Bytes> {
-        if template_id.is_empty() {
-            return Err(CarboneSdkError::MissingTemplateId);
-        }
-
+    pub fn download(&self, template_id: TemplateId) -> Result<Bytes> {
+       
         let client = reqwest::blocking::Client::new();
-        let url = format!("{}/template/{}", self.config.api_url, template_id);
+        let url = format!("{}/template/{}", self.config.api_url, template_id.as_str());
 
         // TODO move new client to new() method
         let response = client
@@ -196,7 +213,7 @@ impl Template {
         }
     }
 
-    // Download a template from the Carbone Service.
+    // Delete a template from the Carbone Service.
     /// 
     ///
     /// # Example
@@ -213,7 +230,7 @@ impl Template {
     ///    
     ///     let token =  match env::var("CARBONE_TOKEN") {
     ///             Ok(v) => v,
-    ///             Err(e) => "".to_string()
+    ///             Err(e) => panic!("{}", e.to_string())
     ///     };
     /// 
     ///     let config = Config::new("http://127.0.0.1".to_string(), 4, 2)?;
