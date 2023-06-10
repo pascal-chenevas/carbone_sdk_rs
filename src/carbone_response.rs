@@ -1,12 +1,12 @@
 use serde::{Deserialize,Serialize};
 use std::collections::HashMap;
 use std::str;
+
 // #[serde(rename_all = "camelCase")]
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CarboneSDKResponse {
     pub success: bool,
     #[serde(default)]
-    //#[serde(with = "date_serde")
     pub data: Option<HashMap<String, String>>,
     #[serde(default)]
     pub error: Option<String>,

@@ -6,8 +6,11 @@ use httpmock::prelude::*;
 use carbone_sdk_rs::carbone_response::CarboneSDKResponse;
 use carbone_sdk_rs::errors::CarboneSdkError;
 use carbone_sdk_rs::config::Config;
-use carbone_sdk_rs::types::ApiJsonToken;
 use carbone_sdk_rs::template::Template;
+
+mod helper;
+
+use helper::Helper;
 
 #[cfg(test)]
 mod tests {
@@ -15,28 +18,6 @@ mod tests {
     use super::*;
     use anyhow::Result;
     use carbone_sdk_rs::template::TemplateId;
-
-    const TOKEN_TEST: &str = "test_32u1i3ui1212334395349dsaowe912384ads89de8e93hj123iowa21085dsaowe91843784p213894dsa912384ads89de8e93hj123iowa210309dhsudausdasda72q37q783hy3243829434gdgadghdsaowe912384ads89de8e93hj1owa21023113i12u32i1321io39534985dsaowe9123843784p213894309dhsudausdasda72q37q783h43784p213894309dhsuda4gdgadghdsaow2384ads89de8e93hj123iowa21023113i12u32i1321io39534985dsa";
-
-    fn create_config_for_mock_server(server: Option<&MockServer>) -> Result<Config, CarboneSdkError> {
-
-        let port = match server {
-            Some(s) => s.port(),
-            None => 8080
-        };
-
-        let config = Config::new(
-            format!("{}{}", "http://127.0.0.1:", port), // port changes each run when used with the MockServer
-            4,
-            2
-        )?;
-        Ok(config)
-    }
-
-    fn create_api_token() -> Result<ApiJsonToken> {
-        let api_token = ApiJsonToken::new(TOKEN_TEST.to_string())?;
-        Ok(api_token)
-    }
 
     #[test]
     fn test_downaload() -> Result<(), CarboneSdkError> {
@@ -56,9 +37,10 @@ mod tests {
                 .body(template_file_content.clone());
         });
 
-        let config = create_config_for_mock_server(Some(&server))?;
+        let helper = Helper::new();
+        let config = helper.create_config_for_mock_server(Some(&server))?;
 
-        let api_token = create_api_token()?;
+        let api_token = helper.create_api_token()?;
 
         let template: Template = Template::new(config, api_token);
 
@@ -96,9 +78,10 @@ mod tests {
                 .json_body_obj(&body);
         });
 
-        let config = create_config_for_mock_server(Some(&server))?;
+        let helper = Helper::new();
+        let config = helper.create_config_for_mock_server(Some(&server))?;
 
-        let api_token = create_api_token()?;
+        let api_token = helper.create_api_token()?;
 
         let template: Template = Template::new(config, api_token);
 
@@ -119,7 +102,8 @@ mod tests {
 
         let config: Config = Default::default();
     
-        let api_token = create_api_token()?;
+        let helper = Helper::new();
+        let api_token = helper.create_api_token()?;
         let template: Template = Template::new(config, api_token);
 
         let file_name = "tests/data/template.test.odt".to_string();
@@ -136,7 +120,8 @@ mod tests {
 
         let config: Config = Default::default();
     
-        let api_token = create_api_token()?;
+        let helper = Helper::new();
+        let api_token = helper.create_api_token()?;
         let template: Template = Template::new(config, api_token);
 
         let file_name = "tests/data/template.test.odt".to_string();
@@ -153,7 +138,8 @@ mod tests {
 
         let config: Config = Default::default();
     
-        let api_token = create_api_token()?;
+        let helper = Helper::new();
+        let api_token = helper.create_api_token()?;
         let template: Template = Template::new(config, api_token);
 
         let file_name = "tests/data/template.test.odt".to_string();
@@ -171,7 +157,8 @@ mod tests {
 
         let config: Config = Default::default();
     
-        let api_token = create_api_token()?;
+        let helper = Helper::new();
+        let api_token = helper.create_api_token()?;
         let template: Template = Template::new(config, api_token);
 
         let file_name = "tests/data/template.test.html".to_string();
@@ -189,7 +176,8 @@ mod tests {
 
         let config: Config = Default::default();
     
-        let api_token = create_api_token()?;
+        let helper = Helper::new();
+        let api_token = helper.create_api_token()?;
         let template: Template = Template::new(config, api_token);
 
         let file_name = "tests/data/template.test.html".to_string();
@@ -208,7 +196,8 @@ mod tests {
 
         let config: Config = Default::default();
     
-        let api_token = create_api_token()?;
+        let helper = Helper::new();
+        let api_token = helper.create_api_token()?;
         let template: Template = Template::new(config, api_token);
 
         let file_name = "".to_string();
@@ -250,9 +239,10 @@ mod tests {
                 .json_body_obj(&body);
         });
 
-        let config = create_config_for_mock_server(Some(&server))?;
+        let helper = Helper::new();
+        let config = helper.create_config_for_mock_server(Some(&server))?;
     
-        let api_token = create_api_token()?;
+        let api_token = helper.create_api_token()?;
         let template: Template = Template::new(config, api_token);
 
         let template_file = String::from("tests/data/template.odt");
@@ -290,9 +280,10 @@ mod tests {
                 .json_body_obj(&body);
         });
 
-        let config = create_config_for_mock_server(Some(&server))?;
+        let helper = Helper::new();
+        let config = helper.create_config_for_mock_server(Some(&server))?;
     
-        let api_token = create_api_token()?;
+        let api_token = helper.create_api_token()?;
         let template: Template = Template::new(config, api_token);
 
         let template_file = String::from("tests/data/template.odt");
@@ -308,9 +299,10 @@ mod tests {
     #[test]
     fn test_upload_template_template_file_path_not_given() -> Result<(), CarboneSdkError> {
 
-        let config = create_config_for_mock_server(None)?;
+        let helper = Helper::new();
+        let config = helper.create_config_for_mock_server(None)?;
 
-        let api_token = create_api_token()?;
+        let api_token = helper.create_api_token()?;
         let template: Template = Template::new(config, api_token);
 
         let template_file = String::from("");
@@ -326,9 +318,10 @@ mod tests {
     #[test]
     fn test_upload_template_error_with_a_non_existing_file() -> Result<(), CarboneSdkError> {
 
-        let config = create_config_for_mock_server(None)?;
+        let helper = Helper::new();
+        let config = helper.create_config_for_mock_server(None)?;
         
-        let api_token = create_api_token()?;
+        let api_token = helper.create_api_token()?;
         let template: Template = Template::new(config, api_token);
 
         let template_file = String::from("/wrong/path/to/template.odt");
@@ -346,9 +339,10 @@ mod tests {
     #[test]
     fn test_upload_template_error_with_directory() -> Result<(), CarboneSdkError> {
 
-        let config = create_config_for_mock_server(None)?;
+        let helper = Helper::new();
+        let config = helper.create_config_for_mock_server(None)?;
         
-        let api_token = create_api_token()?;
+        let api_token = helper.create_api_token()?;
         let template: Template = Template::new(config, api_token);
 
         let template_file = String::from("tests");
@@ -385,9 +379,10 @@ mod tests {
                 .json_body_obj(&body);
         });
 
-        let config = create_config_for_mock_server(Some(&server))?;
+        let helper = Helper::new();
+        let config = helper.create_config_for_mock_server(Some(&server))?;
 
-        let api_token = create_api_token()?;
+        let api_token = helper.create_api_token()?;
 
         let template: Template = Template::new(config, api_token);
 
@@ -424,9 +419,10 @@ mod tests {
                 .json_body_obj(&body);
         });
 
-        let config = create_config_for_mock_server(Some(&server))?;
+        let helper = Helper::new();
+        let config = helper.create_config_for_mock_server(Some(&server))?;
 
-        let api_token = create_api_token()?;
+        let api_token = helper.create_api_token()?;
 
         let template: Template = Template::new(config, api_token);
 
