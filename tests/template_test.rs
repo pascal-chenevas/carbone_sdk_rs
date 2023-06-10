@@ -43,7 +43,7 @@ mod tests {
 
         let template_id = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
 
-        let template_file_content = fs::read("tests/template.test.odt")?;
+        let template_file_content = fs::read("tests/data/template.test.odt")?;
 
         // Start a lightweight mock server.
         let server = MockServer::start();
@@ -122,7 +122,7 @@ mod tests {
         let api_token = create_api_token()?;
         let template: Template = Template::new(config, api_token);
 
-        let file_name = "tests/template.test.odt".to_string();
+        let file_name = "tests/data/template.test.odt".to_string();
         let template_id = template.generate_id(&file_name, "")?;
 
         let expected_template_id = "0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string();
@@ -139,7 +139,7 @@ mod tests {
         let api_token = create_api_token()?;
         let template: Template = Template::new(config, api_token);
 
-        let file_name = "tests/template.test.odt".to_string();
+        let file_name = "tests/data/template.test.odt".to_string();
         let template_id = template.generate_id(&file_name, "ThisIsAPayload")?;
 
         let expected_template_id = "7de8d1d8676abb32291ea5119cb1f78fe37fdfdc75332fcdae28f1e30d064ac0".to_string();
@@ -156,7 +156,7 @@ mod tests {
         let api_token = create_api_token()?;
         let template: Template = Template::new(config, api_token);
 
-        let file_name = "tests/template.test.odt".to_string();
+        let file_name = "tests/data/template.test.odt".to_string();
         let template_id = template.generate_id(&file_name, "8B5PmafbjdRqHuksjHNw83mvPiGj7WTE")?;
 
         let expected_template_id = "a62eb407a5d5765ddf974636de8ab47bda7915cebd61197d7a2bb42ae70ffcd6".to_string();
@@ -174,7 +174,7 @@ mod tests {
         let api_token = create_api_token()?;
         let template: Template = Template::new(config, api_token);
 
-        let file_name = "tests/template.test.html".to_string();
+        let file_name = "tests/data/template.test.html".to_string();
         let template_id = template.generate_id(&file_name, "")?;
 
         let expected_template_id = "75256dd5c260cdf039ae807d3a007e78791e2d8963ea1aa6aff87ba03074df7f".to_string();
@@ -192,7 +192,7 @@ mod tests {
         let api_token = create_api_token()?;
         let template: Template = Template::new(config, api_token);
 
-        let file_name = "tests/template.test.html".to_string();
+        let file_name = "tests/data/template.test.html".to_string();
         let payload = "This is a long payload with different characters 1 *5 &*9 %$ 3%&@9 @(( 3992288282 29299 9299929";
         let template_id = template.generate_id(&file_name, payload)?;
 
@@ -255,7 +255,7 @@ mod tests {
         let api_token = create_api_token()?;
         let template: Template = Template::new(config, api_token);
 
-        let template_file = String::from("template.odt");
+        let template_file = String::from("tests/data/template.odt");
         let template_id = template.upload(&template_file, "".to_string())?;
         
         // Assert
@@ -295,7 +295,7 @@ mod tests {
         let api_token = create_api_token()?;
         let template: Template = Template::new(config, api_token);
 
-        let template_file = String::from("template.odt");
+        let template_file = String::from("tests/data/template.odt");
         let template_id = template.upload(&template_file, "salt1234".to_string())?;
 
         // Assert
