@@ -221,6 +221,7 @@ impl Template {
     /// ```no_run
     /// use std::env;
     /// 
+    /// use carbone_sdk_rs::template::TemplateId;
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::types::ApiJsonToken;
     /// use carbone_sdk_rs::template::Template;
@@ -239,22 +240,20 @@ impl Template {
     /// 
     ///     let template_file = String::from("template.odt");
     /// 
+    ///     let template_id = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
     ///     let template = Template::new(config, api_token);
-    ///     let template_id = "0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string();
-    ///     let is_deleted = template.delete(&template_id)?;
+    /// 
+    ///     let is_deleted = template.delete(template_id)?;
     /// 
     ///     assert_eq!(is_deleted, true);
     /// 
     ///     Ok(())
     /// }
     /// ```
-    pub fn delete(&self, template_id: &String) -> Result<bool> {
-        if template_id.is_empty() {
-            return Err(CarboneSdkError::MissingTemplateId);
-        }
-
+    pub fn delete(&self, template_id: TemplateId) -> Result<bool> {
+       
         let client = reqwest::blocking::Client::new();
-        let url = format!("{}/template/{}", self.config.api_url, template_id);
+        let url = format!("{}/template/{}", self.config.api_url, template_id.as_str());
 
         // TODO move new client to new() method
         let response = client

@@ -84,6 +84,7 @@ mod tests {
 
         let expected_template_id = "0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string();
         assert_eq!(expected_template_id, template_id);
+
         Ok(())
     }
 
@@ -280,7 +281,7 @@ mod tests {
     }
 
     #[test]
-    fn test_add_template_error_with_a_non_existing_file() -> Result<(), CarboneSdkError> {
+    fn test_upload_template_error_with_a_non_existing_file() -> Result<(), CarboneSdkError> {
 
         let config = create_config_for_mock_server(None)?;
         
@@ -300,7 +301,7 @@ mod tests {
     }
 
     #[test]
-    fn test_add_template_error_with_directory() -> Result<(), CarboneSdkError> {
+    fn test_upload_template_error_with_directory() -> Result<(), CarboneSdkError> {
 
         let config = create_config_for_mock_server(None)?;
         
