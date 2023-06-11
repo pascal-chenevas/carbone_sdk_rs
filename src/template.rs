@@ -35,14 +35,14 @@ impl TemplateId {
 
   }
 
-pub struct Template {
-    config: Config,
-    api_token: ApiJsonToken,
+pub struct Template<'a> {
+    config: &'a Config,
+    api_token: &'a ApiJsonToken,
 }
 
-impl Template {
+impl <'a>Template<'a> {
 
-    pub fn new(config: Config, api_token: ApiJsonToken) -> Self {
+    pub fn new(config: &'a Config, api_token: &'a ApiJsonToken) -> Self {
         Self {
             config,
             api_token
@@ -91,9 +91,9 @@ impl Template {
     ///             Err(e) => panic!("{}", e.to_string())
     ///     };
     /// 
-    ///     let config = Config::new("http://127.0.0.1".to_string(), 4, 2)?;
+    ///     let config = &Config::new("http://127.0.0.1".to_string(), 4, 2)?;
     /// 
-    ///     let api_token = ApiJsonToken::new(token)?;
+    ///     let api_token = &ApiJsonToken::new(token)?;
     /// 
     ///     let template_file = String::from("template.odt");
     /// 
@@ -177,9 +177,9 @@ impl Template {
     ///             Err(e) => panic!("{}", e.to_string())
     ///     };
     /// 
-    ///     let config = Config::new("http://127.0.0.1".to_string(), 4, 2)?;
+    ///     let config = &Config::new("http://127.0.0.1".to_string(), 4, 2)?;
     /// 
-    ///     let api_token = ApiJsonToken::new(token)?;
+    ///     let api_token = &ApiJsonToken::new(token)?;
     /// 
     ///     let template_file = String::from("template.odt");
     /// 
@@ -251,9 +251,9 @@ impl Template {
     ///             Err(e) => panic!("{}", e.to_string())
     ///     };
     /// 
-    ///     let config = Config::new("http://127.0.0.1".to_string(), 4, 2)?;
+    ///     let config = &Config::new("http://127.0.0.1".to_string(), 4, 2)?;
     /// 
-    ///     let api_token = ApiJsonToken::new(token)?;
+    ///     let api_token = &ApiJsonToken::new(token)?;
     /// 
     ///     let template_file = String::from("template.odt");
     /// 
