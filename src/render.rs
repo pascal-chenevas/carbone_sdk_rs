@@ -11,6 +11,51 @@ use reqwest::header::HeaderValue;
 
 use crate::template::Template;
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RenderOptions {
+    render_options: String,
+}
+
+impl RenderOptions {
+     /// Create a new render_options.
+    /// 
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use std::env;
+    /// 
+    /// use carbone_sdk_rs::render::RenderOptions;
+    /// use carbone_sdk_rs::errors::CarboneSdkError;
+    ///
+    /// fn main() -> Result<(), CarboneSdkError> {
+    ///    
+    ///     let render_options_value = r#"
+    ///        "data" : {
+    ///            "firstname" : "John",
+    ///            "lastname" : "Wick"
+    ///        },
+    ///        "convertTo" : "odt"
+    ///    "#;
+    ///    
+    ///    let render_options = RenderOptions::new(render_options_value.to_string())?;
+    ///
+    ///    assert_eq!(render_options.as_str(), render_options_value);
+    /// 
+    ///     Ok(())
+    /// }
+    /// ```
+    pub fn new(s: String) -> Result<Self> {
+
+        if s.len() == 0 {
+            return Err(CarboneSdkError::EmptyString("render_options".to_string()));
+        }
+        Ok(Self{render_options: s})  
+    }
+  
+    pub fn as_str(&self) -> &str { &self.render_options }
+}
+
 pub struct Render<'a> {
     config: &'a Config,
     api_token: &'a ApiJsonToken,
@@ -28,7 +73,7 @@ impl <'a>Render<'a> {
     pub fn render_report_with_file(
         &self,
         file_name: String,
-        render_options: String,
+        render_options: RenderOptions,
         payload: &str
     ) -> Result<String> {
 
@@ -44,15 +89,13 @@ impl <'a>Render<'a> {
     pub fn render_report_with_template_id(
         &self,
         template_id: TemplateId,
-        render_options: String,
+        render_options: RenderOptions,
     ) -> Result<String> {
         Ok(self.render_data(template_id, render_options)?)
     }
 
-    fn render_data(&self, template_id: TemplateId, render_options: String) -> Result<String> {
-        if render_options.is_empty() {
-            return Err(CarboneSdkError::MissingRenderOptions);
-        }
+    fn render_data(&self, template_id: TemplateId, render_options: RenderOptions) -> Result<String> {
+
         let client = reqwest::blocking::Client::new();
         let url = format!("{}/render/{}", self.config.api_url, template_id.as_str());
 
@@ -65,7 +108,7 @@ impl <'a>Render<'a> {
             )
             .header("Content-Type", "application/json")
             .bearer_auth(self.api_token.as_str())
-            .body(render_options)
+            .body(render_options.as_str().to_owned())
             .send();
 
         match response {

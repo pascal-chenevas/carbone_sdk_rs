@@ -1,6 +1,8 @@
 use validator::Validate;
 use anyhow::Result;
 
+use crate::errors::CarboneSdkError;
+
 #[derive(Debug, Clone, Validate, PartialEq, Eq)]
 pub struct ApiJsonToken {
     #[validate(length(min = 357))]
@@ -17,4 +19,4 @@ impl ApiJsonToken {
   
     pub fn as_str(&self) -> &str { &self.api_token }
 
-  }
+}

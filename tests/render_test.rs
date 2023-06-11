@@ -1,6 +1,6 @@
 use httpmock::prelude::*;
 
-use carbone_sdk_rs::render::Render;
+use carbone_sdk_rs::render::*;
 use carbone_sdk_rs::errors::CarboneSdkError;
 
 use serde_json::json;
@@ -15,6 +15,38 @@ mod tests {
     use super::*;
     use anyhow::Result;
     use carbone_sdk_rs::template::*;
+
+    #[test]
+    fn test_render_options() -> Result<(), CarboneSdkError> {
+
+        let render_options_value = r#"
+            "data" : {
+                "firstname" : "John",
+                "lastname" : "Wick"
+            },
+            "convertTo" : "odt"
+        "#;
+        
+        let render_options = RenderOptions::new(render_options_value.to_string())?;
+
+        assert_eq!(render_options.as_str(), render_options_value);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_render_options_value_not_given() -> Result<(), CarboneSdkError> {
+
+        let render_options = "";
+        let result = RenderOptions::new(render_options.to_string());
+
+        let exepected_error = CarboneSdkError::EmptyString("render_options".to_string());
+        
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().to_string(), exepected_error.to_string());
+
+        Ok(())
+    }
 
     #[test]
     fn test_render_report_with_template_id() -> Result<(), CarboneSdkError> {
@@ -55,10 +87,11 @@ mod tests {
             "convertTo" : "odt"
         "#);
 
-        let resp = render.render_report_with_template_id(template_id, render_options)?;
+        let render_options = RenderOptions::new(render_options)?;
+        let render_id = render.render_report_with_template_id(template_id, render_options)?;
 
         mock_server.assert();
-        assert_eq!(resp, expected_render_id);
+        assert_eq!(render_id, expected_render_id);
 
         Ok(())
     }
@@ -105,11 +138,12 @@ mod tests {
             },
             "convertTo" : "odt"
         "#);
+        let render_options = RenderOptions::new(render_options)?;
 
-        let resp = render.render_report_with_file(template_file_name, render_options, "")?;
+        let render_id = render.render_report_with_file(template_file_name, render_options, "")?;
 
         mock_server.assert();
-        assert_eq!(resp, expected_render_id);
+        assert_eq!(render_id, expected_render_id);
 
         Ok(())
     }

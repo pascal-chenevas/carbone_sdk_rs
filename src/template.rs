@@ -23,6 +23,26 @@ pub struct TemplateId {
 }
 
 impl TemplateId {
+    /// Create a new template_id.
+    /// 
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use std::env;
+    /// 
+    /// use carbone_sdk_rs::template::TemplateId;
+    /// use carbone_sdk_rs::errors::CarboneSdkError;
+    ///
+    /// fn main() -> Result<(), CarboneSdkError> {
+    ///    
+    ///     let template_id = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
+    /// 
+    ///     assert_eq!(template_id.as_str().is_empty(), false);
+    /// 
+    ///     Ok(())
+    /// }
+    /// ```
     pub fn new(s: String) -> Result<Self> {
         if s.is_empty() {
             return Err(CarboneSdkError::EmptyString("template_id".to_string()));
