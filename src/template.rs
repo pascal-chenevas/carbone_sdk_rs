@@ -184,10 +184,9 @@ impl <'a>Template<'a> {
     /// ```no_run
     /// use std::env;
     /// 
-    /// use carbone_sdk_rs::template::TemplateId;
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::types::ApiJsonToken;
-    /// use carbone_sdk_rs::template::Template;
+    /// use carbone_sdk_rs::template::{Template, TemplateId};
     /// use carbone_sdk_rs::errors::CarboneSdkError;
     ///
     /// fn main() -> Result<(), CarboneSdkError> {
@@ -258,10 +257,9 @@ impl <'a>Template<'a> {
     /// ```no_run
     /// use std::env;
     /// 
-    /// use carbone_sdk_rs::template::TemplateId;
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::types::ApiJsonToken;
-    /// use carbone_sdk_rs::template::Template;
+    /// use carbone_sdk_rs::template::{Template, TemplateId};
     /// use carbone_sdk_rs::errors::CarboneSdkError;
     ///
     /// fn main() -> Result<(), CarboneSdkError> {
