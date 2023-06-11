@@ -17,7 +17,7 @@ pub struct RenderOptions {
 }
 
 impl RenderOptions {
-     /// Create a new render_options.
+    /// Create a new render_options.
     /// 
     ///
     /// # Example
@@ -63,6 +63,34 @@ pub struct Render<'a> {
 
 impl <'a>Render<'a> {
 
+    /// Create a new render stuct.
+    /// 
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use std::env;
+    /// 
+    /// use carbone_sdk_rs::render::Render;
+    /// use carbone_sdk_rs::errors::CarboneSdkError;
+    /// use carbone_sdk_rs::config::Config;
+    /// use carbone_sdk_rs::types::ApiJsonToken;
+    /// 
+    /// fn main() -> Result<(), CarboneSdkError> {
+    ///    
+    /// 
+    ///    let token =  match env::var("CARBONE_TOKEN") {
+    ///             Ok(v) => v,
+    ///             Err(e) => panic!("{}", e.to_string())
+    ///     };
+    ///     let config = &Config::new("http://127.0.0.1".to_string(), 4, 2)?;
+    ///     let api_token = &ApiJsonToken::new(token)?;
+    ///    
+    ///     let render = Render::new(&config, &api_token);
+    /// 
+    ///     Ok(())
+    /// }
+    /// ```
     pub fn new(config: &'a Config, api_token: &'a ApiJsonToken) -> Self {
         Self {
             config,
@@ -70,6 +98,49 @@ impl <'a>Render<'a> {
         }
     }
 
+    /// Render data with a given template file.
+    /// 
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use std::env;
+    /// 
+    /// use carbone_sdk_rs::render::{Render, RenderOptions};
+    /// use carbone_sdk_rs::errors::CarboneSdkError;
+    /// use carbone_sdk_rs::config::Config;
+    /// use carbone_sdk_rs::types::ApiJsonToken;
+    /// 
+    /// fn main() -> Result<(), CarboneSdkError> {
+    ///    
+    ///     let token =  match env::var("CARBONE_TOKEN") {
+    ///             Ok(v) => v,
+    ///             Err(e) => panic!("{}", e.to_string())
+    ///     };
+    /// 
+    ///     let config = &Config::new("http://127.0.0.1".to_string(), 4, 2)?;
+    ///     let api_token = &ApiJsonToken::new(token)?;
+    /// 
+    ///     let render = Render::new(config, &api_token);
+    ///    
+    ///     let render_options_value = String::from(r#"
+    ///         "data" : {
+    ///             "firstname" : "John",
+    ///             "lastname" : "Wick"
+    ///         },
+    ///         "convertTo" : "odt"
+    ///     "#);
+    /// 
+    ///     let render_options = RenderOptions::new(render_options_value)?;
+    /// 
+    ///     let template_file_name = "tests/data/template.test.odt".to_string();
+    ///     let render_id = render.render_report_with_file(template_file_name, render_options, "")?;
+    /// 
+    ///     assert_eq!(render_id.is_empty(), false);
+    /// 
+    ///     Ok(())
+    /// }
+    /// ```
     pub fn render_report_with_file(
         &self,
         file_name: String,
@@ -86,6 +157,51 @@ impl <'a>Render<'a> {
         Ok(render_id)
     }
 
+    /// Render data with a given template_id.
+    /// 
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use std::env;
+    /// 
+    /// use carbone_sdk_rs::render::{Render, RenderOptions};
+    /// use carbone_sdk_rs::config::Config;
+    /// use carbone_sdk_rs::template::TemplateId;
+    /// use carbone_sdk_rs::errors::CarboneSdkError;
+    /// use carbone_sdk_rs::types::ApiJsonToken;
+    /// 
+    /// fn main() -> Result<(), CarboneSdkError> {
+    /// 
+    ///     let token =  match env::var("CARBONE_TOKEN") {
+    ///             Ok(v) => v,
+    ///             Err(e) => panic!("{}", e.to_string())
+    ///     };
+    /// 
+    ///     let config = Config::new("http://127.0.0.1".to_string(), 4, 2)?;
+    ///     let api_token = ApiJsonToken::new(token)?;
+    /// 
+    ///     let template_id = TemplateId::new("foiejwoi21e093ru3209jf2093j".to_string())?;
+    /// 
+    ///     let render = Render::new(&config, &api_token);
+    ///    
+    ///     let render_options_value = String::from(r#"
+    ///         "data" : {
+    ///             "firstname" : "John",
+    ///             "lastname" : "Wick"
+    ///         },
+    ///         "convertTo" : "odt"
+    ///     "#);
+    /// 
+    ///     let render_options = RenderOptions::new(render_options_value)?;
+    /// 
+    ///     let render_id = render.render_report_with_template_id(template_id, render_options)?;
+    /// 
+    ///     assert_eq!(render_id.is_empty(), false);
+    /// 
+    ///     Ok(())
+    /// }
+    /// ```
     pub fn render_report_with_template_id(
         &self,
         template_id: TemplateId,
