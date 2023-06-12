@@ -55,6 +55,7 @@ impl TemplateId {
 
   }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Template<'a> {
     config: &'a Config,
     api_token: &'a ApiJsonToken,

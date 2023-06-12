@@ -1,47 +1,49 @@
+use std::fs;
 
 use httpmock::prelude::*;
 
 use carbone_sdk_rs::carbone::CarboneSDK;
 use carbone_sdk_rs::errors::CarboneSdkError;
-use carbone_sdk_rs::config::Config;
+use carbone_sdk_rs::render::*;
+
+mod helper;
+
+use helper::Helper;
 
 #[cfg(test)]
 mod tests {
 
     use super::*;
 
-    const TOKEN_TEST: &str = "test_32u1i3ui121233439534985dsaowe9123843784p213894309dhsudausdasda72q37q783hy3243829434gdgadghads89de8e93hj123iowa21023113i12u32i1321io";
-
-    fn create_config_for_mock_server(server: Option<&MockServer>) -> Result<Config, CarboneSdkError> {
-
-        let port = match server {
-            Some(s) => s.port(),
-            None => 8080
-        };
-
-        let config = Config::new(
-            format!("{}{}", "http://127.0.0.1:", port), // port changes each run when used with the MockServer
-            4,
-            2
-        )?;
-        Ok(config)
-    }
-
     #[test]
-    fn test_get_report_error_missing_render_id() -> Result<(), CarboneSdkError> {
+    fn test_get_report() -> Result<(), CarboneSdkError> {
         
-        let config = create_config_for_mock_server(None)?;
-        let carbone_sdk = CarboneSDK::new(&config, TOKEN_TEST.to_string())?;
+        // Start a lightweight mock server.
+        let server = MockServer::start();
 
-        let result = carbone_sdk.get_report(&"".to_string());
+        let helper = Helper::new();
 
-        let is_err = result.is_err();
-        let error = result.unwrap_err().to_string();
+        let config = &helper.create_config_for_mock_server(Some(&server))?;
+        let api_token = &helper.create_api_token()?;
 
-        let expected_error = CarboneSdkError::MissingRenderId.to_string(); 
-        
-        assert!(is_err);
-        assert_eq!(expected_error.to_string(), error);
+        let carbone_sdk = CarboneSDK::new(&config, api_token)?;
+
+        let render_id_value = "0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114.pdf";
+        let render_id = &RenderId::new(render_id_value.to_string())?;
+
+        let rendered_file_content = fs::read("tests/data/report.pdf")?;
+
+        let mock_server = server.mock(|when, then| {
+            when.method("GET")
+                .path(format!("/render/{}", render_id.as_str()));
+            then.status(200)
+                .body(rendered_file_content.clone());
+        });
+
+        let report_content = carbone_sdk.get_report(render_id)?;
+    
+        mock_server.assert();
+        assert_eq!(report_content, rendered_file_content.to_vec());
 
         Ok(())
     }

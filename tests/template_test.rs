@@ -37,13 +37,12 @@ mod tests {
         let result = TemplateId::new(template_id_value.to_string());
 
         let exepected_error = CarboneSdkError::EmptyString("template_id".to_string());
-        
+
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().to_string(), exepected_error.to_string());
 
         Ok(())
     }
-
 
     #[test]
     fn test_downaload() -> Result<(), CarboneSdkError> {

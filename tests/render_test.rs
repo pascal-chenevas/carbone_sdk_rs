@@ -49,6 +49,31 @@ mod tests {
     }
 
     #[test]
+    fn test_template_id() -> Result<(), CarboneSdkError> {
+
+        let render_id_value = "0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114";
+        let render_id = TemplateId::new(render_id_value.to_string())?;
+
+        assert_eq!(render_id.as_str(), render_id_value);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_render_id_empty_value_given() -> Result<(), CarboneSdkError> {
+
+        let render_id_value = "";
+        let result = RenderId::new(render_id_value.to_string());
+
+        let exepected_error = CarboneSdkError::EmptyString("render_id".to_string());
+
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().to_string(), exepected_error.to_string());
+
+        Ok(())
+    }
+
+    #[test]
     fn test_render_report_with_file() -> Result<(), CarboneSdkError> {
 
         // Start a lightweight mock server.
@@ -147,5 +172,5 @@ mod tests {
 
         Ok(())
     }
-    
+
 }
