@@ -1,18 +1,15 @@
-use std::str;
-
 use bytes::Bytes;
 
 use reqwest::header::HeaderValue;
 
 use validator::Validate;
 
-use crate::carbone_response::CarboneSDKResponse;
-use crate::config::Config;
 use crate::errors::*;
+
+use crate::config::Config;
 use crate::types::ApiJsonToken;
-use crate::render::Render;
-use crate::template::Template;
-use crate::render::RenderId;
+use crate::render::*;
+use crate::template::*;
 
 pub type Result<T> = std::result::Result<T, CarboneSdkError>;
 
@@ -33,6 +30,41 @@ impl <'a>CarboneSDK<'a> {
         Ok(Self { config: config, api_token: api_token, template: template, render: render })
     }
 
+    /// Create a new render_options.
+    /// 
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use std::env;
+    /// 
+    /// use carbone_sdk_rs::config::Config;
+    /// use carbone_sdk_rs::render::{Render, RenderId};
+    /// use carbone_sdk_rs::carbone::CarboneSDK;
+    /// use carbone_sdk_rs::types::ApiJsonToken;
+    /// use carbone_sdk_rs::errors::CarboneSdkError;
+    ///
+    /// fn main() -> Result<(), CarboneSdkError> {
+    ///    
+    ///     let token =  match env::var("CARBONE_TOKEN") {
+    ///             Ok(v) => v,
+    ///             Err(e) => panic!("{}", e.to_string())
+    ///     };
+    /// 
+    ///     let config = &Config::new("http://127.0.0.1".to_string(), 4, 2)?;
+    /// 
+    ///     let api_token = &ApiJsonToken::new(token)?;
+    /// 
+    ///     let carbone_sdk = CarboneSDK::new(&config, api_token)?;
+    /// 
+    ///     let render_id = &RenderId::new("MTAuMjAuMjEuMTAgICAg01E98H4R7PMC2H6XSE5Z6J8XYQ.pdf".to_string())?;
+    ///     let report_content = carbone_sdk.get_report(render_id)?;
+    /// 
+    ///     assert_eq!(report_content.is_empty(), false);
+    /// 
+    ///     Ok(())
+    /// }
+    /// ```
     pub fn get_report(&self, render_id: &RenderId) -> Result<Bytes> {
        
         let client = reqwest::blocking::Client::new();
@@ -54,5 +86,115 @@ impl <'a>CarboneSDK<'a> {
         }
     }
 
+    /// Generate a report with a template_id given.
+    /// 
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use std::env;
+    /// 
+    /// use carbone_sdk_rs::config::Config;
+    /// use carbone_sdk_rs::render::*;
+    /// use carbone_sdk_rs::carbone::CarboneSDK;
+    /// use carbone_sdk_rs::types::ApiJsonToken;
+    /// use carbone_sdk_rs::template::TemplateId;
+    /// 
+    /// use carbone_sdk_rs::errors::CarboneSdkError;
+    ///
+    /// fn main() -> Result<(), CarboneSdkError> {
+    ///    
+    ///     let token =  match env::var("CARBONE_TOKEN") {
+    ///             Ok(v) => v,
+    ///             Err(e) => panic!("{}", e.to_string())
+    ///     };
+    /// 
+    ///     let config = &Config::new("http://127.0.0.1".to_string(), 4, 2)?;
+    /// 
+    ///     let api_token = &ApiJsonToken::new(token)?;
+    /// 
+    ///     let template_id = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
+    ///     let carbone_sdk = CarboneSDK::new(&config, api_token)?;
+    /// 
+    ///     let render_options_value = String::from(r#"
+    ///         "data" : {
+    ///             "firstname" : "John",
+    ///             "lastname" : "Wick"
+    ///         },
+    ///         "convertTo" : "odt"
+    ///     "#);
+    /// 
+    ///     let render_options = RenderOptions::new(render_options_value)?;
+    ///     let report_content = carbone_sdk.generate_report_with_template_id(template_id, render_options)?;
+    /// 
+    ///     assert_eq!(report_content.is_empty(), false);
+    /// 
+    ///     Ok(())
+    /// }
+    /// ```
+    pub fn generate_report_with_template_id(&self, template_id: TemplateId, render_options: RenderOptions) -> Result<Bytes> {
+
+        let render_id_value = self.render.render_report_with_template_id(template_id, render_options)?;
+        let render_id = RenderId::new(render_id_value)?;
+        let report_content = self.get_report(&render_id)?;
+
+        Ok(report_content)
+    }
+
+/// Generate a report.
+    /// 
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use std::env;
+    /// 
+    /// use carbone_sdk_rs::config::Config;
+    /// use carbone_sdk_rs::render::*;
+    /// use carbone_sdk_rs::carbone::CarboneSDK;
+    /// use carbone_sdk_rs::types::ApiJsonToken;
+    /// use carbone_sdk_rs::template::TemplateId;
+    /// 
+    /// use carbone_sdk_rs::errors::CarboneSdkError;
+    ///
+    /// fn main() -> Result<(), CarboneSdkError> {
+    ///    
+    ///     let token =  match env::var("CARBONE_TOKEN") {
+    ///             Ok(v) => v,
+    ///             Err(e) => panic!("{}", e.to_string())
+    ///     };
+    /// 
+    ///     let config = &Config::new("http://127.0.0.1".to_string(), 4, 2)?;
+    /// 
+    ///     let api_token = &ApiJsonToken::new(token)?;
+    /// 
+    ///     let carbone_sdk = CarboneSDK::new(&config, api_token)?;
+    /// 
+    ///     let render_options_value = String::from(r#"
+    ///         "data" : {
+    ///             "firstname" : "John",
+    ///             "lastname" : "Wick"
+    ///         },
+    ///         "convertTo" : "odt"
+    ///     "#);
+    /// 
+    ///     let render_options = RenderOptions::new(render_options_value)?;
+    /// 
+    ///     let file_name = "/path/to/template.odf".to_string();
+    ///     let report_content = carbone_sdk.generate_report_with_file(file_name, render_options, "")?;
+    /// 
+    ///     assert_eq!(report_content.is_empty(), false);
+    /// 
+    ///     Ok(())
+    /// }
+    /// ```
+    pub fn generate_report_with_file(&self, file_name: String, render_options: RenderOptions, payload: &str) -> Result<Bytes> {
+
+        let render_id_value = self.render.render_report_with_file(file_name, render_options, payload)?;
+        let render_id = RenderId::new(render_id_value)?;
+        let report_content = self.get_report(&render_id)?;
+
+        Ok(report_content)
+    }
 
 }

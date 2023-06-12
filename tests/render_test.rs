@@ -49,7 +49,7 @@ mod tests {
     }
 
     #[test]
-    fn test_template_id() -> Result<(), CarboneSdkError> {
+    fn test_render_id() -> Result<(), CarboneSdkError> {
 
         let render_id_value = "0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114";
         let render_id = TemplateId::new(render_id_value.to_string())?;
