@@ -6,7 +6,7 @@
 
 carbone_sdk_rs is a Library which supply functionalites to communicate with the [Carbone API](https://carbone.io/api-reference.html).
 
-# Process to render a report
+# Process to render a new report
 
 ```mermaid
 sequenceDiagram
