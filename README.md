@@ -21,7 +21,9 @@ sequenceDiagram
 
 TODO
 
-# Render a report
+# Render a new report
+
+### Using an existing Template
 
 ```rust
 use std::env;
@@ -59,7 +61,6 @@ fn main() -> Result<(), CarboneSdkError> {
     let render_options = RenderOptions::new(render_options_value)?;
     let report_content = carbone_sdk.generate_report_with_template_id(template_id, render_options)?;
 
-    
     Ok(())
 }
 ```
