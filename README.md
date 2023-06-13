@@ -2,6 +2,11 @@
 [![Rust](https://github.com/pascal-chenevas/carbone_sdk_rs/actions/workflows/rust.yml/badge.svg)](https://github.com/pascal-chenevas/carbone_sdk_rs/actions/workflows/rust.yml)
 [![unstable](http://badges.github.io/stability-badges/dist/unstable.svg)](http://github.com/badges/stability-badges)
 
+# State of development
+
+This Library is under active development and doesn't reach the status of a stable release.
+Therefore it can not be used in a production environment.
+
 # carbone_sdk_rs
 
 carbone_sdk_rs is a Library that supplies functionalities to communicate with the [Carbone API](https://carbone.io/api-reference.html).
