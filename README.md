@@ -23,7 +23,46 @@ TODO
 
 # Render a report
 
-TODO
+```rust
+use std::env;
+ 
+use carbone_sdk_rs::config::Config;
+use carbone_sdk_rs::render::*;
+use carbone_sdk_rs::carbone::CarboneSDK;
+use carbone_sdk_rs::types::ApiJsonToken;
+use carbone_sdk_rs::template::TemplateId;
+ 
+use carbone_sdk_rs::errors::CarboneSdkError;
+
+fn main() -> Result<(), CarboneSdkError> {
+    
+     let token =  match env::var("CARBONE_TOKEN") {
+             Ok(v) => v,
+             Err(e) => panic!("{}", e.to_string())
+     };
+ 
+    let config = &Config::new("http://127.0.0.1".to_string(), 4, 2)?;
+ 
+    let api_token = &ApiJsonToken::new(token)?;
+ 
+    let template_id = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
+    let carbone_sdk = CarboneSDK::new(&config, api_token)?;
+ 
+    let render_options_value = String::from(r#"
+         "data" : {
+             "firstname" : "John",
+             "lastname" : "Wick"
+        },
+        "convertTo" : "odt"
+    "#);
+ 
+    let render_options = RenderOptions::new(render_options_value)?;
+    let report_content = carbone_sdk.generate_report_with_template_id(template_id, render_options)?;
+
+    
+    Ok(())
+}
+```
 
 # References
 
