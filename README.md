@@ -4,7 +4,7 @@
 
 # carbone_sdk_rs
 
-carbone_sdk_rs is a Library which supply functionalites to communicate with the [Carbone API](https://carbone.io/api-reference.html).
+carbone_sdk_rs is a Library that supplies functionalities to communicate with the [Carbone API](https://carbone.io/api-reference.html).
 
 # Process to render a new report
 
