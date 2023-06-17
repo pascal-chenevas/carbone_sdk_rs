@@ -1,25 +1,15 @@
 use thiserror::Error;
-use validator::ValidationErrors;
+
 #[derive(Error, Debug)]
 pub enum CarboneSdkError {
     #[error("Carbone SDK error: {0:?}")]
     Error(String),
     #[error("CarboneSDK: error: {0:?} can not be empty")]
     EmptyString(String),
-    #[error("CarboneSDK: \"API URL\" is missing")]
-    MissingApiUrl,
-    #[error("CarboneSDK: \"API VERSION\" is missing")]
-    MissingApiVersion,
-    #[error("CarboneSDK: \"template_id\" is missing")]
-    MissingTemplateId,
     #[error("CarboneSDK: \"template_file_name\" is missing")]
     MissingTemplateFileName,
-    #[error("CarboneSDK: \"render_id\" is missing")]
-    MissingRenderId,
     #[error("CarboneSDK: \"render_options\" is missing")]
     MissingRenderOptions,
-    #[error("Carbone SDK error: argument is missing: {0:?}")]
-    MissingArgument(String),
     #[error("Carbone SDK error: file {0:?} not found")]
     FileNotFound(String),
     #[error("Carbone SDK {0:?} is a directory")]
