@@ -3,7 +3,7 @@ use anyhow::Result;
 
 use carbone_sdk_rs::config::Config;
 use carbone_sdk_rs::types::ApiJsonToken;
-use carbone_sdk_rs::errors::CarboneSdkError;
+use carbone_sdk_rs::errors::CarboneError;
 
 const TOKEN_TEST: &str = "test_32u1i3ui1212334395349dsaowe912384ads89de8e93hj123iowa21085dsaowe91843784p213894dsa912384ads89de8e93hj123iowa210309dhsudausdasda72q37q783hy3243829434gdgadghdsaowe912384ads89de8e93hj1owa21023113i12u32i1321io39534985dsaowe9123843784p213894309dhsudausdasda72q37q783h43784p213894309dhsuda4gdgadghdsaow2384ads89de8e93hj123iowa21023113i12u32i1321io39534985dsa";
 
@@ -15,7 +15,7 @@ impl Helper {
         Self{}
     }
     
-    pub fn create_config_for_mock_server(&self, server: Option<&MockServer>) -> Result<Config, CarboneSdkError> {
+    pub fn create_config_for_mock_server(&self, server: Option<&MockServer>) -> Result<Config, CarboneError> {
     
         let port = match server {
             Some(s) => s.port(),

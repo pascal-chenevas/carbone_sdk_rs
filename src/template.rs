@@ -14,7 +14,7 @@ use sha2::{Digest, Sha256};
 
 use crate::types::ApiJsonToken;
 use crate::config::Config;
-use crate::errors::CarboneSdkError;
+use crate::errors::CarboneError;
 use crate::carbone_response::CarboneSDKResponse;
 
 use crate::carbone::Result;
@@ -29,11 +29,11 @@ impl TemplateFile {
 
     pub fn new(path: String) -> Result<Self> {
         if Path::new(path.as_str()).is_dir() {
-            return Err(CarboneSdkError::IsADirectory(path));
+            return Err(CarboneError::IsADirectory(path));
         }
 
         if !Path::new(path.as_str()).is_file() {
-            return Err(CarboneSdkError::FileNotFound(path));
+            return Err(CarboneError::FileNotFound(path));
         }
 
         let metadata = fs::metadata(path.as_str())?;
@@ -65,9 +65,9 @@ impl TemplateId {
     /// use std::env;
     /// 
     /// use carbone_sdk_rs::template::TemplateId;
-    /// use carbone_sdk_rs::errors::CarboneSdkError;
+    /// use carbone_sdk_rs::errors::CarboneError;
     ///
-    /// fn main() -> Result<(), CarboneSdkError> {
+    /// fn main() -> Result<(), CarboneError> {
     ///    
     ///     let template_id = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
     /// 
@@ -78,7 +78,7 @@ impl TemplateId {
     /// ```
     pub fn new(s: String) -> Result<Self> {
         if s.is_empty() {
-            return Err(CarboneSdkError::EmptyString("template_id".to_string()));
+            return Err(CarboneError::EmptyString("template_id".to_string()));
         }
         let template_id = Self {id: s};
         Ok(template_id)  
@@ -133,9 +133,9 @@ impl <'a>Template<'a> {
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::types::ApiJsonToken;
     /// use carbone_sdk_rs::template::{Template, TemplateFile};
-    /// use carbone_sdk_rs::errors::CarboneSdkError;
+    /// use carbone_sdk_rs::errors::CarboneError;
     ///
-    /// fn main() -> Result<(), CarboneSdkError> {
+    /// fn main() -> Result<(), CarboneError> {
     ///    
     ///     let token =  match env::var("CARBONE_TOKEN") {
     ///             Ok(v) => v,
@@ -189,10 +189,10 @@ impl <'a>Template<'a> {
                 if json.success {
                     Ok(template_id)
                 } else {
-                    Err(CarboneSdkError::ResponseError(error_msg))
+                    Err(CarboneError::ResponseError(error_msg))
                 }
             }
-            Err(e) => Err(CarboneSdkError::RequestError(e)),
+            Err(e) => Err(CarboneError::RequestError(e)),
         }
     }
 
@@ -207,9 +207,9 @@ impl <'a>Template<'a> {
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::types::ApiJsonToken;
     /// use carbone_sdk_rs::template::{Template, TemplateId};
-    /// use carbone_sdk_rs::errors::CarboneSdkError;
+    /// use carbone_sdk_rs::errors::CarboneError;
     ///
-    /// fn main() -> Result<(), CarboneSdkError> {
+    /// fn main() -> Result<(), CarboneError> {
     ///    
     ///     let token = match env::var("CARBONE_TOKEN") {
     ///             Ok(v) => v,
@@ -248,7 +248,7 @@ impl <'a>Template<'a> {
             .send();
 
         if response_result.is_err() {
-            return Err(CarboneSdkError::RequestError(response_result.unwrap_err()));
+            return Err(CarboneError::RequestError(response_result.unwrap_err()));
         } else {
 
             let response = response_result.unwrap();
@@ -256,11 +256,11 @@ impl <'a>Template<'a> {
                 if content_type == "application/json" {
                     let json = response.json::<CarboneSDKResponse>()?;
                     let error_msg = json.get_error_message();
-                    Err(CarboneSdkError::ResponseError(error_msg))
+                    Err(CarboneError::ResponseError(error_msg))
                 } else {
                     match content_type.to_str() {
-                        Ok(v) =>  Err(CarboneSdkError::Error(format!("Content-Type `{}` not supported", v))),
-                        Err(e) => Err(CarboneSdkError::Error(e.to_string())),
+                        Ok(v) =>  Err(CarboneError::Error(format!("Content-Type `{}` not supported", v))),
+                        Err(e) => Err(CarboneError::Error(e.to_string())),
                     }
                 }
             } else {
@@ -280,9 +280,9 @@ impl <'a>Template<'a> {
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::types::ApiJsonToken;
     /// use carbone_sdk_rs::template::{Template, TemplateId};
-    /// use carbone_sdk_rs::errors::CarboneSdkError;
+    /// use carbone_sdk_rs::errors::CarboneError;
     ///
-    /// fn main() -> Result<(), CarboneSdkError> {
+    /// fn main() -> Result<(), CarboneError> {
     ///    
     ///     let token =  match env::var("CARBONE_TOKEN") {
     ///             Ok(v) => v,
@@ -326,10 +326,10 @@ impl <'a>Template<'a> {
                 if json.success {
                     Ok(true)
                 } else {
-                    Err(CarboneSdkError::ResponseError(error_msg))
+                    Err(CarboneError::ResponseError(error_msg))
                 }
             }
-            Err(e) => Err(CarboneSdkError::RequestError(e)),
+            Err(e) => Err(CarboneError::RequestError(e)),
         }
     }
 }

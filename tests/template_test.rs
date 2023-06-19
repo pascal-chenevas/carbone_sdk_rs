@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use httpmock::prelude::*;
 
 use carbone_sdk_rs::carbone_response::CarboneSDKResponse;
-use carbone_sdk_rs::errors::CarboneSdkError;
+use carbone_sdk_rs::errors::CarboneError;
 use carbone_sdk_rs::config::Config;
 use carbone_sdk_rs::template::*;
 
@@ -20,7 +20,7 @@ mod tests {
     use carbone_sdk_rs::template::TemplateId;
 
     #[test]
-    fn test_template_file() -> Result<(), CarboneSdkError> {
+    fn test_template_file() -> Result<(), CarboneError> {
 
         let template_file_path = "tests/data/template.test.odt";
         let template_file = TemplateFile::new(template_file_path.to_string())?;
@@ -31,12 +31,12 @@ mod tests {
     }
 
     #[test]
-    fn test_template_file_directory_given() -> Result<(), CarboneSdkError> {
+    fn test_template_file_directory_given() -> Result<(), CarboneError> {
 
         let template_file_path = "tests/data/";
         let result = TemplateFile::new(template_file_path.to_string());
 
-        let expected_error = CarboneSdkError::IsADirectory(template_file_path.to_string());
+        let expected_error = CarboneError::IsADirectory(template_file_path.to_string());
         
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().to_string(), expected_error.to_string());
@@ -45,12 +45,12 @@ mod tests {
     }
 
     #[test]
-    fn test_template_file_not_exists_given() -> Result<(), CarboneSdkError> {
+    fn test_template_file_not_exists_given() -> Result<(), CarboneError> {
 
         let template_file_path = "tests/data/unknown_template.test.docx";
         let result = TemplateFile::new(template_file_path.to_string());
 
-        let expected_error = CarboneSdkError::FileNotFound(template_file_path.to_string());
+        let expected_error = CarboneError::FileNotFound(template_file_path.to_string());
         
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().to_string(), expected_error.to_string());
@@ -59,7 +59,7 @@ mod tests {
     }
 
     #[test]
-    fn test_template_id() -> Result<(), CarboneSdkError> {
+    fn test_template_id() -> Result<(), CarboneError> {
 
         let template_id_value = "0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114";
         let template_id = TemplateId::new(template_id_value.to_string())?;
@@ -70,12 +70,12 @@ mod tests {
     }
 
     #[test]
-    fn test_template_id_empty_value_given() -> Result<(), CarboneSdkError> {
+    fn test_template_id_empty_value_given() -> Result<(), CarboneError> {
 
         let template_id_value = "";
         let result = TemplateId::new(template_id_value.to_string());
 
-        let exepected_error = CarboneSdkError::EmptyString("template_id".to_string());
+        let exepected_error = CarboneError::EmptyString("template_id".to_string());
 
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().to_string(), exepected_error.to_string());
@@ -84,7 +84,7 @@ mod tests {
     }
 
     #[test]
-    fn test_downaload() -> Result<(), CarboneSdkError> {
+    fn test_downaload() -> Result<(), CarboneError> {
 
         let template_id = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
 
@@ -118,7 +118,7 @@ mod tests {
     }
 
     #[test]
-    fn test_downaload_unknown_template_id_given() -> Result<(), CarboneSdkError> {
+    fn test_downaload_unknown_template_id_given() -> Result<(), CarboneError> {
 
         let template_id = TemplateId::new("unknown_template_id".to_string())?;
 
@@ -151,7 +151,7 @@ mod tests {
 
         let result = template.download(template_id);
 
-        let expected_error = CarboneSdkError::ResponseError(error_msg);
+        let expected_error = CarboneError::ResponseError(error_msg);
 
         mock_server.assert();
 
@@ -162,7 +162,7 @@ mod tests {
     }
 
     #[test]
-    fn test_generate_template_id_odt_1() -> Result<(), CarboneSdkError> {
+    fn test_generate_template_id_odt_1() -> Result<(), CarboneError> {
 
         let config: Config = Default::default();
     
@@ -181,7 +181,7 @@ mod tests {
     }
 
     #[test]
-    fn test_generate_template_id_odt_2_payload_1() -> Result<(), CarboneSdkError> {
+    fn test_generate_template_id_odt_2_payload_1() -> Result<(), CarboneError> {
 
         let config: Config = Default::default();
     
@@ -200,7 +200,7 @@ mod tests {
     }
 
     #[test]
-    fn test_generate_template_id_odt_3_payload_2() -> Result<(), CarboneSdkError> {
+    fn test_generate_template_id_odt_3_payload_2() -> Result<(), CarboneError> {
 
         let config: Config = Default::default();
     
@@ -220,7 +220,7 @@ mod tests {
 
 
     #[test]
-    fn test_generate_template_id_html_1() -> Result<(), CarboneSdkError> {
+    fn test_generate_template_id_html_1() -> Result<(), CarboneError> {
 
         let config: Config = Default::default();
     
@@ -239,7 +239,7 @@ mod tests {
     }  
 
     #[test]
-    fn test_generate_template_id_html_2_payload_1() -> Result<(), CarboneSdkError> {
+    fn test_generate_template_id_html_2_payload_1() -> Result<(), CarboneError> {
 
         let config: Config = Default::default();
     
@@ -258,7 +258,7 @@ mod tests {
     }  
 
     #[test]
-    fn test_upload_template() -> Result<(), CarboneSdkError> {
+    fn test_upload_template() -> Result<(), CarboneError> {
 
         let mut data = HashMap::new();
         let template_id_expected = "0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string();
@@ -299,7 +299,7 @@ mod tests {
     }
 
     #[test]
-    fn test_upload_template_with_payload() -> Result<(), CarboneSdkError> {
+    fn test_upload_template_with_payload() -> Result<(), CarboneError> {
 
         let mut data = HashMap::new();
         let template_id_expected = "cb03f7676ef0fbe5d7824a64676166ac2c7c789d9e6da5b7c0c46794911ee7a7".to_string();
@@ -340,7 +340,7 @@ mod tests {
     }
 
     #[test]
-    fn test_delete() -> Result<(), CarboneSdkError> {
+    fn test_delete() -> Result<(), CarboneError> {
 
         let template_id = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
 
@@ -378,7 +378,7 @@ mod tests {
     }
 
     #[test]
-    fn test_delete_unknown_template_id_given() -> Result<(), CarboneSdkError> {
+    fn test_delete_unknown_template_id_given() -> Result<(), CarboneError> {
 
         let template_id = TemplateId::new("unknown_template_id".to_string())?;
 
@@ -410,7 +410,7 @@ mod tests {
 
         let result = template.delete(template_id);
 
-        let expected_error = CarboneSdkError::ResponseError(error_msg);
+        let expected_error = CarboneError::ResponseError(error_msg);
 
         mock_server.assert();
 

@@ -3,7 +3,7 @@ use std::fs;
 use httpmock::prelude::*;
 
 use carbone_sdk_rs::carbone::Carbone;
-use carbone_sdk_rs::errors::CarboneSdkError;
+use carbone_sdk_rs::errors::CarboneError;
 use carbone_sdk_rs::render::*;
 
 mod helper;
@@ -16,7 +16,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_get_report() -> Result<(), CarboneSdkError> {
+    fn test_get_report() -> Result<(), CarboneError> {
         
         // Start a lightweight mock server.
         let server = MockServer::start();

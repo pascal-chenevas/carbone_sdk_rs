@@ -7,7 +7,7 @@ use anyhow::{Result, anyhow};
 
 use validator::Validate;
 
-use crate::errors::CarboneSdkError;
+use crate::errors::CarboneError;
 use serde::Deserialize;
 use std::fs;
 use std::str::FromStr;
@@ -32,9 +32,9 @@ impl Config {
     /// ```no_run
     /// 
     /// use carbone_sdk_rs::config::Config;
-    /// use carbone_sdk_rs::errors::CarboneSdkError;
+    /// use carbone_sdk_rs::errors::CarboneError;
     ///
-    /// fn main() -> Result<(), CarboneSdkError> {
+    /// fn main() -> Result<(), CarboneError> {
     ///     let config = Config::new( 
     ///        "http://127.0.0.1:57780".to_string(), 
     ///        4,
@@ -65,15 +65,15 @@ impl Config {
     /// ```no_run
     /// 
     /// use carbone_sdk_rs::config::Config;
-    /// use carbone_sdk_rs::errors::CarboneSdkError;
+    /// use carbone_sdk_rs::errors::CarboneError;
     ///
-    /// fn main() -> Result<(), CarboneSdkError> {
+    /// fn main() -> Result<(), CarboneError> {
     ///     let config = Config::from_file("tests/config.test.json")?;
     ///     Ok(())
     /// }
     /// ```
     pub fn from_file(path: &str) -> Result<Self> {
-        let file_content = fs::read_to_string(path).or(Err(CarboneSdkError::FileNotFound(path.to_string())))?;
+        let file_content = fs::read_to_string(path).or(Err(CarboneError::FileNotFound(path.to_string())))?;
         let config: Self = Self::from_str(file_content.as_str())?;
         config.validate()?;
         Ok(config)
@@ -90,9 +90,9 @@ impl Config {
 /// ```no_run
 /// 
 /// use carbone_sdk_rs::config::Config;
-/// use carbone_sdk_rs::errors::CarboneSdkError;
+/// use carbone_sdk_rs::errors::CarboneError;
 /// 
-/// fn main() -> Result<(), CarboneSdkError> {
+/// fn main() -> Result<(), CarboneError> {
 /// 
 ///    let config: Config = Default::default();
 ///    
@@ -122,9 +122,9 @@ impl Default for Config {
 /// 
 /// use std::str::FromStr;
 /// use carbone_sdk_rs::config::Config;
-/// use carbone_sdk_rs::errors::CarboneSdkError;
+/// use carbone_sdk_rs::errors::CarboneError;
 /// 
-/// fn main() -> Result<(), CarboneSdkError> {
+/// fn main() -> Result<(), CarboneError> {
 /// 
 ///     let config = Config::from_str(r#"{
 ///         "apiUrl": "http://127.0.0.1",

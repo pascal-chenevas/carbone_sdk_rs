@@ -1,7 +1,7 @@
 use thiserror::Error;
 
 #[derive(Error, Debug)]
-pub enum CarboneSdkError {
+pub enum CarboneError {
     #[error("Carbone SDK error: {0:?}")]
     Error(String),
     #[error("CarboneSDK: error: {0:?} can not be empty")]
@@ -27,20 +27,20 @@ pub enum CarboneSdkError {
     
 }
 
-impl From<std::io::Error> for CarboneSdkError {
+impl From<std::io::Error> for CarboneError {
     fn from(err: std::io::Error) -> Self {
-        CarboneSdkError::IoError(err)
+        CarboneError::IoError(err)
     }
 }
 
-impl From<reqwest::Error> for CarboneSdkError {
+impl From<reqwest::Error> for CarboneError {
     fn from(err: reqwest::Error) -> Self {
-        CarboneSdkError::RequestError(err)
+        CarboneError::RequestError(err)
     }
 }
 
-impl From<anyhow::Error> for CarboneSdkError {
+impl From<anyhow::Error> for CarboneError {
     fn from(err: anyhow::Error) -> Self {
-        CarboneSdkError::Error(err.to_string())
+        CarboneError::Error(err.to_string())
     }
 }

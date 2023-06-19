@@ -1,5 +1,5 @@
 use carbone_sdk_rs::config::Config;
-use carbone_sdk_rs::errors::CarboneSdkError;
+use carbone_sdk_rs::errors::CarboneError;
 
 #[cfg(test)]
 mod tests {
@@ -35,7 +35,7 @@ mod tests {
     }
 
     #[test]
-    fn test_from_str() -> Result<(), CarboneSdkError> {
+    fn test_from_str() -> Result<(), CarboneError> {
 
         let config = Config::from_str(r#"{
             "apiTimeout": 4,
@@ -70,7 +70,7 @@ mod tests {
     }
 
     #[test]
-    fn test_from_file() -> Result<(), CarboneSdkError> {
+    fn test_from_file() -> Result<(), CarboneError> {
 
         let config = Config::from_file("tests/config.test.json")?;
 
@@ -85,7 +85,7 @@ mod tests {
     }
 
     #[test]
-    fn test_from_file_wrong_path_given() -> Result<(), CarboneSdkError> {
+    fn test_from_file_wrong_path_given() -> Result<(), CarboneError> {
 
         let result = Config::from_file("tests/bad/path/config.test.json") ;
 

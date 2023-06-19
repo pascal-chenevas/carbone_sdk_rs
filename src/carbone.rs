@@ -11,7 +11,7 @@ use crate::types::ApiJsonToken;
 use crate::render::*;
 use crate::template::*;
 
-pub type Result<T> = std::result::Result<T, CarboneSdkError>;
+pub type Result<T> = std::result::Result<T, CarboneError>;
 
 #[derive(Debug, Validate, PartialEq, Eq)]
 pub struct Carbone<'a>{
@@ -42,9 +42,9 @@ impl <'a>Carbone<'a> {
     /// use carbone_sdk_rs::render::{Render, RenderId};
     /// use carbone_sdk_rs::carbone::Carbone;
     /// use carbone_sdk_rs::types::ApiJsonToken;
-    /// use carbone_sdk_rs::errors::CarboneSdkError;
+    /// use carbone_sdk_rs::errors::CarboneError;
     ///
-    /// fn main() -> Result<(), CarboneSdkError> {
+    /// fn main() -> Result<(), CarboneError> {
     ///    
     ///     let token =  match env::var("CARBONE_TOKEN") {
     ///             Ok(v) => v,
@@ -82,7 +82,7 @@ impl <'a>Carbone<'a> {
 
         match response {
             Ok(response) => Ok(response.bytes()?),
-            Err(e) => Err(CarboneSdkError::ResponseError(e.to_string())),
+            Err(e) => Err(CarboneError::ResponseError(e.to_string())),
         }
     }
 
@@ -100,9 +100,9 @@ impl <'a>Carbone<'a> {
     /// use carbone_sdk_rs::types::ApiJsonToken;
     /// use carbone_sdk_rs::template::TemplateId;
     /// 
-    /// use carbone_sdk_rs::errors::CarboneSdkError;
+    /// use carbone_sdk_rs::errors::CarboneError;
     ///
-    /// fn main() -> Result<(), CarboneSdkError> {
+    /// fn main() -> Result<(), CarboneError> {
     ///    
     ///     let token =  match env::var("CARBONE_TOKEN") {
     ///             Ok(v) => v,
@@ -155,9 +155,9 @@ impl <'a>Carbone<'a> {
     /// use carbone_sdk_rs::types::ApiJsonToken;
     /// use carbone_sdk_rs::template::{TemplateFile,TemplateId};
     /// 
-    /// use carbone_sdk_rs::errors::CarboneSdkError;
+    /// use carbone_sdk_rs::errors::CarboneError;
     ///
-    /// fn main() -> Result<(), CarboneSdkError> {
+    /// fn main() -> Result<(), CarboneError> {
     ///    
     ///     let token =  match env::var("CARBONE_TOKEN") {
     ///             Ok(v) => v,

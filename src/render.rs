@@ -1,4 +1,4 @@
-use crate::errors::CarboneSdkError;
+use crate::errors::CarboneError;
 use crate::template::{TemplateId, TemplateFile};
 
 use crate::config::Config;
@@ -26,9 +26,9 @@ impl RenderOptions {
     /// use std::env;
     /// 
     /// use carbone_sdk_rs::render::RenderOptions;
-    /// use carbone_sdk_rs::errors::CarboneSdkError;
+    /// use carbone_sdk_rs::errors::CarboneError;
     ///
-    /// fn main() -> Result<(), CarboneSdkError> {
+    /// fn main() -> Result<(), CarboneError> {
     ///    
      ///  let render_options_value = r#"
     ///        "data" : {
@@ -48,7 +48,7 @@ impl RenderOptions {
     pub fn new(s: String) -> Result<Self> {
 
         if s.len() == 0 {
-            return Err(CarboneSdkError::EmptyString("render_options".to_string()));
+            return Err(CarboneError::EmptyString("render_options".to_string()));
         }
         Ok(Self{render_options: s})  
     }
@@ -71,9 +71,9 @@ impl RenderId {
     /// use std::env;
     /// 
     /// use carbone_sdk_rs::render::RenderId;
-    /// use carbone_sdk_rs::errors::CarboneSdkError;
+    /// use carbone_sdk_rs::errors::CarboneError;
     ///
-    /// fn main() -> Result<(), CarboneSdkError> {
+    /// fn main() -> Result<(), CarboneError> {
     ///    
     ///     let render_id = RenderId::new("MTAuMjAuMjEuMTAgICAg01E98H4R7PMC2H6XSE5Z6J8XYQ.odt".to_string())?;
     /// 
@@ -84,7 +84,7 @@ impl RenderId {
     /// ```
     pub fn new(s: String) -> Result<Self> {
         if s.is_empty() {
-            return Err(CarboneSdkError::EmptyString("render_id".to_string()));
+            return Err(CarboneError::EmptyString("render_id".to_string()));
         }
         let render_id = Self {id: s};
         Ok(render_id)  
@@ -111,11 +111,11 @@ impl <'a>Render<'a> {
     /// use std::env;
     /// 
     /// use carbone_sdk_rs::render::Render;
-    /// use carbone_sdk_rs::errors::CarboneSdkError;
+    /// use carbone_sdk_rs::errors::CarboneError;
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::types::ApiJsonToken;
     /// 
-    /// fn main() -> Result<(), CarboneSdkError> {
+    /// fn main() -> Result<(), CarboneError> {
     ///    
     /// 
     ///    let token =  match env::var("CARBONE_TOKEN") {
@@ -147,11 +147,11 @@ impl <'a>Render<'a> {
     /// 
     /// use carbone_sdk_rs::render::{Render, RenderOptions};
     /// use carbone_sdk_rs::template::{Template, TemplateFile};
-    /// use carbone_sdk_rs::errors::CarboneSdkError;
+    /// use carbone_sdk_rs::errors::CarboneError;
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::types::ApiJsonToken;
     /// 
-    /// fn main() -> Result<(), CarboneSdkError> {
+    /// fn main() -> Result<(), CarboneError> {
     ///    
     ///     let token =  match env::var("CARBONE_TOKEN") {
     ///             Ok(v) => v,
@@ -208,10 +208,10 @@ impl <'a>Render<'a> {
     /// use carbone_sdk_rs::render::{Render, RenderOptions};
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::template::TemplateId;
-    /// use carbone_sdk_rs::errors::CarboneSdkError;
+    /// use carbone_sdk_rs::errors::CarboneError;
     /// use carbone_sdk_rs::types::ApiJsonToken;
     /// 
-    /// fn main() -> Result<(), CarboneSdkError> {
+    /// fn main() -> Result<(), CarboneError> {
     /// 
     ///     let token =  match env::var("CARBONE_TOKEN") {
     ///             Ok(v) => v,
@@ -276,10 +276,10 @@ impl <'a>Render<'a> {
                 if json.success {
                     Ok(render_id)
                 } else {
-                    Err(CarboneSdkError::ResponseError(error_msg))
+                    Err(CarboneError::ResponseError(error_msg))
                 }
             }
-            Err(e) => Err(CarboneSdkError::RequestError(e)),
+            Err(e) => Err(CarboneError::RequestError(e)),
         }
     }
 }

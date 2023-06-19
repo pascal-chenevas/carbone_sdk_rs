@@ -39,9 +39,9 @@ use carbone_sdk_rs::carbone::Carbone;
 use carbone_sdk_rs::types::ApiJsonToken;
 use carbone_sdk_rs::template::TemplateId;
  
-use carbone_sdk_rs::errors::CarboneSdkError;
+use carbone_sdk_rs::errors::CarboneError;
 
-fn main() -> Result<(), CarboneSdkError> {
+fn main() -> Result<(), CarboneError> {
     
      let token =  match env::var("CARBONE_TOKEN") {
              Ok(v) => v,
