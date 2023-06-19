@@ -153,7 +153,7 @@ impl <'a>CarboneSDK<'a> {
     /// use carbone_sdk_rs::render::*;
     /// use carbone_sdk_rs::carbone::CarboneSDK;
     /// use carbone_sdk_rs::types::ApiJsonToken;
-    /// use carbone_sdk_rs::template::TemplateId;
+    /// use carbone_sdk_rs::template::{TemplateFile,TemplateId};
     /// 
     /// use carbone_sdk_rs::errors::CarboneSdkError;
     ///
@@ -180,17 +180,17 @@ impl <'a>CarboneSDK<'a> {
     /// 
     ///     let render_options = RenderOptions::new(render_options_value)?;
     /// 
-    ///     let file_name = "/path/to/template.odf".to_string();
-    ///     let report_content = carbone_sdk.generate_report_with_file(file_name, render_options, "")?;
+    ///     let template_file = &TemplateFile::new("/path/to/template.odf".to_string())?;
+    ///     let report_content = carbone_sdk.generate_report_with_file(&template_file, render_options, "")?;
     /// 
     ///     assert_eq!(report_content.is_empty(), false);
     /// 
     ///     Ok(())
     /// }
     /// ```
-    pub fn generate_report_with_file(&self, file_name: String, render_options: RenderOptions, payload: &str) -> Result<Bytes> {
+    pub fn generate_report_with_file(&self, template_file: &TemplateFile, render_options: RenderOptions, payload: &str) -> Result<Bytes> {
 
-        let render_id_value = self.render.render_report_with_file(file_name, render_options, payload)?;
+        let render_id_value = self.render.render_report_with_file(template_file, render_options, payload)?;
         let render_id = RenderId::new(render_id_value)?;
         let report_content = self.get_report(&render_id)?;
 

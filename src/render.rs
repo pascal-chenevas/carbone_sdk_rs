@@ -1,5 +1,5 @@
 use crate::errors::CarboneSdkError;
-use crate::template::TemplateId;
+use crate::template::{TemplateId, TemplateFile};
 
 use crate::config::Config;
 use crate::types::ApiJsonToken;
@@ -146,6 +146,7 @@ impl <'a>Render<'a> {
     /// use std::env;
     /// 
     /// use carbone_sdk_rs::render::{Render, RenderOptions};
+    /// use carbone_sdk_rs::template::{Template, TemplateFile};
     /// use carbone_sdk_rs::errors::CarboneSdkError;
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::types::ApiJsonToken;
@@ -172,8 +173,8 @@ impl <'a>Render<'a> {
     /// 
     ///     let render_options = RenderOptions::new(render_options_value)?;
     /// 
-    ///     let template_file_name = "tests/data/template.test.odt".to_string();
-    ///     let render_id = render.render_report_with_file(template_file_name, render_options, "")?;
+    ///     let template_file = &TemplateFile::new("/path/to/template.odf".to_string())?;
+    ///     let render_id = render.render_report_with_file(template_file, render_options, "")?;
     /// 
     ///     assert_eq!(render_id.is_empty(), false);
     /// 
@@ -182,13 +183,13 @@ impl <'a>Render<'a> {
     /// ```
     pub fn render_report_with_file(
         &self,
-        file_name: String,
+        template_file: &TemplateFile,
         render_options: RenderOptions,
         payload: &str
     ) -> Result<String> {
 
         let template: Template = Template::new(self.config, self.api_token);
-        let generated_template_id = template.generate_id(&file_name, payload)?;
+        let generated_template_id = template.generate_id(template_file, payload)?;
         let template_id = TemplateId::new(generated_template_id)?;
 
         let render_id = self.render_data(template_id, render_options)?;

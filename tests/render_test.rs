@@ -81,13 +81,13 @@ mod tests {
 
         let helper = Helper::new();
 
-        let template_file_name = "tests/data/template.test.odt".to_string();
+        let template_file = &TemplateFile::new("tests/data/template.test.odt".to_string())?;
 
         let config = helper.create_config_for_mock_server(Some(&server))?;
         let api_token = helper.create_api_token()?;
 
         let template: Template = Template::new(&config, &api_token);
-        let generated_template_id = template.generate_id(&template_file_name, "")?;
+        let generated_template_id = template.generate_id(&template_file, "")?;
         let template_id = TemplateId::new(generated_template_id)?;
 
         let expected_render_id = "MTAuMjAuMjEuMTAgICAg01E98H4R7PMC2H6XSE5Z6J8XYQ.odt".to_string();
@@ -117,7 +117,7 @@ mod tests {
         "#);
         let render_options = RenderOptions::new(render_options)?;
 
-        let render_id = render.render_report_with_file(template_file_name, render_options, "")?;
+        let render_id = render.render_report_with_file(template_file, render_options, "")?;
 
         mock_server.assert();
         assert_eq!(render_id, expected_render_id);

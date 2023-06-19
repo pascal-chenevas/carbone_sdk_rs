@@ -6,7 +6,7 @@ use httpmock::prelude::*;
 use carbone_sdk_rs::carbone_response::CarboneSDKResponse;
 use carbone_sdk_rs::errors::CarboneSdkError;
 use carbone_sdk_rs::config::Config;
-use carbone_sdk_rs::template::Template;
+use carbone_sdk_rs::template::*;
 
 mod helper;
 
@@ -18,6 +18,45 @@ mod tests {
     use super::*;
     use anyhow::Result;
     use carbone_sdk_rs::template::TemplateId;
+
+    #[test]
+    fn test_template_file() -> Result<(), CarboneSdkError> {
+
+        let template_file_path = "tests/data/template.test.odt";
+        let template_file = TemplateFile::new(template_file_path.to_string())?;
+
+        assert_eq!(template_file.path_as_str(), template_file_path);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_template_file_directory_given() -> Result<(), CarboneSdkError> {
+
+        let template_file_path = "tests/data/";
+        let result = TemplateFile::new(template_file_path.to_string());
+
+        let expected_error = CarboneSdkError::IsADirectory(template_file_path.to_string());
+        
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().to_string(), expected_error.to_string());
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_template_file_not_exists_given() -> Result<(), CarboneSdkError> {
+
+        let template_file_path = "tests/data/unknown_template.test.docx";
+        let result = TemplateFile::new(template_file_path.to_string());
+
+        let expected_error = CarboneSdkError::FileNotFound(template_file_path.to_string());
+        
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().to_string(), expected_error.to_string());
+
+        Ok(())
+    }
 
     #[test]
     fn test_template_id() -> Result<(), CarboneSdkError> {
@@ -131,8 +170,9 @@ mod tests {
         let api_token = &helper.create_api_token()?;
         let template: Template = Template::new(&config, api_token);
 
-        let file_name = "tests/data/template.test.odt".to_string();
-        let template_id = template.generate_id(&file_name, "")?;
+        let template_file_path = "tests/data/template.test.odt".to_string();
+        let template_file = TemplateFile::new(template_file_path.to_string())?;
+        let template_id = template.generate_id(&template_file, "")?;
 
         let expected_template_id = "0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string();
         assert_eq!(expected_template_id, template_id);
@@ -150,7 +190,8 @@ mod tests {
         let template: Template = Template::new(&config, api_token);
 
         let file_name = "tests/data/template.test.odt".to_string();
-        let template_id = template.generate_id(&file_name, "ThisIsAPayload")?;
+        let template_file = TemplateFile::new(file_name.to_string())?;
+        let template_id = template.generate_id(&template_file, "ThisIsAPayload")?;
 
         let expected_template_id = "7de8d1d8676abb32291ea5119cb1f78fe37fdfdc75332fcdae28f1e30d064ac0".to_string();
         assert_eq!(expected_template_id, template_id);
@@ -168,7 +209,8 @@ mod tests {
         let template: Template = Template::new(&config, api_token);
 
         let file_name = "tests/data/template.test.odt".to_string();
-        let template_id = template.generate_id(&file_name, "8B5PmafbjdRqHuksjHNw83mvPiGj7WTE")?;
+        let template_file = TemplateFile::new(file_name.to_string())?;
+        let template_id = template.generate_id(&template_file, "8B5PmafbjdRqHuksjHNw83mvPiGj7WTE")?;
 
         let expected_template_id = "a62eb407a5d5765ddf974636de8ab47bda7915cebd61197d7a2bb42ae70ffcd6".to_string();
         assert_eq!(expected_template_id, template_id);
@@ -186,8 +228,8 @@ mod tests {
         let api_token = &helper.create_api_token()?;
         let template: Template = Template::new(&config, api_token);
 
-        let file_name = "tests/data/template.test.html".to_string();
-        let template_id = template.generate_id(&file_name, "")?;
+        let template_file = TemplateFile::new("tests/data/template.test.html".to_string())?;
+        let template_id = template.generate_id(&template_file, "")?;
 
         let expected_template_id = "75256dd5c260cdf039ae807d3a007e78791e2d8963ea1aa6aff87ba03074df7f".to_string();
         assert_eq!(expected_template_id, template_id);
@@ -205,38 +247,14 @@ mod tests {
         let api_token = &helper.create_api_token()?;
         let template: Template = Template::new(&config, api_token);
 
-        let file_name = "tests/data/template.test.html".to_string();
+        let template_file = TemplateFile::new("tests/data/template.test.html".to_string())?;
         let payload = "This is a long payload with different characters 1 *5 &*9 %$ 3%&@9 @(( 3992288282 29299 9299929";
-        let template_id = template.generate_id(&file_name, payload)?;
+        let template_id = template.generate_id(&template_file, payload)?;
 
         let expected_template_id = "70799b421cc9cf75d9112273a8e054c141d484eb8d5988bd006fac83e3990707".to_string();
         assert_eq!(expected_template_id, template_id);
         
         Ok(())
-
-    }  
-
-    #[test]
-    fn test_generate_template_id_error() -> Result<(), CarboneSdkError> {
-
-        let config: Config = Default::default();
-    
-        let helper = Helper::new();
-        let api_token = &helper.create_api_token()?;
-        let template: Template = Template::new(&config, api_token);
-
-        let file_name = "".to_string();
-        let payload = "";
-       
-        let result = template.generate_id(&file_name, payload);
-
-        let expected_error = CarboneSdkError::MissingTemplateFileName.to_string(); 
-
-        assert!(result.is_err());
-        assert_eq!(expected_error.to_string(), result.unwrap_err().to_string());
-
-        Ok(())
-
     }  
 
     #[test]
@@ -268,9 +286,9 @@ mod tests {
         let config = &helper.create_config_for_mock_server(Some(&server))?;
     
         let api_token = &helper.create_api_token()?;
+        
         let template: Template = Template::new(config, api_token);
-
-        let template_file = String::from("tests/data/template.odt");
+        let template_file = TemplateFile::new("tests/data/template.odt".to_string())?;
         let template_id = template.upload(&template_file, "".to_string())?;
         
         // Assert
@@ -309,75 +327,14 @@ mod tests {
         let config = &helper.create_config_for_mock_server(Some(&server))?;
     
         let api_token = &helper.create_api_token()?;
-        let template: Template = Template::new(config, api_token);
 
-        let template_file = String::from("tests/data/template.odt");
+        let template: Template = Template::new(config, api_token);
+        let template_file = TemplateFile::new("tests/data/template.odt".to_string())?;
         let template_id = template.upload(&template_file, "salt1234".to_string())?;
 
         // Assert
         m.assert();
         assert_eq!(template_id_expected,template_id);
-
-        Ok(())
-    }
-
-    #[test]
-    fn test_upload_template_template_file_path_not_given() -> Result<(), CarboneSdkError> {
-
-        let helper = Helper::new();
-        let config = &helper.create_config_for_mock_server(None)?;
-
-        let api_token = &helper.create_api_token()?;
-        let template: Template = Template::new(config, api_token);
-
-        let template_file = String::from("");
-
-        let error = template.upload(&template_file, "".to_string());
-       
-        assert!(error.is_err());
-        assert_eq!(CarboneSdkError::MissingTemplateFileName.to_string(), error.unwrap_err().to_string());
-
-        Ok(())
-    }
-
-    #[test]
-    fn test_upload_template_error_with_a_non_existing_file() -> Result<(), CarboneSdkError> {
-
-        let helper = Helper::new();
-        let config = &helper.create_config_for_mock_server(None)?;
-        
-        let api_token = &helper.create_api_token()?;
-        let template: Template = Template::new(config, api_token);
-
-        let template_file = String::from("/wrong/path/to/template.odt");
-
-        let result = template.upload(&template_file, "".to_string());
-
-        let expected_error = CarboneSdkError::FileNotFound("/wrong/path/to/template.odt".to_string()); 
-        
-        assert!(result.is_err());
-        assert_eq!(expected_error.to_string(), result.unwrap_err().to_string());
-
-        Ok(())
-    }
-
-    #[test]
-    fn test_upload_template_error_with_directory() -> Result<(), CarboneSdkError> {
-
-        let helper = Helper::new();
-        let config = &helper.create_config_for_mock_server(None)?;
-        
-        let api_token = &helper.create_api_token()?;
-        let template: Template = Template::new(config, api_token);
-
-        let template_file = String::from("tests");
-
-        let result = template.upload(&template_file, "".to_string());
-
-        let expected_error = CarboneSdkError::IsADirectory("tests".to_string()); 
-        
-        assert!(result.is_err());
-        assert_eq!(expected_error.to_string(), result.unwrap_err().to_string());
 
         Ok(())
     }

@@ -2,6 +2,8 @@ use std::str;
 use std::fs;
 use std::path::Path;
 
+use std::fs::Metadata;
+
 use bytes::Bytes;
 
 use reqwest::blocking::multipart;
@@ -16,6 +18,37 @@ use crate::errors::CarboneSdkError;
 use crate::carbone_response::CarboneSDKResponse;
 
 use crate::carbone::Result;
+
+#[derive(Debug, Clone)]
+pub struct TemplateFile {
+    path: String,
+    pub metadata: Metadata,
+}
+
+impl TemplateFile {
+
+    pub fn new(path: String) -> Result<Self> {
+        if Path::new(path.as_str()).is_dir() {
+            return Err(CarboneSdkError::IsADirectory(path));
+        }
+
+        if !Path::new(path.as_str()).is_file() {
+            return Err(CarboneSdkError::FileNotFound(path));
+        }
+
+        let metadata = fs::metadata(path.as_str())?;
+
+        Ok(Self {
+            path,
+            metadata: metadata,
+        })
+    }
+
+    pub fn path_as_str(&self) -> &str { &self.path }
+
+}
+
+
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TemplateId {
@@ -53,7 +86,7 @@ impl TemplateId {
   
     pub fn as_str(&self) -> &str { &self.id }
 
-  }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Template<'a> {
@@ -72,14 +105,11 @@ impl <'a>Template<'a> {
 
     pub fn generate_id(
         &self,
-        template_file_name: &String,
+        template_file: &TemplateFile,
         payload: &str,
     ) -> Result<String> {
-        if template_file_name.is_empty() {
-            return Err(CarboneSdkError::MissingTemplateFileName);
-        }
 
-        let file_content = fs::read(template_file_name)?;
+        let file_content = fs::read(template_file.path_as_str())?;
 
         let mut sha256 = Sha256::new();
 
@@ -102,7 +132,7 @@ impl <'a>Template<'a> {
     /// 
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::types::ApiJsonToken;
-    /// use carbone_sdk_rs::template::Template;
+    /// use carbone_sdk_rs::template::{Template, TemplateFile};
     /// use carbone_sdk_rs::errors::CarboneSdkError;
     ///
     /// fn main() -> Result<(), CarboneSdkError> {
@@ -116,7 +146,7 @@ impl <'a>Template<'a> {
     /// 
     ///     let api_token = &ApiJsonToken::new(token)?;
     /// 
-    ///     let template_file = String::from("template.odt");
+    ///     let template_file = TemplateFile::new("template.odt".to_string())?;
     /// 
     ///     let template = Template::new(config, api_token);
     ///     let template_id = template.upload(&template_file, "".to_string())?;
@@ -128,24 +158,13 @@ impl <'a>Template<'a> {
     /// ```
     pub fn upload(
         &self,
-        template_file_name: &String,
+        template_file: &TemplateFile,
         salt: String,
     ) -> Result<String> {
-        if template_file_name.is_empty() {
-            return Err(CarboneSdkError::MissingTemplateFileName);
-        }
-
-        if Path::new(template_file_name.as_str()).is_dir() {
-            return Err(CarboneSdkError::IsADirectory(template_file_name.to_string()));
-        }
-
-        if !Path::new(template_file_name.as_str()).is_file() {
-            return Err(CarboneSdkError::FileNotFound(template_file_name.to_string()));
-        }
-
+    
         let form = multipart::Form::new()
             .text("", salt)
-            .file("template", template_file_name)?;
+            .file("template", template_file.path_as_str())?;
 
         let client = reqwest::blocking::Client::new();
         let url = format!("{}/template", self.config.api_url);
@@ -273,8 +292,6 @@ impl <'a>Template<'a> {
     ///     let config = &Config::new("http://127.0.0.1".to_string(), 4, 2)?;
     /// 
     ///     let api_token = &ApiJsonToken::new(token)?;
-    /// 
-    ///     let template_file = String::from("template.odt");
     /// 
     ///     let template_id = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
     ///     let template = Template::new(config, api_token);
