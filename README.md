@@ -35,7 +35,7 @@ use std::env;
  
 use carbone_sdk_rs::config::Config;
 use carbone_sdk_rs::render::*;
-use carbone_sdk_rs::carbone::CarboneSDK;
+use carbone_sdk_rs::carbone::Carbone;
 use carbone_sdk_rs::types::ApiJsonToken;
 use carbone_sdk_rs::template::TemplateId;
  
@@ -53,7 +53,7 @@ fn main() -> Result<(), CarboneSdkError> {
     let api_token = &ApiJsonToken::new(token)?;
  
     let template_id = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
-    let carbone_sdk = CarboneSDK::new(&config, api_token)?;
+    let carbone_sdk = Carbone::new(&config, api_token)?;
  
     let render_options_value = String::from(r#"
          "data" : {
