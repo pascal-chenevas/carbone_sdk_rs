@@ -2,7 +2,7 @@ use std::fs;
 
 use httpmock::prelude::*;
 
-use carbone_sdk_rs::carbone::CarboneSDK;
+use carbone_sdk_rs::carbone::Carbone;
 use carbone_sdk_rs::errors::CarboneSdkError;
 use carbone_sdk_rs::render::*;
 
@@ -26,7 +26,7 @@ mod tests {
         let config = &helper.create_config_for_mock_server(Some(&server))?;
         let api_token = &helper.create_api_token()?;
 
-        let carbone_sdk = CarboneSDK::new(&config, api_token)?;
+        let carbone_sdk = Carbone::new(&config, api_token)?;
 
         let render_id_value = "0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114.pdf";
         let render_id = &RenderId::new(render_id_value.to_string())?;

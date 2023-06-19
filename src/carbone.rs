@@ -14,14 +14,14 @@ use crate::template::*;
 pub type Result<T> = std::result::Result<T, CarboneSdkError>;
 
 #[derive(Debug, Validate, PartialEq, Eq)]
-pub struct CarboneSDK<'a>{
+pub struct Carbone<'a>{
     config: &'a Config,
     api_token: &'a ApiJsonToken,
     template: Template<'a>,
     render: Render<'a>,
 }
 
-impl <'a>CarboneSDK<'a> {
+impl <'a>Carbone<'a> {
     pub fn new(config: &'a Config, api_token: &'a ApiJsonToken) -> Result<Self> {
         
         let template: Template<'a> = Template::new(config, api_token);
@@ -40,7 +40,7 @@ impl <'a>CarboneSDK<'a> {
     /// 
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::render::{Render, RenderId};
-    /// use carbone_sdk_rs::carbone::CarboneSDK;
+    /// use carbone_sdk_rs::carbone::Carbone;
     /// use carbone_sdk_rs::types::ApiJsonToken;
     /// use carbone_sdk_rs::errors::CarboneSdkError;
     ///
@@ -55,7 +55,7 @@ impl <'a>CarboneSDK<'a> {
     /// 
     ///     let api_token = &ApiJsonToken::new(token)?;
     /// 
-    ///     let carbone_sdk = CarboneSDK::new(&config, api_token)?;
+    ///     let carbone_sdk = Carbone::new(&config, api_token)?;
     /// 
     ///     let render_id = &RenderId::new("MTAuMjAuMjEuMTAgICAg01E98H4R7PMC2H6XSE5Z6J8XYQ.pdf".to_string())?;
     ///     let report_content = carbone_sdk.get_report(render_id)?;
@@ -96,7 +96,7 @@ impl <'a>CarboneSDK<'a> {
     /// 
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::render::*;
-    /// use carbone_sdk_rs::carbone::CarboneSDK;
+    /// use carbone_sdk_rs::carbone::Carbone;
     /// use carbone_sdk_rs::types::ApiJsonToken;
     /// use carbone_sdk_rs::template::TemplateId;
     /// 
@@ -114,7 +114,7 @@ impl <'a>CarboneSDK<'a> {
     ///     let api_token = &ApiJsonToken::new(token)?;
     /// 
     ///     let template_id = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
-    ///     let carbone_sdk = CarboneSDK::new(&config, api_token)?;
+    ///     let carbone_sdk = Carbone::new(&config, api_token)?;
     /// 
     ///     let render_options_value = String::from(r#"
     ///         "data" : {
@@ -151,7 +151,7 @@ impl <'a>CarboneSDK<'a> {
     /// 
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::render::*;
-    /// use carbone_sdk_rs::carbone::CarboneSDK;
+    /// use carbone_sdk_rs::carbone::Carbone;
     /// use carbone_sdk_rs::types::ApiJsonToken;
     /// use carbone_sdk_rs::template::{TemplateFile,TemplateId};
     /// 
@@ -168,7 +168,7 @@ impl <'a>CarboneSDK<'a> {
     /// 
     ///     let api_token = &ApiJsonToken::new(token)?;
     /// 
-    ///     let carbone_sdk = CarboneSDK::new(&config, api_token)?;
+    ///     let carbone_sdk = Carbone::new(&config, api_token)?;
     /// 
     ///     let render_options_value = String::from(r#"
     ///         "data" : {
