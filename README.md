@@ -51,10 +51,7 @@ fn main() -> Result<(), CarboneError> {
     let config = &Config::new("http://127.0.0.1".to_string(), 4, 2)?;
  
     let api_token = &ApiJsonToken::new(token)?;
- 
-    let template_id = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
-    let carbone_sdk = Carbone::new(&config, api_token)?;
- 
+
     let render_options_value = String::from(r#"
          "data" : {
              "firstname" : "John",
@@ -64,6 +61,11 @@ fn main() -> Result<(), CarboneError> {
     "#);
  
     let render_options = RenderOptions::new(render_options_value)?;
+
+    let template_id = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
+
+    let carbone_sdk = Carbone::new(config, api_token)?;
+    
     let report_content = carbone_sdk.generate_report_with_template_id(template_id, render_options)?;
 
     Ok(())
