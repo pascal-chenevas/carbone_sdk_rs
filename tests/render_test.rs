@@ -12,6 +12,8 @@ use helper::Helper;
 #[cfg(test)]
 mod tests {
 
+    use std::result;
+
     use super::*;
     use anyhow::Result;
     use carbone_sdk_rs::template::*;
@@ -52,7 +54,7 @@ mod tests {
     fn test_render_id() -> Result<(), CarboneSdkError> {
 
         let render_id_value = "0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114";
-        let render_id = TemplateId::new(render_id_value.to_string())?;
+        let render_id = RenderId::new(render_id_value.to_string())?;
 
         assert_eq!(render_id.as_str(), render_id_value);
 
@@ -169,6 +171,54 @@ mod tests {
 
         mock_server.assert();
         assert_eq!(render_id, expected_render_id);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_render_report_with_template_id_unknown_template_id_given() -> Result<(), CarboneSdkError> {
+
+        let helper = Helper::new();
+
+        let template_id = TemplateId::new("unknown_template_id".to_string())?;
+
+        // Start a lightweight mock server.
+        let server = MockServer::start();
+
+        // Create a mock on the server.
+        let mock_server = server.mock(|when, then| {
+            when.method("POST")
+                .path(format!("/render/{}", template_id.as_str()));
+            then.status(400)
+                .json_body(json!({
+                    "success": false,
+                    "error": "Invalid or undefined TemplateId or RenderId in the URL",
+                    "code": "w115"
+                }));
+        });
+
+        let config = helper.create_config_for_mock_server(Some(&server))?;
+
+        let api_token = helper.create_api_token()?;
+
+        let render = Render::new(&config, &api_token);
+        
+        let render_options = String::from(r#"
+            "data" : {
+                "firstname" : "John",
+                "lastname" : "Wick"
+            },
+            "convertTo" : "odt"
+        "#);
+
+        let render_options = RenderOptions::new(render_options)?;
+        let result = render.render_report_with_template_id(template_id, render_options);
+
+        let expected_error = CarboneSdkError::ResponseError("Invalid or undefined TemplateId or RenderId in the URL".to_string());
+
+        mock_server.assert();
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().to_string(), expected_error.to_string());
 
         Ok(())
     }
