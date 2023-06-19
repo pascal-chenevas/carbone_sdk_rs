@@ -77,11 +77,3 @@ fn main() -> Result<(), CarboneSdkError> {
 ## Useful links
 
 - [How to build a template file](https://carbone.io/documentation.html#building-a-template)
-
-- [Substitutions](https://carbone.io/documentation.html#substitutions)
-
-- [Repetitions](https://carbone.io/documentation.html#repetitions)
-
-- [Formatters](https://carbone.io/documentation.html#formatters)
-
-- [Translations](https://carbone.io/documentation.html#translations)
