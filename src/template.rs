@@ -1,4 +1,3 @@
-use std::fmt::format;
 use std::str;
 use std::fs;
 use std::path::Path;
@@ -41,7 +40,7 @@ impl TemplateFile {
 
         Ok(Self {
             path,
-            metadata: metadata,
+            metadata,
         })
     }
 
@@ -248,8 +247,8 @@ impl <'a>Template<'a> {
             .bearer_auth(self.api_token.as_str())
             .send();
 
-        if response_result.is_err() {
-            return Err(CarboneError::RequestError(response_result.unwrap_err()));
+        if let Err(e) = response_result {
+            Err(CarboneError::RequestError(e))
         } else {
 
             let response = response_result.unwrap();

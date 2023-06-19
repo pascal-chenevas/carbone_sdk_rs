@@ -27,7 +27,7 @@ impl <'a>Carbone<'a> {
         let template: Template<'a> = Template::new(config, api_token);
         let render: Render<'a> = Render::new(config, api_token);
 
-        Ok(Self { config: config, api_token: api_token, template: template, render: render })
+        Ok(Self { config, api_token, template, render })
     }
 
     /// Create a new render_options.

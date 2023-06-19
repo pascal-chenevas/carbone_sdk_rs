@@ -41,7 +41,7 @@ pub struct CarboneSDKResponse {
 impl CarboneSDKResponse {
 
     pub fn new(success: bool, data: Option<HashMap<String, String>>, error: Option<String>) -> Self {
-        Self { success: success, data: data, error: error }
+        Self { success, data, error }
     }
 
     pub fn get_template_id(&self) -> String {

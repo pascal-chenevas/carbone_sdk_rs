@@ -46,8 +46,7 @@ impl RenderOptions {
     /// }
     /// ```
     pub fn new(s: String) -> Result<Self> {
-
-        if s.len() == 0 {
+        if s.is_empty() {
             return Err(CarboneError::EmptyString("render_options".to_string()));
         }
         Ok(Self{render_options: s})  
@@ -247,7 +246,7 @@ impl <'a>Render<'a> {
         template_id: TemplateId,
         render_options: RenderOptions,
     ) -> Result<String> {
-        Ok(self.render_data(template_id, render_options)?)
+        self.render_data(template_id, render_options)
     }
 
     fn render_data(&self, template_id: TemplateId, render_options: RenderOptions) -> Result<String> {
