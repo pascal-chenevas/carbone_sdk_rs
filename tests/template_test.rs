@@ -122,14 +122,6 @@ mod tests {
 
         let template_id = TemplateId::new("unknown_template_id".to_string())?;
 
-        let error_msg = "Error: Cannot remove template, does it exist ?".to_string();
-
-        let body = CarboneSDKResponse{
-            success: false,
-            data: None,
-            error: Some(error_msg.clone()),
-        };
-
         // Start a lightweight mock server.
         let server = MockServer::start();
 
@@ -137,9 +129,7 @@ mod tests {
         let mock_server = server.mock(|when, then| {
             when.method("GET")
                 .path(format!("/template/{}", template_id.as_str()));
-            then.status(200)
-                .header("content-type", "application/json")
-                .json_body_obj(&body);
+            then.status(400);
         });
 
         let helper = Helper::new();
@@ -151,12 +141,12 @@ mod tests {
 
         let result = template.download(template_id);
 
-        let expected_error = CarboneError::ResponseError(error_msg);
+        let expected_error = CarboneError::ResponseError("template_id unknown_template_id not found".to_string());
 
         mock_server.assert();
 
         assert!(result.is_err());
-        assert_eq!(expected_error.to_string(), result.unwrap_err().to_string());
+        assert_eq!(result.unwrap_err().to_string(), expected_error.to_string());
 
         Ok(())
     }

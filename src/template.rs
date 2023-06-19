@@ -1,3 +1,4 @@
+use std::fmt::format;
 use std::str;
 use std::fs;
 use std::path::Path;
@@ -252,19 +253,24 @@ impl <'a>Template<'a> {
         } else {
 
             let response = response_result.unwrap();
-            if let Some(content_type) = response.headers().get(CONTENT_TYPE) {
-                if content_type == "application/json" {
-                    let json = response.json::<CarboneSDKResponse>()?;
-                    let error_msg = json.get_error_message();
-                    Err(CarboneError::ResponseError(error_msg))
-                } else {
-                    match content_type.to_str() {
-                        Ok(v) =>  Err(CarboneError::Error(format!("Content-Type `{}` not supported", v))),
-                        Err(e) => Err(CarboneError::Error(e.to_string())),
+
+            if response.status() == 200 {
+                if let Some(content_type) = response.headers().get(CONTENT_TYPE) {
+                    if content_type == "application/json" {
+                        let json = response.json::<CarboneSDKResponse>()?;
+                        let error_msg = json.get_error_message();
+                        Err(CarboneError::ResponseError(error_msg))
+                    } else {
+                        match content_type.to_str() {
+                            Ok(v) =>  Err(CarboneError::Error(format!("Content-Type `{}` not supported", v))),
+                            Err(e) => Err(CarboneError::Error(e.to_string())),
+                        }
                     }
+                } else {
+                    Ok(response.bytes()?)
                 }
             } else {
-                Ok(response.bytes()?)
+                Err(CarboneError::ResponseError(format!("template_id {} not found", template_id.as_str())))
             }
         }
     }
