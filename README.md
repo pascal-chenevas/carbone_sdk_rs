@@ -66,7 +66,7 @@ fn main() -> Result<(), CarboneError> {
 
     let carbone_sdk = Carbone::new(config, api_token)?;
     
-    let report_content = carbone_sdk.generate_report_with_template_id(template_id, render_options)?;
+    let _report_content = carbone_sdk.generate_report_with_template_id(template_id, render_options)?;
 
     Ok(())
 }
