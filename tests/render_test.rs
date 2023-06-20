@@ -12,8 +12,6 @@ use helper::Helper;
 #[cfg(test)]
 mod tests {
 
-    use std::result;
-
     use super::*;
     use anyhow::Result;
     use carbone_sdk_rs::template::*;
@@ -89,10 +87,9 @@ mod tests {
         let api_token = helper.create_api_token()?;
 
         let template: Template = Template::new(&config, &api_token);
-        let generated_template_id = template.generate_id(&template_file, "")?;
-        let template_id = TemplateId::new(generated_template_id)?;
+        let template_id = template.generate_id(&template_file, "")?;
 
-        let expected_render_id = "MTAuMjAuMjEuMTAgICAg01E98H4R7PMC2H6XSE5Z6J8XYQ.odt".to_string();
+        let expected_render_id = RenderId::new("MTAuMjAuMjEuMTAgICAg01E98H4R7PMC2H6XSE5Z6J8XYQ.odt".to_string())?;
 
         // Create a mock on the server.
         let mock_server = server.mock(|when, then| {
@@ -102,7 +99,7 @@ mod tests {
                 .json_body(json!({
                     "success": true,
                     "data": {
-                        "renderId": expected_render_id.clone(),
+                        "renderId": expected_render_id.as_str(),
                         "inputFileExtension": "odt"
                     }
                 }));
@@ -137,7 +134,7 @@ mod tests {
         // Start a lightweight mock server.
         let server = MockServer::start();
 
-        let expected_render_id = "MTAuMjAuMjEuMTAgICAg01E98H4R7PMC2H6XSE5Z6J8XYQ.odt".to_string();
+        let expected_render_id = RenderId::new("MTAuMjAuMjEuMTAgICAg01E98H4R7PMC2H6XSE5Z6J8XYQ.odt".to_string())?;
         // Create a mock on the server.
         let mock_server = server.mock(|when, then| {
             when.method("POST")
@@ -146,7 +143,7 @@ mod tests {
                 .json_body(json!({
                     "success": true,
                     "data": {
-                        "renderId": expected_render_id.clone(),
+                        "renderId": expected_render_id.as_str(),
                         "inputFileExtension": "odt"
                     }
                 }));

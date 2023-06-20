@@ -134,14 +134,13 @@ impl <'a>Carbone<'a> {
     /// ```
     pub fn generate_report_with_template_id(&self, template_id: TemplateId, render_options: RenderOptions) -> Result<Bytes> {
 
-        let render_id_value = self.render.render_report_with_template_id(template_id, render_options)?;
-        let render_id = RenderId::new(render_id_value)?;
+        let render_id = self.render.render_report_with_template_id(template_id, render_options)?;
         let report_content = self.get_report(&render_id)?;
 
         Ok(report_content)
     }
 
-/// Generate a report.
+    /// Generate a report.
     /// 
     ///
     /// # Example
@@ -190,8 +189,7 @@ impl <'a>Carbone<'a> {
     /// ```
     pub fn generate_report_with_file(&self, template_file: &TemplateFile, render_options: RenderOptions, payload: &str) -> Result<Bytes> {
 
-        let render_id_value = self.render.render_report_with_file(template_file, render_options, payload)?;
-        let render_id = RenderId::new(render_id_value)?;
+        let render_id = self.render.render_report_with_file(template_file, render_options, payload)?;
         let report_content = self.get_report(&render_id)?;
 
         Ok(report_content)

@@ -107,7 +107,7 @@ impl <'a>Template<'a> {
         &self,
         template_file: &TemplateFile,
         payload: &str,
-    ) -> Result<String> {
+    ) -> Result<TemplateId> {
 
         let file_content = fs::read(template_file.path_as_str())?;
 
@@ -119,7 +119,7 @@ impl <'a>Template<'a> {
         // convert [u8] to String
         let result: String = format!("{:X}", sha256.finalize());
 
-        Ok(result.to_lowercase())
+        TemplateId::new(result.to_lowercase())
     }
 
     /// Upload a template to the Carbone Service.
@@ -151,7 +151,7 @@ impl <'a>Template<'a> {
     ///     let template = Template::new(config, api_token);
     ///     let template_id = template.upload(&template_file, "".to_string())?;
     /// 
-    ///     assert_eq!(template_id.is_empty(), false);
+    ///     assert_eq!(template_id.as_str().is_empty(), false);
     /// 
     ///     Ok(())
     /// }
@@ -160,7 +160,7 @@ impl <'a>Template<'a> {
         &self,
         template_file: &TemplateFile,
         salt: String,
-    ) -> Result<String> {
+    ) -> Result<TemplateId> {
     
         let form = multipart::Form::new()
             .text("", salt)
@@ -187,7 +187,7 @@ impl <'a>Template<'a> {
                 let error_msg = json.get_error_message();
 
                 if json.success {
-                    Ok(template_id)
+                    TemplateId::new(template_id)
                 } else {
                     Err(CarboneError::ResponseError(error_msg))
                 }

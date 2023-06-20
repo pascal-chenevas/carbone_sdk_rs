@@ -26,10 +26,10 @@ mod tests {
         let is_err = result.is_err();
         let error = result.unwrap_err().to_string();
 
-        let expected_error = "api_token: Validation error: length [{\"min\": Number(357), \"value\": String(\"test_\")}]".to_string();
+        let _expected_error = "api_token: Validation error: length [{\"min\": Number(357), \"value\": String(\"test_\")}]";
 
         assert!(is_err);
-        assert!(matches!(error, expected_error));
+        assert!(matches!(error, _expected_error));
 
         Ok(())
     }

@@ -175,7 +175,7 @@ impl <'a>Render<'a> {
     ///     let template_file = &TemplateFile::new("/path/to/template.odf".to_string())?;
     ///     let render_id = render.render_report_with_file(template_file, render_options, "")?;
     /// 
-    ///     assert_eq!(render_id.is_empty(), false);
+    ///     assert_eq!(render_id.as_str().is_empty(), false);
     /// 
     ///     Ok(())
     /// }
@@ -185,14 +185,13 @@ impl <'a>Render<'a> {
         template_file: &TemplateFile,
         render_options: RenderOptions,
         payload: &str
-    ) -> Result<String> {
+    ) -> Result<RenderId> {
 
         let template: Template = Template::new(self.config, self.api_token);
-        let generated_template_id = template.generate_id(template_file, payload)?;
-        let template_id = TemplateId::new(generated_template_id)?;
+        let template_id = template.generate_id(template_file, payload)?;
 
         let render_id = self.render_data(template_id, render_options)?;
-        
+
         Ok(render_id)
     }
 
@@ -236,7 +235,7 @@ impl <'a>Render<'a> {
     /// 
     ///     let render_id = render.render_report_with_template_id(template_id, render_options)?;
     /// 
-    ///     assert_eq!(render_id.is_empty(), false);
+    ///     assert_eq!(render_id.as_str().is_empty(), false);
     /// 
     ///     Ok(())
     /// }
@@ -245,11 +244,11 @@ impl <'a>Render<'a> {
         &self,
         template_id: TemplateId,
         render_options: RenderOptions,
-    ) -> Result<String> {
+    ) -> Result<RenderId> {
         self.render_data(template_id, render_options)
     }
 
-    fn render_data(&self, template_id: TemplateId, render_options: RenderOptions) -> Result<String> {
+    fn render_data(&self, template_id: TemplateId, render_options: RenderOptions) -> Result<RenderId> {
 
         let client = reqwest::blocking::Client::new();
         let url = format!("{}/render/{}", self.config.api_url, template_id.as_str());
@@ -273,7 +272,7 @@ impl <'a>Render<'a> {
                 let error_msg = json.get_error_message();
 
                 if json.success {
-                    Ok(render_id)
+                    RenderId::new(render_id)
                 } else {
                     Err(CarboneError::ResponseError(error_msg))
                 }

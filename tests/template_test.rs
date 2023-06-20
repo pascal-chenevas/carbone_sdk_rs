@@ -164,7 +164,8 @@ mod tests {
         let template_file = TemplateFile::new(template_file_path.to_string())?;
         let template_id = template.generate_id(&template_file, "")?;
 
-        let expected_template_id = "0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string();
+        let expected_template_id = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
+
         assert_eq!(expected_template_id, template_id);
 
         Ok(())
@@ -183,7 +184,8 @@ mod tests {
         let template_file = TemplateFile::new(file_name.to_string())?;
         let template_id = template.generate_id(&template_file, "ThisIsAPayload")?;
 
-        let expected_template_id = "7de8d1d8676abb32291ea5119cb1f78fe37fdfdc75332fcdae28f1e30d064ac0".to_string();
+        let expected_template_id = TemplateId::new("7de8d1d8676abb32291ea5119cb1f78fe37fdfdc75332fcdae28f1e30d064ac0".to_string())?;
+
         assert_eq!(expected_template_id, template_id);
         
         Ok(())
@@ -202,7 +204,8 @@ mod tests {
         let template_file = TemplateFile::new(file_name.to_string())?;
         let template_id = template.generate_id(&template_file, "8B5PmafbjdRqHuksjHNw83mvPiGj7WTE")?;
 
-        let expected_template_id = "a62eb407a5d5765ddf974636de8ab47bda7915cebd61197d7a2bb42ae70ffcd6".to_string();
+        let expected_template_id = TemplateId::new("a62eb407a5d5765ddf974636de8ab47bda7915cebd61197d7a2bb42ae70ffcd6".to_string())?;
+
         assert_eq!(expected_template_id, template_id);
         
         Ok(())
@@ -221,7 +224,8 @@ mod tests {
         let template_file = TemplateFile::new("tests/data/template.test.html".to_string())?;
         let template_id = template.generate_id(&template_file, "")?;
 
-        let expected_template_id = "75256dd5c260cdf039ae807d3a007e78791e2d8963ea1aa6aff87ba03074df7f".to_string();
+        let expected_template_id = TemplateId::new("75256dd5c260cdf039ae807d3a007e78791e2d8963ea1aa6aff87ba03074df7f".to_string())?;
+
         assert_eq!(expected_template_id, template_id);
         
         Ok(())
@@ -241,7 +245,8 @@ mod tests {
         let payload = "This is a long payload with different characters 1 *5 &*9 %$ 3%&@9 @(( 3992288282 29299 9299929";
         let template_id = template.generate_id(&template_file, payload)?;
 
-        let expected_template_id = "70799b421cc9cf75d9112273a8e054c141d484eb8d5988bd006fac83e3990707".to_string();
+        let expected_template_id = TemplateId::new("70799b421cc9cf75d9112273a8e054c141d484eb8d5988bd006fac83e3990707".to_string())?;
+
         assert_eq!(expected_template_id, template_id);
         
         Ok(())
@@ -251,8 +256,8 @@ mod tests {
     fn test_upload_template() -> Result<(), CarboneError> {
 
         let mut data = HashMap::new();
-        let template_id_expected = "0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string();
-        data.insert("templateId".to_string(), template_id_expected.clone());
+        let template_id_expected = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
+        data.insert("templateId".to_string(), template_id_expected.as_str().to_string());
 
         let body = CarboneSDKResponse{
             success: true,
@@ -283,7 +288,7 @@ mod tests {
         
         // Assert
         mock_server.assert();
-        assert_eq!(template_id_expected,template_id);
+        assert_eq!(template_id, template_id_expected);
 
         Ok(())
     }
@@ -292,8 +297,8 @@ mod tests {
     fn test_upload_template_with_payload() -> Result<(), CarboneError> {
 
         let mut data = HashMap::new();
-        let template_id_expected = "cb03f7676ef0fbe5d7824a64676166ac2c7c789d9e6da5b7c0c46794911ee7a7".to_string();
-        data.insert("templateId".to_string(), template_id_expected.clone());
+        let template_id_expected = TemplateId::new("cb03f7676ef0fbe5d7824a64676166ac2c7c789d9e6da5b7c0c46794911ee7a7".to_string())?;
+        data.insert("templateId".to_string(), template_id_expected.as_str().to_string());
 
         let body = CarboneSDKResponse{
             success: true,
@@ -324,7 +329,7 @@ mod tests {
 
         // Assert
         m.assert();
-        assert_eq!(template_id_expected,template_id);
+        assert_eq!(template_id, template_id_expected);
 
         Ok(())
     }
