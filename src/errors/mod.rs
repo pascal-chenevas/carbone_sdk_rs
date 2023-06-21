@@ -6,10 +6,14 @@ pub enum CarboneError {
     Error(String),
     #[error("CarboneSDK: error: {0:?} can not be empty")]
     EmptyString(String),
+    #[error("CarboneSDK: Unknown Server Error")]
+    ServerError,
     #[error("CarboneSDK: \"template_file_name\" is missing")]
     MissingTemplateFileName,
-    #[error("CarboneSDK: \"render_options\" is missing")]
-    MissingRenderOptions,
+    #[error("CarboneSDK: render_id: \"{0:?}\" not found")]
+    RenderIdNotFound(String),
+    #[error("CarboneSDK: template_id: \"{0:?}\" not found")]
+    TemplateIdNotFound(String),
     #[error("Carbone SDK error: file {0:?} not found")]
     FileNotFound(String),
     #[error("Carbone SDK {0:?} is a directory")]

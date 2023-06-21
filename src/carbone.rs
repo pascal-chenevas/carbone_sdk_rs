@@ -1,5 +1,6 @@
 use bytes::Bytes;
 
+use reqwest::StatusCode;
 use reqwest::header::HeaderValue;
 
 use validator::Validate;
@@ -81,7 +82,13 @@ impl <'a>Carbone<'a> {
             .send();
 
         match response {
-            Ok(response) => Ok(response.bytes()?),
+            Ok(response) => {
+                match response.status() {
+                    StatusCode::OK => Ok(response.bytes()?),
+                    StatusCode::NOT_FOUND => Err(CarboneError::RenderIdNotFound(render_id.as_str().to_string())),
+                      _ => Err(CarboneError::ServerError)
+                }
+            }
             Err(e) => Err(CarboneError::ResponseError(e.to_string())),
         }
     }
