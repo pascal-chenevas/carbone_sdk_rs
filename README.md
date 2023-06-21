@@ -48,7 +48,7 @@ fn main() -> Result<(), CarboneError> {
              Err(e) => panic!("{}", e.to_string())
      };
  
-    let config = &Config::new("http://127.0.0.1".to_string(), 4, 2)?;
+    let config = &Config::new("https://render.carbone.io".to_string(), 4, 2)?;
  
     let api_token = &ApiJsonToken::new(token)?;
 
