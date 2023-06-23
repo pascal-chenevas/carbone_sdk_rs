@@ -1,8 +1,10 @@
+use std::ops::Deref;
+
 use crate::errors::CarboneError;
 use crate::template::{TemplateId, TemplateFile};
 
 use crate::config::Config;
-use crate::types::ApiJsonToken;
+use crate::types::*;
 
 use crate::carbone::Result;
 use crate::carbone_response::CarboneSDKResponse;
@@ -56,9 +58,7 @@ impl RenderOptions {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct RenderId {
-    id: String,
-}
+pub struct RenderId(Id);
 
 impl RenderId {
     /// Create a new render_id struct.
@@ -81,17 +81,25 @@ impl RenderId {
     ///     Ok(())
     /// }
     /// ```
-    pub fn new(s: String) -> Result<Self> {
-        if s.is_empty() {
-            return Err(CarboneError::EmptyString("render_id".to_string()));
-        }
-        let render_id = Self {id: s};
-        Ok(render_id)  
+    pub fn new<T: Into<String>>(id: T) -> Result<Self> {
+        let id = Id::new(id, "render_id")?;
+        Ok(RenderId(id))
     }
-  
-    pub fn as_str(&self) -> &str { &self.id }
+}
 
-  }
+impl Deref for RenderId {
+    type Target = Id;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl AsRef<str> for RenderId {
+    fn as_ref(&self) -> &str {
+        self.0.as_ref()
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Render<'a> {

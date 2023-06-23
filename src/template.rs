@@ -4,6 +4,8 @@ use std::path::Path;
 
 use std::fs::Metadata;
 
+use std::ops::Deref;
+
 use bytes::Bytes;
 
 use reqwest::blocking::multipart;
@@ -12,7 +14,7 @@ use reqwest::header::CONTENT_TYPE;
 
 use sha2::{Digest, Sha256};
 
-use crate::types::ApiJsonToken;
+use crate::types::*;
 use crate::config::Config;
 use crate::errors::CarboneError;
 use crate::carbone_response::CarboneSDKResponse;
@@ -48,12 +50,8 @@ impl TemplateFile {
 
 }
 
-
-
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct TemplateId {
-    id: String,
-}
+pub struct TemplateId(Id);
 
 impl TemplateId {
     /// Create a new template_id.
@@ -76,16 +74,24 @@ impl TemplateId {
     ///     Ok(())
     /// }
     /// ```
-    pub fn new(s: String) -> Result<Self> {
-        if s.is_empty() {
-            return Err(CarboneError::EmptyString("template_id".to_string()));
-        }
-        let template_id = Self {id: s};
-        Ok(template_id)  
+    pub fn new<T: Into<String>>(id: T) -> Result<Self> {
+        let id = Id::new(id, "template_id")?;
+        Ok(TemplateId(id))
     }
-  
-    pub fn as_str(&self) -> &str { &self.id }
+}
 
+impl Deref for TemplateId {
+    type Target = Id;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl AsRef<str> for TemplateId {
+    fn as_ref(&self) -> &str {
+        self.0.as_ref()
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

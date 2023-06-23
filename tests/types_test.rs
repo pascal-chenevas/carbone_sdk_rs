@@ -2,7 +2,8 @@
 mod tests {
 
     use  std::matches;
-    use carbone_sdk_rs::types::ApiJsonToken;
+    use carbone_sdk_rs::types::*;
+    use carbone_sdk_rs::errors::CarboneError;
 
     use anyhow::Result;
 
@@ -30,6 +31,31 @@ mod tests {
 
         assert!(is_err);
         assert!(matches!(error, _expected_error));
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_id() -> Result<(), CarboneError> {
+
+        let id_value = "0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114";
+        let id = Id::new(id_value.to_string(), "id")?;
+
+        assert_eq!(id.as_str(), id_value);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_template_id_empty_value_given() -> Result<(), CarboneError> {
+
+        let id_value = "";
+        let result = Id::new(id_value.to_string(), "id");
+
+        let exepected_error = CarboneError::EmptyString("id".to_string());
+
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().to_string(), exepected_error.to_string());
 
         Ok(())
     }

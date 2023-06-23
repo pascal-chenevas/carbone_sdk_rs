@@ -58,30 +58,6 @@ mod tests {
         Ok(())
     }
 
-    #[test]
-    fn test_template_id() -> Result<(), CarboneError> {
-
-        let template_id_value = "0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114";
-        let template_id = TemplateId::new(template_id_value.to_string())?;
-
-        assert_eq!(template_id.as_str(), template_id_value);
-
-        Ok(())
-    }
-
-    #[test]
-    fn test_template_id_empty_value_given() -> Result<(), CarboneError> {
-
-        let template_id_value = "";
-        let result = TemplateId::new(template_id_value.to_string());
-
-        let exepected_error = CarboneError::EmptyString("template_id".to_string());
-
-        assert!(result.is_err());
-        assert_eq!(result.unwrap_err().to_string(), exepected_error.to_string());
-
-        Ok(())
-    }
 
     #[test]
     fn test_downaload() -> Result<(), CarboneError> {
