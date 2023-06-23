@@ -2,6 +2,10 @@ use serde::{Deserialize,Serialize};
 use std::collections::HashMap;
 use std::str;
 
+use crate::template::TemplateId;
+use crate::render::RenderId;
+
+use crate::carbone::Result;
 
 // #[serde(rename_all = "camelCase")]
 #[derive(Debug, Deserialize, Serialize)]
@@ -44,12 +48,14 @@ impl CarboneSDKResponse {
         Self { success, data, error }
     }
 
-    pub fn get_template_id(&self) -> String {
-        self.get_id_from_data("templateId".to_string())
+    pub fn get_template_id(&self) -> Result<TemplateId> {
+        let render_id = self.get_id_from_data("templateId".to_string());
+        TemplateId::new(render_id)
     }
 
-    pub fn get_render_id(&self) -> String {
-        self.get_id_from_data("renderId".to_string())
+    pub fn get_render_id(&self) -> Result<RenderId> {
+        let render_id = self.get_id_from_data("renderId".to_string());
+        RenderId::new(render_id)
     }
 
     pub fn get_error_message(&self) -> String {

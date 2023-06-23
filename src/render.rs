@@ -276,11 +276,11 @@ impl <'a>Render<'a> {
         match response {
             Ok(response) => {
                 let json = response.json::<CarboneSDKResponse>()?;
-                let render_id = json.get_render_id();
                 let error_msg = json.get_error_message();
 
                 if json.success {
-                    RenderId::new(render_id)
+                    let render_id = json.get_render_id()?;
+                    Ok(render_id)
                 } else {
                     Err(CarboneError::ResponseError(error_msg))
                 }

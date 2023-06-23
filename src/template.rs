@@ -189,11 +189,11 @@ impl <'a>Template<'a> {
         match response {
             Ok(response) => {
                 let json = response.json::<CarboneSDKResponse>()?;
-                let template_id = json.get_template_id();
                 let error_msg = json.get_error_message();
 
                 if json.success {
-                    TemplateId::new(template_id)
+                    let template_id = json.get_template_id()?;
+                    Ok(template_id)
                 } else {
                     Err(CarboneError::ResponseError(error_msg))
                 }
