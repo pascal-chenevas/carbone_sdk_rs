@@ -76,6 +76,8 @@ fn main() -> Result<(), CarboneError> {
 
 [Carbone.io](https://carbone.io) a report generator.
 
+[Carbone CLI App](https://github.com/pascal-chenevas/carbone_cli_rs) a simple CLI App to create reports.
+
 ## Useful links
 
 - [How to build a template file](https://carbone.io/documentation.html#building-a-template)
