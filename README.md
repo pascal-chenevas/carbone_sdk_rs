@@ -48,7 +48,7 @@ fn main() -> Result<(), CarboneError> {
              Err(e) => panic!("{}", e.to_string())
      };
  
-     let config: Config = Default::default();
+    let config: Config = Default::default();
  
     let api_token = ApiJsonToken::new(token)?;
 
