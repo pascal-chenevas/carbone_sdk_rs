@@ -48,9 +48,9 @@ fn main() -> Result<(), CarboneError> {
              Err(e) => panic!("{}", e.to_string())
      };
  
-    let config = &Config::new("https://render.carbone.io".to_string(), 4, 2)?;
+     let config: Config = Default::default();
  
-    let api_token = &ApiJsonToken::new(token)?;
+    let api_token = ApiJsonToken::new(token)?;
 
     let render_options_value = String::from(r#"
          "data" : {
@@ -64,7 +64,7 @@ fn main() -> Result<(), CarboneError> {
 
     let template_id = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
 
-    let carbone_sdk = Carbone::new(config, api_token)?;
+    let carbone_sdk = Carbone::new(&config, &api_token)?;
     
     let _report_content = carbone_sdk.generate_report_with_template_id(template_id, render_options)?;
 
