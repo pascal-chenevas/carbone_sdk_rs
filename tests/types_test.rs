@@ -47,7 +47,7 @@ mod tests {
     }
 
     #[test]
-    fn test_template_id_empty_value_given() -> Result<(), CarboneError> {
+    fn test_id_empty_value_given() -> Result<(), CarboneError> {
 
         let id_value = "";
         let result = Id::new(id_value.to_string(), "id");
