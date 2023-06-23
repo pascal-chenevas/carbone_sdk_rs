@@ -12,6 +12,8 @@ pub enum CarboneError {
     RenderIdNotFound(String),
     #[error("CarboneSDK: template_id: \"{0:?}\" not found")]
     TemplateIdNotFound(String),
+    #[error("CarboneSDK: template file: \"{0:?}\" not found")]
+    TemplateFileNotFound(String),
     #[error("Carbone SDK error: file {0:?} not found")]
     FileNotFound(String),
     #[error("Carbone SDK {0:?} is a directory")]

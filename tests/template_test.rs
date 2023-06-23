@@ -50,7 +50,7 @@ mod tests {
         let template_file_path = "tests/data/unknown_template.test.docx";
         let result = TemplateFile::new(template_file_path.to_string());
 
-        let expected_error = CarboneError::FileNotFound(template_file_path.to_string());
+        let expected_error = CarboneError::TemplateFileNotFound(template_file_path.to_string());
         
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().to_string(), expected_error.to_string());

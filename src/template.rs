@@ -35,7 +35,7 @@ impl TemplateFile {
         }
 
         if !Path::new(path.as_str()).is_file() {
-            return Err(CarboneError::FileNotFound(path));
+            return Err(CarboneError::TemplateFileNotFound(path));
         }
 
         let metadata = fs::metadata(path.as_str())?;
