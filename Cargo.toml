@@ -2,6 +2,8 @@
 name = "carbone_sdk_rs"
 version = "0.1.0"
 edition = "2021"
+author = "Pascal Chenevas-Paule [ pacp.dev[a t] posteo.de"
+about = "A library to communicate with the Carbone API (http://carbone.io)"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
