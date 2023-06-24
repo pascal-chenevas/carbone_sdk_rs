@@ -211,7 +211,7 @@ mod tests {
         let render_options = RenderOptions::new(render_options)?;
         let result = render.render_report_with_template_id(template_id, render_options);
 
-        let expected_error = CarboneError::ResponseError("Invalid or undefined TemplateId or RenderId in the URL".to_string());
+        let expected_error = CarboneError::BadRequest("Invalid or undefined TemplateId or RenderId in the URL".to_string());
 
         mock_server.assert();
         assert!(result.is_err());

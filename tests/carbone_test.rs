@@ -5,6 +5,7 @@ use httpmock::prelude::*;
 use carbone_sdk_rs::carbone::Carbone;
 use carbone_sdk_rs::errors::CarboneError;
 use carbone_sdk_rs::render::*;
+use carbone_sdk_rs::carbone_response::ResponseBody  ;
 
 mod helper;
 
@@ -64,13 +65,25 @@ mod tests {
         let render_id_value = "unknown_render_id.pdf";
         let render_id = &RenderId::new(render_id_value.to_string())?;
 
+        let error_msg = "Invalid or undefined TemplateId or RenderId in the URL".to_string();
+
+        let body = ResponseBody
+        {
+            success: false,
+            data: None,
+            error: Some(error_msg.clone()),
+            code: Some("w115".to_string())
+        };
+
         let mock_server = server.mock(|when, then| {
             when.method("GET")
                 .path(format!("/render/{}", render_id.as_str()));
-            then.status(404);
+            then.status(400)
+                .header("content-type", "application/json; charset=utf-8")
+                .json_body_obj(&body);
         });
 
-        let expected_error = CarboneError::RenderIdNotFound(render_id_value.to_string());
+        let expected_error = CarboneError::BadRequest(error_msg);
         let result = carbone_sdk.get_report(render_id);
     
         mock_server.assert();

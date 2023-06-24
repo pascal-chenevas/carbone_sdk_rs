@@ -3,7 +3,7 @@ use std::fs;
 use std::collections::HashMap;
 use httpmock::prelude::*;
 
-use carbone_sdk_rs::carbone_response::CarboneSDKResponse;
+use carbone_sdk_rs::carbone_response::ResponseBody;
 use carbone_sdk_rs::errors::CarboneError;
 use carbone_sdk_rs::config::Config;
 use carbone_sdk_rs::template::*;
@@ -101,11 +101,22 @@ mod tests {
         // Start a lightweight mock server.
         let server = MockServer::start();
 
+        let error_msg = "Invalid or undefined TemplateId or RenderId in the URL".to_string();
+
+        let body = ResponseBody{
+            success: false,
+            data: None,
+            error: Some(error_msg.clone()),
+            code: Some("w115".to_string())
+        };
+
         // Create a mock on the server.
         let mock_server = server.mock(|when, then| {
             when.method("GET")
                 .path(format!("/template/{}", template_id.as_str()));
-            then.status(400);
+            then.status(400)
+                .header("content-type", "application/json; charset=utf-8")
+                .json_body_obj(&body);
         });
 
         let helper = Helper::new();
@@ -117,7 +128,7 @@ mod tests {
 
         let result = template.download(template_id);
 
-        let expected_error = CarboneError::ResponseError("template_id unknown_template_id not found".to_string());
+        let expected_error = CarboneError::BadRequest(error_msg);
 
         mock_server.assert();
 
@@ -235,10 +246,11 @@ mod tests {
         let template_id_expected = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
         data.insert("templateId".to_string(), template_id_expected.as_str().to_string());
 
-        let body = CarboneSDKResponse{
+        let body = ResponseBody{
             success: true,
             data: Some(data),
-            error: None
+            error: None,
+            code: None
         };
 
         // Start a lightweight mock server.
@@ -276,10 +288,11 @@ mod tests {
         let template_id_expected = TemplateId::new("cb03f7676ef0fbe5d7824a64676166ac2c7c789d9e6da5b7c0c46794911ee7a7".to_string())?;
         data.insert("templateId".to_string(), template_id_expected.as_str().to_string());
 
-        let body = CarboneSDKResponse{
+        let body = ResponseBody{
             success: true,
             data: Some(data),
-            error: None
+            error: None,
+            code: None
         };
 
         // Start a lightweight mock server.
@@ -318,10 +331,11 @@ mod tests {
         // Start a lightweight mock server.
         let server = MockServer::start();
 
-        let body = CarboneSDKResponse{
+        let body = ResponseBody{
             success: true,
             data: None,
             error: None,
+            code: None
         };
 
         // Create a mock on the server.
@@ -356,19 +370,21 @@ mod tests {
         // Start a lightweight mock server.
         let server = MockServer::start();
 
-        let error_msg = "ResponseError: Cannot remove template, does it exist ?".to_string();
+        let error_msg = "Invalid or undefined TemplateId or RenderId in the URL".to_string();
 
-        let body = CarboneSDKResponse{
+        let body = ResponseBody{
             success: false,
             data: None,
             error: Some(error_msg.clone()),
+            code: None
         };
 
         // Create a mock on the server.
         let mock_server = server.mock(|when, then| {
             when.method("DELETE")
                 .path(format!("/template/{}", template_id.as_str()));
-            then.status(200)
+            then.status(400)
+                .header("content-type", "application/json; charset=utf-8")
                 .json_body_obj(&body);
         });
 
@@ -381,7 +397,7 @@ mod tests {
 
         let result = template.delete(template_id);
 
-        let expected_error = CarboneError::ResponseError(error_msg);
+        let expected_error = CarboneError::BadRequest(error_msg);
 
         mock_server.assert();
 
