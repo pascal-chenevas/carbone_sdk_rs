@@ -8,6 +8,8 @@ pub enum CarboneError {
     EmptyString(String),
     #[error("CarboneSDK: Unknown Server Error")]
     ServerError,
+    #[error("CarboneSDK: Bad Request: {0:?}")]
+    BadRequest(String),
     #[error("CarboneSDK: render_id: \"{0:?}\" not found")]
     RenderIdNotFound(String),
     #[error("CarboneSDK: template_id: \"{0:?}\" not found")]

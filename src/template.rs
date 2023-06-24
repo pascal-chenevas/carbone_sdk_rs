@@ -8,16 +8,16 @@ use std::ops::Deref;
 
 use bytes::Bytes;
 
+use reqwest::StatusCode;
 use reqwest::blocking::multipart;
 use reqwest::header::HeaderValue;
-use reqwest::header::CONTENT_TYPE;
 
 use sha2::{Digest, Sha256};
 
 use crate::types::*;
 use crate::config::Config;
 use crate::errors::CarboneError;
-use crate::carbone_response::CarboneSDKResponse;
+use crate::carbone_response::ResponseBody;
 
 use crate::carbone::Result;
 
@@ -148,13 +148,13 @@ impl <'a>Template<'a> {
     ///             Err(e) => panic!("{}", e.to_string())
     ///     };
     /// 
-    ///     let config = &Config::new("http://127.0.0.1".to_string(), 4, 2)?;
+    ///     let config: Config = Default::default();
     /// 
-    ///     let api_token = &ApiJsonToken::new(token)?;
+    ///     let api_token = ApiJsonToken::new(token)?;
     /// 
     ///     let template_file = TemplateFile::new("template.odt".to_string())?;
     /// 
-    ///     let template = Template::new(config, api_token);
+    ///     let template = Template::new(&config, &api_token);
     ///     let template_id = template.upload(&template_file, "".to_string())?;
     /// 
     ///     assert_eq!(template_id.as_str().is_empty(), false);
@@ -188,14 +188,14 @@ impl <'a>Template<'a> {
 
         match response {
             Ok(response) => {
-                let json = response.json::<CarboneSDKResponse>()?;
+                let json = response.json::<ResponseBody>()?;
                 let error_msg = json.get_error_message();
 
                 if json.success {
                     let template_id = json.get_template_id()?;
                     Ok(template_id)
                 } else {
-                    Err(CarboneError::ResponseError(error_msg))
+                    Err(CarboneError::BadRequest(error_msg))
                 }
             }
             Err(e) => Err(CarboneError::RequestError(e)),
@@ -222,14 +222,14 @@ impl <'a>Template<'a> {
     ///             Err(e) => panic!("{}", e.to_string())
     ///     };
     /// 
-    ///     let config = &Config::new("http://127.0.0.1".to_string(), 4, 2)?;
+    ///     let config: Config = Default::default();
     /// 
-    ///     let api_token = &ApiJsonToken::new(token)?;
+    ///     let api_token = ApiJsonToken::new(token)?;
     /// 
     ///     let template_file = String::from("template.odt");
     /// 
     ///     let template_id = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
-    ///     let template = Template::new(config, api_token);
+    ///     let template = Template::new(&config, &api_token);
     ///     
     ///     let template_content = template.download(template_id)?;
     /// 
@@ -244,7 +244,7 @@ impl <'a>Template<'a> {
         let url = format!("{}/template/{}", self.config.api_url, template_id.as_str());
 
         // TODO move new client to new() method
-        let response_result = client
+        let response = client
             .get(url)
             .header(
                 "carbone-version",
@@ -253,30 +253,17 @@ impl <'a>Template<'a> {
             .bearer_auth(self.api_token.as_str())
             .send();
 
-        if let Err(e) = response_result {
-            Err(CarboneError::RequestError(e))
-        } else {
-
-            let response = response_result.unwrap();
-
-            if response.status() == 200 {
-                if let Some(content_type) = response.headers().get(CONTENT_TYPE) {
-                    if content_type == "application/json" {
-                        let json = response.json::<CarboneSDKResponse>()?;
-                        let error_msg = json.get_error_message();
-                        Err(CarboneError::ResponseError(error_msg))
-                    } else {
-                        match content_type.to_str() {
-                            Ok(v) =>  Err(CarboneError::Error(format!("Content-Type `{}` not supported", v))),
-                            Err(e) => Err(CarboneError::Error(e.to_string())),
-                        }
-                    }
+        match response {
+            Ok(r) => {
+                if r.status() == StatusCode::OK {
+                    Ok(r.bytes()?)
                 } else {
-                    Ok(response.bytes()?)
+                    let json = r.json::<ResponseBody>()?;
+                    let error_msg = json.get_error_message();
+                    Err(CarboneError::BadRequest(error_msg))
                 }
-            } else {
-                Err(CarboneError::ResponseError(format!("template_id {} not found", template_id.as_str())))
             }
+            Err(e) => Err(CarboneError::RequestError(e)),
         }
     }
 
@@ -300,12 +287,12 @@ impl <'a>Template<'a> {
     ///             Err(e) => panic!("{}", e.to_string())
     ///     };
     /// 
-    ///     let config = &Config::new("http://127.0.0.1".to_string(), 4, 2)?;
+    ///     let config: Config = Default::default();
     /// 
-    ///     let api_token = &ApiJsonToken::new(token)?;
+    ///     let api_token = ApiJsonToken::new(token)?;
     /// 
     ///     let template_id = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
-    ///     let template = Template::new(config, api_token);
+    ///     let template = Template::new(&config, &api_token);
     /// 
     ///     let is_deleted = template.delete(template_id)?;
     /// 
@@ -331,13 +318,13 @@ impl <'a>Template<'a> {
 
         match response {
             Ok(response) => {
-                let json = response.json::<CarboneSDKResponse>()?;
+                let json = response.json::<ResponseBody>()?;
                 let error_msg = json.get_error_message();
 
                 if json.success {
                     Ok(true)
                 } else {
-                    Err(CarboneError::ResponseError(error_msg))
+                    Err(CarboneError::BadRequest(error_msg))
                 }
             }
             Err(e) => Err(CarboneError::RequestError(e)),

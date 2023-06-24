@@ -7,7 +7,7 @@ use crate::config::Config;
 use crate::types::*;
 
 use crate::carbone::Result;
-use crate::carbone_response::CarboneSDKResponse;
+use crate::carbone_response::ResponseBody;
 
 use reqwest::header::HeaderValue;
 
@@ -129,8 +129,8 @@ impl <'a>Render<'a> {
     ///             Ok(v) => v,
     ///             Err(e) => panic!("{}", e.to_string())
     ///     };
-    ///     let config = &Config::new("http://127.0.0.1".to_string(), 4, 2)?;
-    ///     let api_token = &ApiJsonToken::new(token)?;
+    ///     let config: Config = Default::default();
+    ///     let api_token = ApiJsonToken::new(token)?;
     ///    
     ///     let render = Render::new(&config, &api_token);
     /// 
@@ -165,10 +165,10 @@ impl <'a>Render<'a> {
     ///             Err(e) => panic!("{}", e.to_string())
     ///     };
     /// 
-    ///     let config = &Config::new("http://127.0.0.1".to_string(), 4, 2)?;
-    ///     let api_token = &ApiJsonToken::new(token)?;
+    ///     let config: Config = Default::default();
+    ///     let api_token = ApiJsonToken::new(token)?;
     /// 
-    ///     let render = Render::new(config, &api_token);
+    ///     let render = Render::new(&config, &api_token);
     ///    
     ///     let render_options_value = String::from(r#"
     ///         "data" : {
@@ -224,7 +224,7 @@ impl <'a>Render<'a> {
     ///             Err(e) => panic!("{}", e.to_string())
     ///     };
     /// 
-    ///     let config = Config::new("http://127.0.0.1".to_string(), 4, 2)?;
+    ///     let config: Config = Default::default();
     ///     let api_token = ApiJsonToken::new(token)?;
     /// 
     ///     let template_id = TemplateId::new("foiejwoi21e093ru3209jf2093j".to_string())?;
@@ -275,14 +275,14 @@ impl <'a>Render<'a> {
 
         match response {
             Ok(response) => {
-                let json = response.json::<CarboneSDKResponse>()?;
+                let json = response.json::<ResponseBody>()?;
                 let error_msg = json.get_error_message();
 
                 if json.success {
                     let render_id = json.get_render_id()?;
                     Ok(render_id)
                 } else {
-                    Err(CarboneError::ResponseError(error_msg))
+                    Err(CarboneError::BadRequest(error_msg))
                 }
             }
             Err(e) => Err(CarboneError::RequestError(e)),

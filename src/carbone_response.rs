@@ -9,12 +9,14 @@ use crate::carbone::Result;
 
 // #[serde(rename_all = "camelCase")]
 #[derive(Debug, Deserialize, Serialize)]
-pub struct CarboneSDKResponse {
+pub struct ResponseBody {
     pub success: bool,
     #[serde(default)]
     pub data: Option<HashMap<String, String>>,
     #[serde(default)]
     pub error: Option<String>,
+    #[serde(default)]
+    pub code: Option<String>,
 }
 
 ///
@@ -42,10 +44,19 @@ pub struct CarboneSDKResponse {
 ///     "error": "<error message>"
 //  }
 ///
-impl CarboneSDKResponse {
+///  or
+/// 
+/// {
+///     "success": false,
+///     "error": "Invalid or undefined TemplateId or RenderId in the URL",
+///     "code": "w115"
+/// }
+/// 
+///
+impl ResponseBody {
 
-    pub fn new(success: bool, data: Option<HashMap<String, String>>, error: Option<String>) -> Self {
-        Self { success, data, error }
+    pub fn new(success: bool, data: Option<HashMap<String, String>>, error: Option<String>, code: Option<String>) -> Self {
+        Self { success, data, error, code }
     }
 
     pub fn get_template_id(&self) -> Result<TemplateId> {
@@ -61,6 +72,13 @@ impl CarboneSDKResponse {
     pub fn get_error_message(&self) -> String {
         match self.error.clone() {
             Some(error_msg) => error_msg,
+            None => "".to_string(),
+        }
+    }
+
+    pub fn get_error_code(&self) -> String {
+        match self.code.clone() {
+            Some(error_code) => error_code,
             None => "".to_string(),
         }
     }

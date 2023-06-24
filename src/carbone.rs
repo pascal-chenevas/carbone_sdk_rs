@@ -1,16 +1,16 @@
 use bytes::Bytes;
 
-use reqwest::StatusCode;
 use reqwest::header::HeaderValue;
+use reqwest::StatusCode;
 
 use validator::Validate;
 
 use crate::errors::*;
-
 use crate::config::Config;
 use crate::types::ApiJsonToken;
 use crate::render::*;
 use crate::template::*;
+use crate::carbone_response::ResponseBody;
 
 pub type Result<T> = std::result::Result<T, CarboneError>;
 
@@ -81,16 +81,18 @@ impl <'a>Carbone<'a> {
             .bearer_auth(self.api_token.as_str())
             .send();
 
-        match response {
-            Ok(response) => {
-                match response.status() {
-                    StatusCode::OK => Ok(response.bytes()?),
-                    StatusCode::NOT_FOUND => Err(CarboneError::RenderIdNotFound(render_id.as_str().to_string())),
-                      _ => Err(CarboneError::ServerError)
+            match response {
+                Ok(r) => {
+                    if r.status() == StatusCode::OK {
+                        Ok(r.bytes()?)
+                    } else {
+                        let json = r.json::<ResponseBody>()?;
+                        let error_msg = json.get_error_message();
+                        Err(CarboneError::BadRequest(error_msg))
+                    }
                 }
+                Err(e) => Err(CarboneError::RequestError(e)),
             }
-            Err(e) => Err(CarboneError::ResponseError(e.to_string())),
-        }
     }
 
     /// Generate a report with a template_id given.
