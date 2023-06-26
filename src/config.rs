@@ -148,6 +148,11 @@ impl FromStr for Config {
     }
 }
 
+impl AsRef<Config> for Config {
+    fn as_ref(&self) -> &Config {
+        &self
+    }
+}
 
 impl fmt::Display for Config {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

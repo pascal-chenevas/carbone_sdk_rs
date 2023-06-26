@@ -52,7 +52,7 @@ impl <'a>Carbone<'a> {
     ///             Err(e) => panic!("{}", e.to_string())
     ///     };
     /// 
-    ///     let config = &Config::new("http://127.0.0.1".to_string(), 4, 2)?;
+    ///     let config: Config = Default::default();
     /// 
     ///     let api_token = &ApiJsonToken::new(token)?;
     /// 
@@ -118,7 +118,7 @@ impl <'a>Carbone<'a> {
     ///             Err(e) => panic!("{}", e.to_string())
     ///     };
     /// 
-    ///     let config = &Config::new("http://127.0.0.1".to_string(), 4, 2)?;
+    ///     let config: Config = Default::default();
     /// 
     ///     let api_token = &ApiJsonToken::new(token)?;
     /// 
@@ -172,7 +172,7 @@ impl <'a>Carbone<'a> {
     ///             Err(e) => panic!("{}", e.to_string())
     ///     };
     /// 
-    ///     let config = &Config::new("http://127.0.0.1".to_string(), 4, 2)?;
+    ///     let config: Config = Default::default();
     /// 
     ///     let api_token = &ApiJsonToken::new(token)?;
     /// 

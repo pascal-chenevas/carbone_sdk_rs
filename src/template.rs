@@ -14,6 +14,8 @@ use reqwest::header::HeaderValue;
 
 use sha2::{Digest, Sha256};
 
+use serde::Deserialize;
+
 use crate::types::*;
 use crate::config::Config;
 use crate::errors::CarboneError;
