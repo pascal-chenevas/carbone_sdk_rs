@@ -14,7 +14,7 @@ use crate::carbone_response::ResponseBody;
 
 pub type Result<T> = std::result::Result<T, CarboneError>;
 
-#[derive(Debug, Validate, PartialEq, Eq)]
+#[derive(Debug, Validate, Clone, PartialEq, Eq)]
 pub struct Carbone<'a>{
     config: &'a Config,
     api_token: &'a ApiJsonToken,
