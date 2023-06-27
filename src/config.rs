@@ -103,11 +103,12 @@ impl Config {
 /// ```
 impl Default for Config {
     fn default() -> Self { 
-       Self{
+       let default = Self{
             api_url: CARBONE_API_URL.to_string(),
             api_timeout: 60,
             api_version: CARBONE_API_VERSION,
-        }
+        };
+        default.clone()
     }
 }
 
