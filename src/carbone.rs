@@ -204,4 +204,12 @@ impl <'a>Carbone<'a> {
         Ok(report_content)
     }
 
+    pub fn template(&self) -> Template {
+        self.template.clone()
+    }
+
+    pub fn render(&self) -> Render {
+        self.render.clone()
+    }
+
 }
