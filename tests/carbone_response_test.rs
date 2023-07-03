@@ -6,6 +6,63 @@ mod tests {
     use carbone_sdk_rs::render::RenderId;
     use carbone_sdk_rs::template::TemplateId;
     use serde_json;
+    use std::collections::HashMap;
+
+    #[test]
+    fn test_deserialize_response_succeed() -> Result<(), CarboneError> {
+       
+        let expected_template_id = TemplateId::new(
+            "2436447a0d5954de2ad9cd28376f9e743a8fe732b829a1d37b60f51539dad7ad".to_string(),
+        )?;
+        let data = HashMap::from([("templateId".to_string(), expected_template_id.as_str().to_string())]);
+        let carbone_resp = ResponseBody::new(true, Some(data), None, None);
+
+    
+        let resp_boyd = format!(
+            "
+        {{
+            \"success\": true,
+            \"data\": {{
+                      \"templateId\": \"{}\"
+            }}
+        }}
+        ",
+            expected_template_id.as_str()
+        );
+
+        let deserialized: ResponseBody = serde_json::from_str(&resp_boyd).unwrap();
+        assert_eq!(deserialized, carbone_resp);
+        
+        Ok(())
+
+    }
+
+    #[test]
+    fn test_deserialize_response_failed() -> Result<(), CarboneError> {
+       
+        let error_msg = "an error message".to_string();
+        let error_code = "W45".to_string();
+        let carbone_resp = ResponseBody::new(false, None, Some(error_msg.clone()), Some(error_code.clone()));
+
+    
+        let resp_boyd = format!(
+            "
+            {{
+                \"success\": false,
+                \"error\": \"{}\",
+                \"code\" : \"{}\"
+            }}
+        ",
+        &error_msg.as_str(),
+        &error_code.as_str()
+        );
+
+        let deserialized: ResponseBody = serde_json::from_str(&resp_boyd).unwrap();
+        assert_eq!(deserialized, carbone_resp);
+        
+        Ok(())
+
+    }
 
     #[test]
     fn test_get_template_id() -> Result<(), CarboneError> {
