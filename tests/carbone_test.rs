@@ -15,7 +15,7 @@ use helper::Helper;
 #[cfg(test)]
 mod tests {
 
-    use carbone_sdk_rs::template::{Template, TemplateFile};
+    use carbone_sdk_rs::template::*;
 
     use super::*;
 
@@ -179,7 +179,7 @@ mod tests {
         let render_options = RenderOptions::new(report_data)?;
 
         let render_id_value = "MTAuMjAuMjEuNDAgICAgBY4OM11wQg11ekv6_R0n0wcmVwb3J0.pdf".to_string(); 
-        let _render_id = &RenderId::new(&render_id_value)?;
+        let render_id = &RenderId::new(&render_id_value)?;
 
         let file_path = "tests/data/report.pdf";
 
@@ -192,16 +192,15 @@ mod tests {
                 .json_body(json!({
                     "success": true,
                     "data": {
-                        "renderId": &render_id_value,
+                        "renderId": render_id.as_str(),
                         "inputFileExtension": "odt"
                     }
                 }));
         });
        
-
         let mock_get_report_response = server.mock(|when, then| {
             when.method("GET")
-                .path(format!("/render/{}", &render_id_value));
+                .path(format!("/render/{}",render_id.as_str()));
             then.status(200)
                 .body(&expected_content);
         });
@@ -215,5 +214,40 @@ mod tests {
        
         Ok(())
     }
+
+    #[test]
+    fn test_template() -> Result<(), CarboneError> {
+
+        let helper = Helper::new();
+        let config = &helper.create_config_for_mock_server(None)?;
+
+        let api_token = &helper.create_api_token()?;
+
+        let template: Template = Template::new(config, api_token);
+
+        let carbone = Carbone::new(&config, api_token)?;
+
+        assert_eq!(&template, carbone.template());
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_render() -> Result<(), CarboneError> {
+
+        let helper = Helper::new();
+        let config = &helper.create_config_for_mock_server(None)?;
+
+        let api_token = &helper.create_api_token()?;
+
+        let render: Render = Render::new(config, api_token);
+
+        let carbone = Carbone::new(&config, api_token)?;
+
+        assert_eq!(&render, carbone.render());
+
+        Ok(())
+    }
+
 
 }

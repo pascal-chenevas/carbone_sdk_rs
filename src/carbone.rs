@@ -3,8 +3,6 @@ use bytes::Bytes;
 use reqwest::header::HeaderValue;
 use reqwest::StatusCode;
 
-use validator::Validate;
-
 use crate::errors::*;
 use crate::config::Config;
 use crate::types::ApiJsonToken;
@@ -14,7 +12,7 @@ use crate::carbone_response::ResponseBody;
 
 pub type Result<T> = std::result::Result<T, CarboneError>;
 
-#[derive(Debug, Validate, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Carbone<'a>{
     config: &'a Config,
     api_token: &'a ApiJsonToken,
@@ -204,12 +202,12 @@ impl <'a>Carbone<'a> {
         Ok(report_content)
     }
 
-    pub fn template(&self) -> Template {
-        self.template.clone()
+    pub fn template(&self) -> &Template {
+        &self.template
     }
 
-    pub fn render(&self) -> Render {
-        self.render.clone()
+    pub fn render(&self) -> &Render {
+        &self.render
     }
 
 }
