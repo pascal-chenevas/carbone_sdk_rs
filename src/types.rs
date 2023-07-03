@@ -22,7 +22,6 @@ impl ApiJsonToken {
 
 }
 
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Id(String);
 
