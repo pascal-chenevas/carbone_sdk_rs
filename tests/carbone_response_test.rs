@@ -35,6 +35,33 @@ mod tests {
     }
 
     #[test]
+    fn test_get_template_id_failed() {
+        
+        let resp_boyd = format!(
+            "
+        {{
+            \"success\": true,
+            \"data\": {{
+                      \"a_key\": \"123\"
+            }}
+        }}
+        ");
+
+        let deserialized: ResponseBody = serde_json::from_str(&resp_boyd).unwrap();
+        let result =  deserialized.get_template_id();
+
+        let expected_error = CarboneError::EmptyString("template_id".to_string());
+
+        assert!(result.is_err());
+
+        assert_eq!(
+            result.unwrap_err().to_string(),
+            expected_error.to_string()
+        );
+
+    }
+
+    #[test]
     fn test_get_render_id() -> Result<(), CarboneError> {
         let expected_render_id =
             RenderId::new("MTAuMjAuMjEuMTAgICAg01E98H4R7PMC2H6XSE5Z6J8XYQ.odt".to_string())?;
@@ -55,6 +82,33 @@ mod tests {
         assert_eq!(deserialized.get_render_id().unwrap(), expected_render_id);
 
         Ok(())
+    }
+
+    #[test]
+    fn test_get_render_id_failed() {
+        
+        let resp_boyd = format!(
+            "
+        {{
+            \"success\": true,
+            \"data\": {{
+                      \"a_key\": \"123\"
+            }}
+        }}
+        ");
+
+        let deserialized: ResponseBody = serde_json::from_str(&resp_boyd).unwrap();
+        let result =  deserialized.get_render_id();
+
+        let expected_error = CarboneError::EmptyString("render_id".to_string());
+
+        assert!(result.is_err());
+
+        assert_eq!(
+            result.unwrap_err().to_string(),
+            expected_error.to_string()
+        );
+
     }
 
     #[test]
@@ -82,7 +136,7 @@ mod tests {
             "
         {{
             \"success\": false,
-            \"error\": \"an error message\",
+            \"error\": \"an error message\"
         }}
         "
         );
