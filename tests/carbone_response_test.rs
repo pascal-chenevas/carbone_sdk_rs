@@ -36,7 +36,6 @@ mod tests {
 
     #[test]
     fn test_get_template_id_failed() {
-        
         let resp_boyd = format!(
             "
         {{
@@ -45,20 +44,17 @@ mod tests {
                       \"a_key\": \"123\"
             }}
         }}
-        ");
+        "
+        );
 
         let deserialized: ResponseBody = serde_json::from_str(&resp_boyd).unwrap();
-        let result =  deserialized.get_template_id();
+        let result = deserialized.get_template_id();
 
         let expected_error = CarboneError::EmptyString("template_id".to_string());
 
         assert!(result.is_err());
 
-        assert_eq!(
-            result.unwrap_err().to_string(),
-            expected_error.to_string()
-        );
-
+        assert_eq!(result.unwrap_err().to_string(), expected_error.to_string());
     }
 
     #[test]
@@ -86,7 +82,6 @@ mod tests {
 
     #[test]
     fn test_get_render_id_failed() {
-        
         let resp_boyd = format!(
             "
         {{
@@ -95,20 +90,37 @@ mod tests {
                       \"a_key\": \"123\"
             }}
         }}
-        ");
+        "
+        );
 
         let deserialized: ResponseBody = serde_json::from_str(&resp_boyd).unwrap();
-        let result =  deserialized.get_render_id();
+        let result = deserialized.get_render_id();
 
         let expected_error = CarboneError::EmptyString("render_id".to_string());
 
         assert!(result.is_err());
 
-        assert_eq!(
-            result.unwrap_err().to_string(),
-            expected_error.to_string()
+        assert_eq!(result.unwrap_err().to_string(), expected_error.to_string());
+    }
+
+    #[test]
+    fn test_get_template_id_missing_data_as_key_in_json() {
+        let resp_boyd = format!(
+            "
+        {{
+            \"success\": true
+        }}
+        "
         );
 
+        let deserialized: ResponseBody = serde_json::from_str(&resp_boyd).unwrap();
+        let result = deserialized.get_render_id();
+
+        let expected_error = CarboneError::EmptyString("render_id".to_string());
+
+        assert!(result.is_err());
+
+        assert_eq!(result.unwrap_err().to_string(), expected_error.to_string());
     }
 
     #[test]
