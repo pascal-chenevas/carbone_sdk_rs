@@ -29,8 +29,7 @@ pub enum CarboneError {
     #[error("Carbone SDK RequestBodyNotWellFormedJsonError")]
     RequestBodyNotWellFormedJsonError,
     #[error("Carbone SDK {0:?} ParseError {1:?}")]
-    ParseError(String, String)
-    
+    ParseError(String, String),
 }
 
 impl From<std::io::Error> for CarboneError {

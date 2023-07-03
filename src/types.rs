@@ -1,8 +1,8 @@
-use validator::Validate;
 use anyhow::Result as AnyHowResult;
+use validator::Validate;
 
-use crate::errors::CarboneError;
 use crate::carbone::Result;
+use crate::errors::CarboneError;
 
 #[derive(Debug, Clone, Validate, PartialEq, Eq)]
 pub struct ApiJsonToken {
@@ -12,14 +12,14 @@ pub struct ApiJsonToken {
 
 impl ApiJsonToken {
     pub fn new(s: String) -> AnyHowResult<Self> {
-
-        let api_token = Self {api_token: s};
+        let api_token = Self { api_token: s };
         api_token.validate()?;
-        Ok(api_token)  
+        Ok(api_token)
     }
-  
-    pub fn as_str(&self) -> &str { &self.api_token }
 
+    pub fn as_str(&self) -> &str {
+        &self.api_token
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -34,7 +34,9 @@ impl Id {
             Err(CarboneError::EmptyString(type_name.to_string()))
         }
     }
-    pub fn as_str(&self) -> &str { &self.0 }
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
 }
 
 impl AsRef<str> for Id {

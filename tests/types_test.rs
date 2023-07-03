@@ -1,15 +1,14 @@
 #[cfg(test)]
 mod tests {
 
-    use  std::matches;
-    use carbone_sdk_rs::types::*;
     use carbone_sdk_rs::errors::CarboneError;
+    use carbone_sdk_rs::types::*;
+    use std::matches;
 
     use anyhow::Result;
 
     #[test]
     fn test_api_token_as_str() -> Result<()> {
-
         let api_token_value = "test_32u1i3ui1212334395349dsaowe912384ads89de8e93hj123iowa21085dsaowe91843784p213894dsa912384ads89de8e93hj123iowa210309dhsudausdasda72q37q783hy3243829434gdgadghdsaowe912384ads89de8e93hj1owa21023113i12u32i1321io39534985dsaowe9123843784p213894309dhsudausdasda72q37q783h43784p213894309dhsuda4gdgadghdsaow2384ads89de8e93hj123iowa21023113i12u32i1321io39534985dsa";
         let api_token = ApiJsonToken::new(api_token_value.to_string())?;
 
@@ -20,7 +19,6 @@ mod tests {
 
     #[test]
     fn test_api_token_short_token_given() -> Result<()> {
-
         let api_token_value = "test_";
 
         let result = ApiJsonToken::new(api_token_value.to_string());
@@ -37,7 +35,6 @@ mod tests {
 
     #[test]
     fn test_id() -> Result<(), CarboneError> {
-
         let id_value = "0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114";
         let id = Id::new(id_value.to_string(), "id")?;
 
@@ -48,7 +45,6 @@ mod tests {
 
     #[test]
     fn test_id_empty_value_given() -> Result<(), CarboneError> {
-
         let id_value = "";
         let result = Id::new(id_value.to_string(), "id");
 

@@ -1,6 +1,6 @@
-use std::str;
 use std::fs;
 use std::path::Path;
+use std::str;
 
 use std::fs::Metadata;
 
@@ -8,16 +8,16 @@ use std::ops::Deref;
 
 use bytes::Bytes;
 
-use reqwest::StatusCode;
 use reqwest::blocking::multipart;
 use reqwest::header::HeaderValue;
+use reqwest::StatusCode;
 
 use sha2::{Digest, Sha256};
 
-use crate::types::*;
+use crate::carbone_response::ResponseBody;
 use crate::config::Config;
 use crate::errors::CarboneError;
-use crate::carbone_response::ResponseBody;
+use crate::types::*;
 
 use crate::carbone::Result;
 
@@ -28,7 +28,6 @@ pub struct TemplateFile {
 }
 
 impl TemplateFile {
-
     pub fn new(path: String) -> Result<Self> {
         if Path::new(path.as_str()).is_dir() {
             return Err(CarboneError::IsADirectory(path));
@@ -40,14 +39,12 @@ impl TemplateFile {
 
         let metadata = fs::metadata(path.as_str())?;
 
-        Ok(Self {
-            path,
-            metadata,
-        })
+        Ok(Self { path, metadata })
     }
 
-    pub fn path_as_str(&self) -> &str { &self.path }
-
+    pub fn path_as_str(&self) -> &str {
+        &self.path
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -55,22 +52,22 @@ pub struct TemplateId(Id);
 
 impl TemplateId {
     /// Create a new template_id.
-    /// 
+    ///
     ///
     /// # Example
     ///
     /// ```no_run
     /// use std::env;
-    /// 
+    ///
     /// use carbone_sdk_rs::template::TemplateId;
     /// use carbone_sdk_rs::errors::CarboneError;
     ///
     /// fn main() -> Result<(), CarboneError> {
     ///    
     ///     let template_id = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
-    /// 
+    ///
     ///     assert_eq!(template_id.as_str().is_empty(), false);
-    /// 
+    ///
     ///     Ok(())
     /// }
     /// ```
@@ -100,21 +97,12 @@ pub struct Template<'a> {
     api_token: &'a ApiJsonToken,
 }
 
-impl <'a>Template<'a> {
-
+impl<'a> Template<'a> {
     pub fn new(config: &'a Config, api_token: &'a ApiJsonToken) -> Self {
-        Self {
-            config,
-            api_token
-        }
+        Self { config, api_token }
     }
 
-    pub fn generate_id(
-        &self,
-        template_file: &TemplateFile,
-        payload: &str,
-    ) -> Result<TemplateId> {
-
+    pub fn generate_id(&self, template_file: &TemplateFile, payload: &str) -> Result<TemplateId> {
         let file_content = fs::read(template_file.path_as_str())?;
 
         let mut sha256 = Sha256::new();
@@ -129,13 +117,13 @@ impl <'a>Template<'a> {
     }
 
     /// Upload a template to the Carbone Service.
-    /// 
+    ///
     ///
     /// # Example
     ///
     /// ```no_run
     /// use std::env;
-    /// 
+    ///
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::types::ApiJsonToken;
     /// use carbone_sdk_rs::template::{Template, TemplateFile};
@@ -147,27 +135,22 @@ impl <'a>Template<'a> {
     ///             Ok(v) => v,
     ///             Err(e) => panic!("{}", e.to_string())
     ///     };
-    /// 
+    ///
     ///     let config: Config = Default::default();
-    /// 
+    ///
     ///     let api_token = ApiJsonToken::new(token)?;
-    /// 
+    ///
     ///     let template_file = TemplateFile::new("template.odt".to_string())?;
-    /// 
+    ///
     ///     let template = Template::new(&config, &api_token);
     ///     let template_id = template.upload(&template_file, "".to_string())?;
-    /// 
+    ///
     ///     assert_eq!(template_id.as_str().is_empty(), false);
-    /// 
+    ///
     ///     Ok(())
     /// }
     /// ```
-    pub fn upload(
-        &self,
-        template_file: &TemplateFile,
-        salt: String,
-    ) -> Result<TemplateId> {
-    
+    pub fn upload(&self, template_file: &TemplateFile, salt: String) -> Result<TemplateId> {
         let form = multipart::Form::new()
             .text("", salt)
             .file("template", template_file.path_as_str())?;
@@ -203,13 +186,13 @@ impl <'a>Template<'a> {
     }
 
     // Download a template from the Carbone Service.
-    /// 
+    ///
     ///
     /// # Example
     ///
     /// ```no_run
     /// use std::env;
-    /// 
+    ///
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::types::ApiJsonToken;
     /// use carbone_sdk_rs::template::{Template, TemplateId};
@@ -221,25 +204,24 @@ impl <'a>Template<'a> {
     ///             Ok(v) => v,
     ///             Err(e) => panic!("{}", e.to_string())
     ///     };
-    /// 
+    ///
     ///     let config: Config = Default::default();
-    /// 
+    ///
     ///     let api_token = ApiJsonToken::new(token)?;
-    /// 
+    ///
     ///     let template_file = String::from("template.odt");
-    /// 
+    ///
     ///     let template_id = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
     ///     let template = Template::new(&config, &api_token);
     ///     
     ///     let template_content = template.download(template_id)?;
-    /// 
+    ///
     ///     assert_eq!(template_content.is_empty(), false);
-    /// 
+    ///
     ///     Ok(())
     /// }
     /// ```
     pub fn download(&self, template_id: TemplateId) -> Result<Bytes> {
-       
         let client = reqwest::blocking::Client::new();
         let url = format!("{}/template/{}", self.config.api_url, template_id.as_str());
 
@@ -268,13 +250,13 @@ impl <'a>Template<'a> {
     }
 
     // Delete a template from the Carbone Service.
-    /// 
+    ///
     ///
     /// # Example
     ///
     /// ```no_run
     /// use std::env;
-    /// 
+    ///
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::types::ApiJsonToken;
     /// use carbone_sdk_rs::template::{Template, TemplateId};
@@ -286,23 +268,22 @@ impl <'a>Template<'a> {
     ///             Ok(v) => v,
     ///             Err(e) => panic!("{}", e.to_string())
     ///     };
-    /// 
+    ///
     ///     let config: Config = Default::default();
-    /// 
+    ///
     ///     let api_token = ApiJsonToken::new(token)?;
-    /// 
+    ///
     ///     let template_id = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
     ///     let template = Template::new(&config, &api_token);
-    /// 
+    ///
     ///     let is_deleted = template.delete(template_id)?;
-    /// 
+    ///
     ///     assert_eq!(is_deleted, true);
-    /// 
+    ///
     ///     Ok(())
     /// }
     /// ```
     pub fn delete(&self, template_id: TemplateId) -> Result<bool> {
-       
         let client = reqwest::blocking::Client::new();
         let url = format!("{}/template/{}", self.config.api_url, template_id.as_str());
 

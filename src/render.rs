@@ -1,7 +1,7 @@
 use std::ops::Deref;
 
 use crate::errors::CarboneError;
-use crate::template::{TemplateId, TemplateFile};
+use crate::template::{TemplateFile, TemplateId};
 
 use crate::config::Config;
 use crate::types::*;
@@ -20,30 +20,30 @@ pub struct RenderOptions {
 
 impl RenderOptions {
     /// Create a new render_options.
-    /// 
+    ///
     ///
     /// # Example
     ///
     /// ```no_run
     /// use std::env;
-    /// 
+    ///
     /// use carbone_sdk_rs::render::RenderOptions;
     /// use carbone_sdk_rs::errors::CarboneError;
     ///
     /// fn main() -> Result<(), CarboneError> {
     ///    
-     ///  let render_options_value = r#"
+    ///  let render_options_value = r#"
     ///        "data" : {
     ///            "firstname" : "John",
     ///            "lastname" : "Wick"
     ///        },
     ///        "convertTo" : "odt"
     ///    "#;    
-    /// 
+    ///
     ///    let render_options = RenderOptions::new(render_options_value.to_string())?;
     ///
     ///    assert_eq!(render_options.as_str(), render_options_value);
-    /// 
+    ///
     ///     Ok(())
     /// }
     /// ```
@@ -51,10 +51,12 @@ impl RenderOptions {
         if s.is_empty() {
             return Err(CarboneError::EmptyString("render_options".to_string()));
         }
-        Ok(Self{render_options: s})  
+        Ok(Self { render_options: s })
     }
-  
-    pub fn as_str(&self) -> &str { &self.render_options }
+
+    pub fn as_str(&self) -> &str {
+        &self.render_options
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -62,22 +64,22 @@ pub struct RenderId(Id);
 
 impl RenderId {
     /// Create a new render_id struct.
-    /// 
+    ///
     ///
     /// # Example
     ///
     /// ```no_run
     /// use std::env;
-    /// 
+    ///
     /// use carbone_sdk_rs::render::RenderId;
     /// use carbone_sdk_rs::errors::CarboneError;
     ///
     /// fn main() -> Result<(), CarboneError> {
     ///    
     ///     let render_id = RenderId::new("MTAuMjAuMjEuMTAgICAg01E98H4R7PMC2H6XSE5Z6J8XYQ.odt".to_string())?;
-    /// 
+    ///
     ///     assert_eq!(render_id.as_str().is_empty(), false);
-    /// 
+    ///
     ///     Ok(())
     /// }
     /// ```
@@ -107,24 +109,23 @@ pub struct Render<'a> {
     api_token: &'a ApiJsonToken,
 }
 
-impl <'a>Render<'a> {
-
+impl<'a> Render<'a> {
     /// Create a new render stuct.
-    /// 
+    ///
     ///
     /// # Example
     ///
     /// ```no_run
     /// use std::env;
-    /// 
+    ///
     /// use carbone_sdk_rs::render::Render;
     /// use carbone_sdk_rs::errors::CarboneError;
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::types::ApiJsonToken;
-    /// 
+    ///
     /// fn main() -> Result<(), CarboneError> {
     ///    
-    /// 
+    ///
     ///    let token =  match env::var("CARBONE_TOKEN") {
     ///             Ok(v) => v,
     ///             Err(e) => panic!("{}", e.to_string())
@@ -133,41 +134,38 @@ impl <'a>Render<'a> {
     ///     let api_token = ApiJsonToken::new(token)?;
     ///    
     ///     let render = Render::new(&config, &api_token);
-    /// 
+    ///
     ///     Ok(())
     /// }
     /// ```
     pub fn new(config: &'a Config, api_token: &'a ApiJsonToken) -> Self {
-        Self {
-            config,
-            api_token
-        }
+        Self { config, api_token }
     }
 
     /// Render data with a given template file.
-    /// 
+    ///
     ///
     /// # Example
     ///
     /// ```no_run
     /// use std::env;
-    /// 
+    ///
     /// use carbone_sdk_rs::render::{Render, RenderOptions};
     /// use carbone_sdk_rs::template::{Template, TemplateFile};
     /// use carbone_sdk_rs::errors::CarboneError;
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::types::ApiJsonToken;
-    /// 
+    ///
     /// fn main() -> Result<(), CarboneError> {
     ///    
     ///     let token =  match env::var("CARBONE_TOKEN") {
     ///             Ok(v) => v,
     ///             Err(e) => panic!("{}", e.to_string())
     ///     };
-    /// 
+    ///
     ///     let config: Config = Default::default();
     ///     let api_token = ApiJsonToken::new(token)?;
-    /// 
+    ///
     ///     let render = Render::new(&config, &api_token);
     ///    
     ///     let render_options_value = String::from(r#"
@@ -177,14 +175,14 @@ impl <'a>Render<'a> {
     ///         },
     ///         "convertTo" : "odt"
     ///     "#);
-    /// 
+    ///
     ///     let render_options = RenderOptions::new(render_options_value)?;
-    /// 
+    ///
     ///     let template_file = &TemplateFile::new("/path/to/template.odf".to_string())?;
     ///     let render_id = render.render_report_with_file(template_file, render_options, "")?;
-    /// 
+    ///
     ///     assert_eq!(render_id.as_str().is_empty(), false);
-    /// 
+    ///
     ///     Ok(())
     /// }
     /// ```
@@ -192,9 +190,8 @@ impl <'a>Render<'a> {
         &self,
         template_file: &TemplateFile,
         render_options: RenderOptions,
-        payload: &str
+        payload: &str,
     ) -> Result<RenderId> {
-
         let template: Template = Template::new(self.config, self.api_token);
         let template_id = template.generate_id(template_file, payload)?;
 
@@ -204,31 +201,31 @@ impl <'a>Render<'a> {
     }
 
     /// Render data with a given template_id.
-    /// 
+    ///
     ///
     /// # Example
     ///
     /// ```no_run
     /// use std::env;
-    /// 
+    ///
     /// use carbone_sdk_rs::render::{Render, RenderOptions};
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::template::TemplateId;
     /// use carbone_sdk_rs::errors::CarboneError;
     /// use carbone_sdk_rs::types::ApiJsonToken;
-    /// 
+    ///
     /// fn main() -> Result<(), CarboneError> {
-    /// 
+    ///
     ///     let token =  match env::var("CARBONE_TOKEN") {
     ///             Ok(v) => v,
     ///             Err(e) => panic!("{}", e.to_string())
     ///     };
-    /// 
+    ///
     ///     let config: Config = Default::default();
     ///     let api_token = ApiJsonToken::new(token)?;
-    /// 
+    ///
     ///     let template_id = TemplateId::new("foiejwoi21e093ru3209jf2093j".to_string())?;
-    /// 
+    ///
     ///     let render = Render::new(&config, &api_token);
     ///    
     ///     let render_options_value = String::from(r#"
@@ -238,13 +235,13 @@ impl <'a>Render<'a> {
     ///         },
     ///         "convertTo" : "odt"
     ///     "#);
-    /// 
+    ///
     ///     let render_options = RenderOptions::new(render_options_value)?;
-    /// 
+    ///
     ///     let render_id = render.render_report_with_template_id(template_id, render_options)?;
-    /// 
+    ///
     ///     assert_eq!(render_id.as_str().is_empty(), false);
-    /// 
+    ///
     ///     Ok(())
     /// }
     /// ```
@@ -256,8 +253,11 @@ impl <'a>Render<'a> {
         self.render_data(template_id, render_options)
     }
 
-    fn render_data(&self, template_id: TemplateId, render_options: RenderOptions) -> Result<RenderId> {
-
+    fn render_data(
+        &self,
+        template_id: TemplateId,
+        render_options: RenderOptions,
+    ) -> Result<RenderId> {
         let client = reqwest::blocking::Client::new();
         let url = format!("{}/render/{}", self.config.api_url, template_id.as_str());
 

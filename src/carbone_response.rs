@@ -1,9 +1,9 @@
-use serde::{Deserialize,Serialize};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::str;
 
-use crate::template::TemplateId;
 use crate::render::RenderId;
+use crate::template::TemplateId;
 
 use crate::carbone::Result;
 
@@ -22,7 +22,7 @@ pub struct ResponseBody {
 ///
 /// On succes (when uploading a template or render data) the Carbone Service delivers two
 /// responses which can contain a template_id or a render_id:
-/// 
+///
 /// {
 ///     "success": true,
 ///         "data": {
@@ -36,27 +36,36 @@ pub struct ResponseBody {
 ///             "renderId": "MTAuMjAuMjEuMTAgICAg01E98H4R7PMC2H6XSE5Z6J8XYQ.odt"
 ///     }
 /// }
-/// 
+///
 /// On Failure the Carbone Service responds with the following json:
-/// 
+///
 /// {
 ///     "success": false,
 ///     "error": "<error message>"
 //  }
 ///
 ///  or
-/// 
+///
 /// {
 ///     "success": false,
 ///     "error": "Invalid or undefined TemplateId or RenderId in the URL",
 ///     "code": "w115"
 /// }
-/// 
+///
 ///
 impl ResponseBody {
-
-    pub fn new(success: bool, data: Option<HashMap<String, String>>, error: Option<String>, code: Option<String>) -> Self {
-        Self { success, data, error, code }
+    pub fn new(
+        success: bool,
+        data: Option<HashMap<String, String>>,
+        error: Option<String>,
+        code: Option<String>,
+    ) -> Self {
+        Self {
+            success,
+            data,
+            error,
+            code,
+        }
     }
 
     pub fn get_template_id(&self) -> Result<TemplateId> {
