@@ -95,6 +95,7 @@ mod tests {
 
         Ok(())
     }
+
     #[test]
     fn test_generate_report_with_template_id() -> Result<(), CarboneError> {
         
@@ -146,6 +147,66 @@ mod tests {
         });
 
         let result = carbone.generate_report_with_template_id(template_id, render_options)?;
+
+        mock_render_response.assert();
+        mock_get_report_response.assert();
+
+        assert_eq!(result, expected_content);
+       
+        Ok(())
+    }
+
+    #[test]
+    fn test_generate_report_with_file() -> Result<(), CarboneError> {
+        
+        // Start a lightweight mock server.
+        let server = MockServer::start();
+
+        let helper = Helper::new();
+
+        let config = &helper.create_config_for_mock_server(Some(&server))?;
+        let api_token = &helper.create_api_token()?;
+
+        let carbone = Carbone::new(&config, api_token)?;
+
+        let template = Template::new(&config, &api_token);
+
+        let report_data = fs::read_to_string("tests/data/report_data.json")?;
+
+        let template_file = TemplateFile::new("tests/data/template.odt".to_string())?;
+        let template_id = template.generate_id(&template_file, "")?;
+
+        let render_options = RenderOptions::new(report_data)?;
+
+        let render_id_value = "MTAuMjAuMjEuNDAgICAgBY4OM11wQg11ekv6_R0n0wcmVwb3J0.pdf".to_string(); 
+        let _render_id = &RenderId::new(&render_id_value)?;
+
+        let file_path = "tests/data/report.pdf";
+
+        let expected_content  = fs::read(file_path)?;
+
+        let mock_render_response = server.mock(|when, then| {
+            when.method("POST")
+                .path(format!("/render/{}", template_id.as_str()));
+            then.status(200)
+                .json_body(json!({
+                    "success": true,
+                    "data": {
+                        "renderId": &render_id_value,
+                        "inputFileExtension": "odt"
+                    }
+                }));
+        });
+       
+
+        let mock_get_report_response = server.mock(|when, then| {
+            when.method("GET")
+                .path(format!("/render/{}", &render_id_value));
+            then.status(200)
+                .body(&expected_content);
+        });
+
+        let result = carbone.generate_report_with_file(&template_file, render_options, "")?;
 
         mock_render_response.assert();
         mock_get_report_response.assert();
