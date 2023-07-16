@@ -156,6 +156,7 @@ impl<'a> Template<'a> {
             .file("template", template_file.path_as_str())?;
 
         let client = reqwest::blocking::Client::new();
+
         let url = format!("{}/template", self.config.api_url);
 
         // TODO move new client to new() method

@@ -1,5 +1,3 @@
-use std::fmt;
-
 pub const CARBONE_API_URL: &str = "https://api.carbone.io";
 pub const CARBONE_API_VERSION: u32 = 4;
 
@@ -147,18 +145,3 @@ impl FromStr for Config {
     }
 }
 
-impl AsRef<Config> for Config {
-    fn as_ref(&self) -> &Config {
-        self
-    }
-}
-
-impl fmt::Display for Config {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "Config {{ api_url: {} , api_timeout: {}, api_version: {} }}",
-            self.api_url, self.api_timeout, self.api_version
-        )
-    }
-}
