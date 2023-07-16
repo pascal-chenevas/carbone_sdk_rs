@@ -123,7 +123,7 @@ mod tests {
 
         let result = template.download(template_id);
 
-        let expected_error = CarboneError::BadRequest(error_msg);
+        let expected_error = CarboneError::Error(error_msg);
 
         mock_server.assert();
 
@@ -329,6 +329,48 @@ mod tests {
     }
 
     #[test]
+    fn test_upload_template_unsupported_file_format_given() -> Result<(), CarboneError> {
+        
+        let error_msg = "Template format not supported, it must be an XML-based document: DOCX, XLSX, PPTX, ODT, ODS, ODP, XHTML, HTML or an XML file";
+
+        let body = ResponseBody {
+            success: false,
+            data: None,
+            error: Some(error_msg.to_string()),
+            code: Some("w118".to_string()),
+        };
+
+        // Start a lightweight mock server.
+        let server = MockServer::start();
+
+        // Create a mock on the server.
+        let m = server.mock(|when, then| {
+            when.method("POST").path("/template");
+            then.status(415)
+                .header("content-type", "application/json")
+                .json_body_obj(&body);
+        });
+
+        let helper = Helper::new();
+        let config = &helper.create_config_for_mock_server(Some(&server))?;
+
+        let api_token = &helper.create_api_token()?;
+
+        let template: Template = Template::new(config, api_token);
+        let template_file = TemplateFile::new("tests/data/template.test.txt".to_string())?;
+        let result = template.upload(&template_file, "".to_string());
+
+        let expected_error = CarboneError::Error(error_msg.to_string());
+
+        // Assert
+        m.assert();
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().to_string(), expected_error.to_string());
+
+        Ok(())
+    }
+
+    #[test]
     fn test_delete() -> Result<(), CarboneError> {
         let template_id = TemplateId::new(
             "0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string(),
@@ -401,7 +443,7 @@ mod tests {
 
         let result = template.delete(template_id);
 
-        let expected_error = CarboneError::BadRequest(error_msg);
+        let expected_error = CarboneError::Error(error_msg);
 
         mock_server.assert();
 

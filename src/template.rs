@@ -179,7 +179,7 @@ impl<'a> Template<'a> {
                     let template_id = json.get_template_id()?;
                     Ok(template_id)
                 } else {
-                    Err(CarboneError::BadRequest(error_msg))
+                    Err(CarboneError::Error(error_msg))
                 }
             }
             Err(e) => Err(CarboneError::RequestError(e)),
@@ -243,7 +243,7 @@ impl<'a> Template<'a> {
                 } else {
                     let json = r.json::<ResponseBody>()?;
                     let error_msg = json.get_error_message();
-                    Err(CarboneError::BadRequest(error_msg))
+                    Err(CarboneError::Error(error_msg))
                 }
             }
             Err(e) => Err(CarboneError::RequestError(e)),
@@ -306,7 +306,7 @@ impl<'a> Template<'a> {
                 if json.success {
                     Ok(true)
                 } else {
-                    Err(CarboneError::BadRequest(error_msg))
+                    Err(CarboneError::Error(error_msg))
                 }
             }
             Err(e) => Err(CarboneError::RequestError(e)),
