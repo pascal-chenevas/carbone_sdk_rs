@@ -15,7 +15,7 @@ use helper::Helper;
 #[cfg(test)]
 mod tests {
 
-    use carbone_sdk_rs::template::*;
+    use carbone_sdk_rs::{template::*, config::Config};
 
     use super::*;
 
@@ -47,6 +47,27 @@ mod tests {
 
         mock_server.assert();
         assert_eq!(report_content, rendered_file_content.to_vec());
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_get_report_failed() -> Result<(), CarboneError> {
+
+        let helper = Helper::new();
+
+        let config = Config::new("http://bad_url".to_string(), 1, 4)?;
+        let api_token = &helper.create_api_token()?;
+
+        let carbone = Carbone::new(&config, api_token)?;
+
+        let render_id_value =
+            "844318fe97904fb0897d4b0a47fbe9bbd1ce5c9624ae694545cbc1877f581d86.pdf";
+        let render_id = &RenderId::new(render_id_value.to_string())?;
+
+        let result = carbone.get_report(render_id);
+
+        assert!(result.is_err());
 
         Ok(())
     }
