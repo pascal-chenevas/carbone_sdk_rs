@@ -1,5 +1,6 @@
 use httpmock::prelude::*;
 
+use carbone_sdk_rs::config::Config;
 use carbone_sdk_rs::errors::CarboneError;
 use carbone_sdk_rs::render::*;
 
@@ -216,6 +217,36 @@ mod tests {
         mock_server.assert();
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().to_string(), expected_error.to_string());
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_render_report_with_template_id_failed() -> Result<(), CarboneError> {
+
+        let helper = Helper::new();
+
+        let template_id = TemplateId::new("unknown_template_id".to_string())?;
+
+        let config = Config::new("http://bad_url".to_string(), 1, 4)?;
+        let api_token = helper.create_api_token()?;
+
+        let render = Render::new(&config, &api_token);
+
+        let render_options = String::from(
+            r#"
+            "data" : {
+                "firstname" : "John",
+                "lastname" : "Wick"
+            },
+            "convertTo" : "odt"
+        "#,
+        );
+
+        let render_options = RenderOptions::new(render_options)?;
+        let result = render.render_report_with_template_id(template_id, render_options);
+
+        assert!(result.is_err());
 
         Ok(())
     }
