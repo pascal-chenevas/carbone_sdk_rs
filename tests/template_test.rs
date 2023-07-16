@@ -410,4 +410,14 @@ mod tests {
 
         Ok(())
     }
+
+    #[test]
+    fn test_template_id_as_ref() -> Result<(), CarboneError> {
+        let id_value = "1";
+        let id = TemplateId::new(id_value.to_string())?;
+
+        assert_eq!(id.as_ref(), id_value);
+
+        Ok(())
+    }
 }
