@@ -282,7 +282,7 @@ impl<'a> Render<'a> {
                     let render_id = json.get_render_id()?;
                     Ok(render_id)
                 } else {
-                    Err(CarboneError::BadRequest(error_msg))
+                    Err(CarboneError::Error(error_msg))
                 }
             }
             Err(e) => Err(CarboneError::RequestError(e)),
