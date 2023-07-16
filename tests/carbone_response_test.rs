@@ -18,7 +18,7 @@ mod tests {
         let carbone_resp = ResponseBody::new(true, Some(data), None, None);
 
     
-        let resp_boyd = format!(
+        let resp_body = format!(
             "
         {{
             \"success\": true,
@@ -30,7 +30,7 @@ mod tests {
             expected_template_id.as_str()
         );
 
-        let deserialized: ResponseBody = serde_json::from_str(&resp_boyd).unwrap();
+        let deserialized: ResponseBody = serde_json::from_str(&resp_body).unwrap();
         assert_eq!(deserialized, carbone_resp);
         
         Ok(())
@@ -45,7 +45,7 @@ mod tests {
         let carbone_resp = ResponseBody::new(false, None, Some(error_msg.clone()), Some(error_code.clone()));
 
     
-        let resp_boyd = format!(
+        let resp_body = format!(
             "
             {{
                 \"success\": false,
@@ -57,7 +57,7 @@ mod tests {
         &error_code.as_str()
         );
 
-        let deserialized: ResponseBody = serde_json::from_str(&resp_boyd).unwrap();
+        let deserialized: ResponseBody = serde_json::from_str(&resp_body).unwrap();
         assert_eq!(deserialized, carbone_resp);
         
         Ok(())
@@ -93,7 +93,7 @@ mod tests {
 
     #[test]
     fn test_get_template_id_failed() {
-        let resp_boyd = format!(
+        let resp_body = format!(
             "
         {{
             \"success\": true,
@@ -104,7 +104,7 @@ mod tests {
         "
         );
 
-        let deserialized: ResponseBody = serde_json::from_str(&resp_boyd).unwrap();
+        let deserialized: ResponseBody = serde_json::from_str(&resp_body).unwrap();
         let result = deserialized.get_template_id();
 
         let expected_error = CarboneError::EmptyString("template_id".to_string());
@@ -139,7 +139,7 @@ mod tests {
 
     #[test]
     fn test_get_render_id_failed() {
-        let resp_boyd = format!(
+        let resp_body = format!(
             "
         {{
             \"success\": true,
@@ -150,7 +150,7 @@ mod tests {
         "
         );
 
-        let deserialized: ResponseBody = serde_json::from_str(&resp_boyd).unwrap();
+        let deserialized: ResponseBody = serde_json::from_str(&resp_body).unwrap();
         let result = deserialized.get_render_id();
 
         let expected_error = CarboneError::EmptyString("render_id".to_string());
@@ -162,7 +162,7 @@ mod tests {
 
     #[test]
     fn test_get_template_id_missing_data_as_key_in_json() {
-        let resp_boyd = format!(
+        let resp_body = format!(
             "
         {{
             \"success\": true
@@ -170,7 +170,7 @@ mod tests {
         "
         );
 
-        let deserialized: ResponseBody = serde_json::from_str(&resp_boyd).unwrap();
+        let deserialized: ResponseBody = serde_json::from_str(&resp_body).unwrap();
         let result = deserialized.get_render_id();
 
         let expected_error = CarboneError::EmptyString("render_id".to_string());
@@ -201,7 +201,7 @@ mod tests {
 
     #[test]
     fn test_get_error_code_is_empty() {
-        let resp_boyd = format!(
+        let resp_body = format!(
             "
         {{
             \"success\": false,
@@ -210,8 +210,33 @@ mod tests {
         "
         );
 
-        let deserialized: ResponseBody = serde_json::from_str(&resp_boyd).unwrap();
+        let deserialized: ResponseBody = serde_json::from_str(&resp_body).unwrap();
 
         assert_eq!(deserialized.get_error_code().is_empty(), true);
     }
+
+    #[test]
+    fn test_response_body_without_error_code() {
+
+        let succeed = false;
+        let error_msg = "an error message";
+
+        let resp_body = format!(
+            "
+        {{
+            \"success\": {},
+            \"error\": \"{}\"
+        }}
+        ",
+        succeed,
+        error_msg
+        );
+
+        let carbone_resp = ResponseBody::new(succeed, None, Some(error_msg.to_string()), None);
+
+        let deserialized: ResponseBody = serde_json::from_str(&resp_body).unwrap();
+
+        assert_eq!(carbone_resp, deserialized);
+    }
+
 }
