@@ -219,4 +219,14 @@ mod tests {
 
         Ok(())
     }
+
+    #[test]
+    fn test_render_id_as_ref() -> Result<(), CarboneError> {
+        let id_value = "1";
+        let id = RenderId::new(id_value.to_string())?;
+
+        assert_eq!(id.as_ref(), id_value);
+
+        Ok(())
+    }
 }
