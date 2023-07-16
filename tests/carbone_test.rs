@@ -83,7 +83,7 @@ mod tests {
                 .json_body_obj(&body);
         });
 
-        let expected_error = CarboneError::BadRequest(error_msg);
+        let expected_error = CarboneError::Error(error_msg);
         let result = carbone.get_report(render_id);
 
         mock_server.assert();

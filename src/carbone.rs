@@ -89,7 +89,7 @@ impl<'a> Carbone<'a> {
                 } else {
                     let json = r.json::<ResponseBody>()?;
                     let error_msg = json.get_error_message();
-                    Err(CarboneError::BadRequest(error_msg))
+                    Err(CarboneError::Error(error_msg))
                 }
             }
             Err(e) => Err(CarboneError::RequestError(e)),
