@@ -18,6 +18,25 @@ mod tests {
     use carbone_sdk_rs::template::*;
 
     #[test]
+    fn test_render_options_clone() -> Result<(), CarboneError> {
+
+        let render_options_value = r#"
+                                            "data" : {
+                                                "firstname" : "John",
+                                                "lastname" : "Wick"
+                                        },
+                                        "convertTo" : "odt"
+                                        "#;
+        let render_options = RenderOptions::new(render_options_value.to_string())?;
+        
+        let cloned = render_options.clone();
+
+        assert_eq!(render_options, cloned);
+
+        Ok(())
+    }
+
+    #[test]
     fn test_render_options() -> Result<(), CarboneError> {
         let render_options_value = r#"
             "data" : {

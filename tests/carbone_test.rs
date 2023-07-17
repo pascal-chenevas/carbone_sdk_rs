@@ -20,6 +20,23 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_clone() -> Result<(), CarboneError> {
+
+        let helper = Helper::new();
+
+        let config: Config = Default::default();
+        let api_token = helper.create_api_token()?;
+
+        let carbone = Carbone::new(&config, &api_token)?;
+
+        let cloned = carbone.clone();
+
+        assert_eq!(carbone, cloned);
+
+        Ok(())
+    }
+
+    #[test]
     fn test_get_report() -> Result<(), CarboneError> {
         // Start a lightweight mock server.
         let server = MockServer::start();

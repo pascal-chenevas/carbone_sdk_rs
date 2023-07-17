@@ -10,6 +10,18 @@ mod tests {
     use std::str::FromStr;
 
     #[test]
+    fn test_clone() -> Result<(), CarboneError> {
+
+        let config: Config = Default::default();
+
+        let cloned = config.clone();
+
+        assert_eq!(config, cloned);
+
+        Ok(())
+    }
+
+    #[test]
     fn test_api_url_not_given() {
         let result = Config::new("".to_string(), 6, 2);
 
