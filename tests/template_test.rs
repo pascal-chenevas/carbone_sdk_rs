@@ -90,6 +90,27 @@ mod tests {
     }
 
     #[test]
+    fn test_download_failed() -> Result<(), CarboneError> {
+
+        let helper = Helper::new();
+
+        let config = Config::new("http://bad_url".to_string(), 1, 4)?;
+        let api_token = helper.create_api_token()?;
+
+        let template = Template::new(&config, &api_token);
+
+        let template_id = TemplateId::new(
+            "0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string(),
+        )?;
+
+        let result = template.download(template_id);
+
+        assert!(result.is_err());
+
+        Ok(())
+    }
+
+    #[test]
     fn test_downaload_unknown_template_id_given() -> Result<(), CarboneError> {
         let template_id = TemplateId::new("unknown_template_id".to_string())?;
 
