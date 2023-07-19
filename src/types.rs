@@ -5,19 +5,21 @@ pub type Result<T> = std::result::Result<T, CarboneError>;
 
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ApiJsonToken(String);
+pub struct ApiJsonToken{
+    api_token: String,
+}
 
 impl ApiJsonToken {
     pub fn new(s: String) -> Result<Self> {
         if s.len() >= 300 {
-            Ok(ApiJsonToken(s))
+            Ok(Self{api_token: s})
         } else {
             Err(CarboneError::Error("wrong token length".to_string()))
         }
     }
 
     pub fn as_str(&self) -> &str {
-        &self.0
+        &self.api_token
     }
 }
 
