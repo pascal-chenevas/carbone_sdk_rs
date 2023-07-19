@@ -207,14 +207,14 @@ impl<'a> Carbone<'a> {
         render_options: RenderOptions,
         payload: &str,
     ) -> Result<Bytes> {
-        let render_id =
-            self.render_report_with_file(template_file, render_options, payload)?;
+        let template_id = template_file.generate_id(payload)?;
+        let render_id = self.render_data(template_id, render_options)?;
         let report_content = self.get_report(&render_id)?;
 
         Ok(report_content)
     }
 
-    /// Create a new render_options.
+    /// Get a new report.
     ///
     ///
     /// # Example
@@ -276,64 +276,6 @@ impl<'a> Carbone<'a> {
         }
     }
 
-    /// Render data with a given template file.
-    ///
-    ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// use std::env;
-    ///
-    /// use carbone_sdk_rs::blocking::Carbone;
-    /// use carbone_sdk_rs::render::RenderOptions;
-    /// use carbone_sdk_rs::template::TemplateFile;
-    /// use carbone_sdk_rs::errors::CarboneError;
-    /// use carbone_sdk_rs::config::Config;
-    /// use carbone_sdk_rs::types::ApiJsonToken;
-    ///
-    /// fn main() -> Result<(), CarboneError> {
-    ///    
-    ///     let token =  match env::var("CARBONE_TOKEN") {
-    ///             Ok(v) => v,
-    ///             Err(e) => panic!("{}", e.to_string())
-    ///     };
-    ///
-    ///     let config: Config = Default::default();
-    ///     let api_token = ApiJsonToken::new(token)?;
-    ///
-    ///     let carbone = Carbone::new(&config, &api_token)?;
-    ///    
-    ///     let render_options_value = String::from(r#"
-    ///         "data" : {
-    ///             "firstname" : "John",
-    ///             "lastname" : "Wick"
-    ///         },
-    ///         "convertTo" : "odt"
-    ///     "#);
-    ///
-    ///     let render_options = RenderOptions::new(render_options_value)?;
-    ///
-    ///     let template_file = &TemplateFile::new("/path/to/template.odf".to_string())?;
-    ///     let render_id = carbone.render_report_with_file(template_file, render_options, "")?;
-    ///
-    ///     assert_eq!(render_id.as_str().is_empty(), false);
-    ///
-    ///     Ok(())
-    /// }
-    /// ```
-    pub fn render_report_with_file(
-        &self,
-        template_file: &TemplateFile,
-        render_options: RenderOptions,
-        payload: &str,
-    ) -> Result<RenderId> {
-
-        let template_id = template_file.generate_id(payload)?;
-        let render_id = self.render_report_with_template_id(template_id, render_options)?;
-
-        Ok(render_id)
-    }
-
     /// Generate a report with a template_id given.
     ///
     ///
@@ -385,7 +327,7 @@ impl<'a> Carbone<'a> {
         template_id: TemplateId,
         render_options: RenderOptions,
     ) -> Result<Bytes> {
-        let render_id = self.render_report_with_template_id(template_id, render_options)?;
+        let render_id = self.render_data(template_id, render_options)?;
         let report_content = self.get_report(&render_id)?;
 
         Ok(report_content)
@@ -437,7 +379,7 @@ impl<'a> Carbone<'a> {
     ///     Ok(())
     /// }
     /// ```
-    pub fn render_report_with_template_id(
+    pub fn render_data(
         &self,
         template_id: TemplateId,
         render_options: RenderOptions,
