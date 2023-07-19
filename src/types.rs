@@ -1,25 +1,23 @@
-use anyhow::Result as AnyHowResult;
-use validator::Validate;
-
-pub type Result<T> = std::result::Result<T, CarboneError>;
 
 use crate::errors::CarboneError;
 
-#[derive(Debug, Clone, Validate, PartialEq, Eq)]
-pub struct ApiJsonToken {
-    #[validate(length(min = 357))]
-    api_token: String,
-}
+pub type Result<T> = std::result::Result<T, CarboneError>;
+
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ApiJsonToken(String);
 
 impl ApiJsonToken {
-    pub fn new(s: String) -> AnyHowResult<Self> {
-        let api_token = Self { api_token: s };
-        api_token.validate()?;
-        Ok(api_token)
+    pub fn new(s: String) -> Result<Self> {
+        if s.len() >= 300 {
+            Ok(ApiJsonToken(s))
+        } else {
+            Err(CarboneError::Error("wrong token length".to_string()))
+        }
     }
 
     pub fn as_str(&self) -> &str {
-        &self.api_token
+        &self.0
     }
 }
 
