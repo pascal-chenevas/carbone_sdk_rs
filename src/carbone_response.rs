@@ -5,7 +5,7 @@ use std::str;
 use crate::render::RenderId;
 use crate::template::TemplateId;
 
-use crate::carbone::Result;
+use crate::types::Result;
 
 // #[serde(rename_all = "camelCase")]
 #[derive(Debug, Deserialize, Serialize)]
@@ -109,11 +109,11 @@ impl ResponseBody {
 impl PartialEq for ResponseBody {
     fn eq(&self, other: &ResponseBody) -> bool {
         if self.success && other.success {
-            return self.data == other.data
+            self.data == other.data
         } else if self.code.is_some() && other.code.is_some() {
-            return self.error == other.error && self.code == other.code
-        } {
-            return self.error == other.error
+            self.error == other.error && self.code == other.code
+        } else {
+            self.error == other.error
         }
     }
 }

@@ -1,7 +1,8 @@
 use anyhow::Result as AnyHowResult;
 use validator::Validate;
 
-use crate::carbone::Result;
+pub type Result<T> = std::result::Result<T, CarboneError>;
+
 use crate::errors::CarboneError;
 
 #[derive(Debug, Clone, Validate, PartialEq, Eq)]

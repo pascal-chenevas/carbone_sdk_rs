@@ -1,6 +1,7 @@
 use thiserror::Error;
 
 #[derive(Error, Debug)]
+#[non_exhaustive]
 pub enum CarboneError {
     #[error("Carbone SDK error: {0:?}")]
     Error(String),

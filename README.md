@@ -36,7 +36,7 @@ use std::env;
  
 use carbone_sdk_rs::config::Config;
 use carbone_sdk_rs::render::*;
-use carbone_sdk_rs::carbone::Carbone;
+use carbone_sdk_rs::blocking::Carbone;
 use carbone_sdk_rs::types::ApiJsonToken;
 use carbone_sdk_rs::template::TemplateId;
  
@@ -65,9 +65,9 @@ fn main() -> Result<(), CarboneError> {
 
     let template_id = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
 
-    let carbone_sdk = Carbone::new(&config, &api_token)?;
+    let carbone = Carbone::new(&config, &api_token)?;
     
-    let _report_content = carbone_sdk.generate_report_with_template_id(template_id, render_options)?;
+    let _report_content = carbone.generate_report_with_template_id(template_id, render_options)?;
 
     Ok(())
 }

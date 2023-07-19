@@ -7,6 +7,10 @@ description = "A library to communicate with the Carbone API (http://carbone.io)
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+blocking = []
+default = ["blocking"]
+
 [dependencies]
 data-encoding = "2.3.3"
 ring = "0.16.20"
