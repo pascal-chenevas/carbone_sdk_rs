@@ -441,7 +441,7 @@ mod tests {
     }
 
     #[test]
-    fn test_render_report_with_template_id_unknown_template_id_given() -> Result<(), CarboneError> {
+    fn test_render_data_template_id_unknown_template_id_given() -> Result<(), CarboneError> {
         let helper = Helper::new();
 
         let template_id = TemplateId::new("unknown_template_id".to_string())?;
@@ -477,7 +477,7 @@ mod tests {
         );
 
         let render_options = RenderOptions::new(render_options)?;
-        let result = carbone.render_report_with_template_id(template_id, render_options);
+        let result = carbone.render_data(template_id, render_options);
 
         let expected_error = CarboneError::Error(
             "Invalid or undefined TemplateId or RenderId in the URL".to_string(),
@@ -491,7 +491,7 @@ mod tests {
     }
 
     #[test]
-    fn test_render_report_with_template_id_failed() -> Result<(), CarboneError> {
+    fn test_render_data_failed() -> Result<(), CarboneError> {
 
         let helper = Helper::new();
 
@@ -513,7 +513,7 @@ mod tests {
         );
 
         let render_options = RenderOptions::new(render_options)?;
-        let result = carbone.render_report_with_template_id(template_id, render_options);
+        let result = carbone.render_data(template_id, render_options);
 
         assert!(result.is_err());
 

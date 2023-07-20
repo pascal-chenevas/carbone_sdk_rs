@@ -207,6 +207,7 @@ impl<'a> Carbone<'a> {
         render_options: RenderOptions,
         payload: &str,
     ) -> Result<Bytes> {
+
         let template_id = template_file.generate_id(payload)?;
         let render_id = self.render_data(template_id, render_options)?;
         let report_content = self.get_report(&render_id)?;
@@ -372,7 +373,7 @@ impl<'a> Carbone<'a> {
     ///
     ///     let render_options = RenderOptions::new(render_options_value)?;
     ///
-    ///     let render_id = carbone.render_report_with_template_id(template_id, render_options)?;
+    ///     let render_id = carbone.render_data(template_id, render_options)?;
     ///
     ///     assert_eq!(render_id.as_str().is_empty(), false);
     ///
