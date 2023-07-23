@@ -20,27 +20,15 @@ pub enum CarboneError {
     #[error("Carbone SDK {0:?} is a directory")]
     IsADirectory(String),
     #[error("Carbone SDK IoError {0:?}")]
-    IoError(std::io::Error),
+    IoError(#[from] std::io::Error),
     #[error("Carbone SDK RequestError {0:?}")]
-    RequestError(reqwest::Error),
+    RequestError(#[from] reqwest::Error),
     #[error("Carbone SDK ResponseError {0:?}")]
     ResponseError(String),
     #[error("Carbone SDK RequestBodyNotWellFormedJsonError")]
     RequestBodyNotWellFormedJsonError,
     #[error("Carbone SDK {0:?} ParseError {1:?}")]
     ParseError(String, String),
-}
-
-impl From<std::io::Error> for CarboneError {
-    fn from(err: std::io::Error) -> Self {
-        CarboneError::IoError(err)
-    }
-}
-
-impl From<reqwest::Error> for CarboneError {
-    fn from(err: reqwest::Error) -> Self {
-        CarboneError::RequestError(err)
-    }
 }
 
 impl From<anyhow::Error> for CarboneError {
