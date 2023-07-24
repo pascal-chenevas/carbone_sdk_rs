@@ -1,5 +1,5 @@
 pub const CARBONE_API_URL: &str = "https://api.carbone.io";
-pub const CARBONE_API_VERSION: u32 = 4;
+pub const CARBONE_API_VERSION: &str = "4";
 
 use anyhow::{anyhow, Result};
 
@@ -10,13 +10,15 @@ use serde::Deserialize;
 use std::fs;
 use std::str::FromStr;
 
+use crate::types::ApiVersion;
+
 #[derive(Debug, Clone, Deserialize, Validate, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct Config {
     #[validate(url)]
     pub api_url: String,
-    pub api_timeout: u8,
-    pub api_version: u32,
+    pub api_timeout: u64,
+    pub api_version: ApiVersion,
 }
 
 impl Config {
@@ -30,16 +32,18 @@ impl Config {
     ///
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::errors::CarboneError;
+    /// use carbone_sdk_rs::types::ApiVersion;
     ///
     /// fn main() -> Result<(), CarboneError> {
+    ///     let api_version: ApiVersion = ApiVersion::new("4".to_string())?;
     ///     let config = Config::new(
     ///        "http://127.0.0.1:57780".to_string(),
     ///        4,
-    ///        2)?;
+    ///        api_version)?;
     ///     Ok(())
     /// }
     /// ```
-    pub fn new(api_url: String, api_timeout: u8, api_version: u32) -> Result<Self> {
+    pub fn new(api_url: String, api_timeout: u64, api_version: ApiVersion) -> Result<Self> {
         let config = Self {
             api_url,
             api_timeout,
@@ -102,7 +106,7 @@ impl Default for Config {
         Self {
             api_url: CARBONE_API_URL.to_string(),
             api_timeout: 60,
-            api_version: CARBONE_API_VERSION,
+            api_version: ApiVersion::new(CARBONE_API_VERSION.to_string()).unwrap(),
         }
     }
 }
@@ -121,11 +125,11 @@ impl Default for Config {
 /// use carbone_sdk_rs::errors::CarboneError;
 ///
 /// fn main() -> Result<(), CarboneError> {
-///
+///     
 ///     let config = Config::from_str(r#"{
 ///         "apiUrl": "http://127.0.0.1",
 ///         "apiTimeout": 4,
-///         "apiVersion" : 2
+///         "apiVersion" : "4"
 ///     }"#)?;
 ///
 ///     Ok(())
@@ -144,4 +148,3 @@ impl FromStr for Config {
         }
     }
 }
-

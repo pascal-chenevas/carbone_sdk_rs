@@ -1,5 +1,5 @@
-use std::fs;
 use std::collections::HashMap;
+use std::fs;
 
 use httpmock::prelude::*;
 use serde_json::json;
@@ -16,26 +16,9 @@ use helper::Helper;
 #[cfg(test)]
 mod tests {
 
-    use carbone_sdk_rs::{template::*, config::Config};
+    use carbone_sdk_rs::{config::Config, template::*, types::ApiVersion};
 
     use super::*;
-
-    #[test]
-    fn test_clone() -> Result<(), CarboneError> {
-
-        let helper = Helper::new();
-
-        let config: Config = Default::default();
-        let api_token = helper.create_api_token()?;
-
-        let carbone = Carbone::new(&config, &api_token)?;
-
-        let cloned = carbone.clone();
-
-        assert_eq!(carbone, cloned);
-
-        Ok(())
-    }
 
     #[test]
     fn test_delete_template() -> Result<(), CarboneError> {
@@ -77,10 +60,10 @@ mod tests {
 
     #[test]
     fn test_delete_template_failed() -> Result<(), CarboneError> {
-
         let helper = Helper::new();
 
-        let config = Config::new("http://bad_url".to_string(), 1, 4)?;
+        let api_version = ApiVersion::new("4".to_string())?;
+        let config = Config::new("http://bad_url".to_string(), 1, api_version)?;
         let api_token = helper.create_api_token()?;
 
         let template_id = TemplateId::new(
@@ -174,10 +157,10 @@ mod tests {
 
     #[test]
     fn test_download_failed() -> Result<(), CarboneError> {
-
         let helper = Helper::new();
 
-        let config = Config::new("http://bad_url".to_string(), 1, 4)?;
+        let api_version = ApiVersion::new("4".to_string())?;
+        let config = Config::new("http://bad_url".to_string(), 1, api_version)?;
         let api_token = helper.create_api_token()?;
 
         let template_id = TemplateId::new(
@@ -236,7 +219,7 @@ mod tests {
 
         Ok(())
     }
-    
+
     #[test]
     fn test_generate_report_with_template_id() -> Result<(), CarboneError> {
         // Start a lightweight mock server.
@@ -252,7 +235,7 @@ mod tests {
         let report_data = fs::read_to_string("tests/data/report_data.json")?;
 
         let template_file = TemplateFile::new("tests/data/template.odt".to_string())?;
-        let template_id = template_file.generate_id( "")?;
+        let template_id = template_file.generate_id("")?;
 
         let render_options = RenderOptions::new(report_data)?;
 
@@ -379,10 +362,10 @@ mod tests {
 
     #[test]
     fn test_get_report_failed() -> Result<(), CarboneError> {
-
         let helper = Helper::new();
 
-        let config = Config::new("http://bad_url".to_string(), 1, 4)?;
+        let api_version: ApiVersion = ApiVersion::new("4".to_string())?;
+        let config = Config::new("http://bad_url".to_string(), 1, api_version)?;
         let api_token = helper.create_api_token()?;
 
         let carbone = Carbone::new(&config, &api_token)?;
@@ -492,12 +475,12 @@ mod tests {
 
     #[test]
     fn test_render_data_failed() -> Result<(), CarboneError> {
-
         let helper = Helper::new();
 
         let template_id = TemplateId::new("unknown_template_id".to_string())?;
 
-        let config = Config::new("http://bad_url".to_string(), 1, 4)?;
+        let api_version: ApiVersion = ApiVersion::new("4".to_string())?;
+        let config = Config::new("http://bad_url".to_string(), 1, api_version)?;
         let api_token = helper.create_api_token()?;
 
         let carbone = Carbone::new(&config, &api_token)?;
@@ -614,7 +597,6 @@ mod tests {
 
     #[test]
     fn test_upload_template_unsupported_file_format_given() -> Result<(), CarboneError> {
-        
         let error_msg = "Template format not supported, it must be an XML-based document: DOCX, XLSX, PPTX, ODT, ODS, ODP, XHTML, HTML or an XML file";
 
         let body = ResponseBody {

@@ -1,8 +1,13 @@
 use bytes::Bytes;
 
+use std::time::Duration;
+
+use reqwest::blocking::multipart;
+use reqwest::blocking::Client;
+use reqwest::blocking::ClientBuilder;
+use reqwest::header;
 use reqwest::header::HeaderValue;
 use reqwest::StatusCode;
-use reqwest::blocking::multipart;
 
 use crate::carbone_response::ResponseBody;
 use crate::config::Config;
@@ -13,17 +18,35 @@ use crate::types::ApiJsonToken;
 
 use crate::types::Result;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub struct Carbone<'a> {
     config: &'a Config,
-    api_token: &'a ApiJsonToken,
+    http_client: Client,
 }
 
 impl<'a> Carbone<'a> {
     pub fn new(config: &'a Config, api_token: &'a ApiJsonToken) -> Result<Self> {
+        let mut headers = header::HeaderMap::new();
+        headers.insert(
+            "carbone-version",
+            HeaderValue::from_str(config.api_version.as_str()).unwrap(),
+        );
+
+        let bearer = format!("Bearer {}", api_token.as_str());
+
+        let mut auth_value = header::HeaderValue::from_str(bearer.as_str()).unwrap();
+        auth_value.set_sensitive(true);
+
+        headers.insert(header::AUTHORIZATION, auth_value);
+
+        let client = ClientBuilder::new()
+            .default_headers(headers)
+            .timeout(Duration::from_secs(config.api_timeout))
+            .build()?;
+
         Ok(Self {
-            config,
-            api_token
+            config: config,
+            http_client: client,
         })
     }
 
@@ -63,17 +86,9 @@ impl<'a> Carbone<'a> {
     /// }
     /// ```
     pub fn delete_template(&self, template_id: TemplateId) -> Result<bool> {
-        let client = reqwest::blocking::Client::new();
         let url = format!("{}/template/{}", self.config.api_url, template_id.as_str());
 
-        let response = client
-            .delete(url)
-            .header(
-                "carbone-version",
-                HeaderValue::from_str(&self.config.api_version.to_string()).unwrap(),
-            )
-            .bearer_auth(self.api_token.as_str())
-            .send();
+        let response = self.http_client.delete(url).send();
 
         match response {
             Ok(response) => {
@@ -128,17 +143,9 @@ impl<'a> Carbone<'a> {
     /// }
     /// ```
     pub fn download_template(&self, template_id: TemplateId) -> Result<Bytes> {
-        let client = reqwest::blocking::Client::new();
         let url = format!("{}/template/{}", self.config.api_url, template_id.as_str());
 
-        let response = client
-            .get(url)
-            .header(
-                "carbone-version",
-                HeaderValue::from_str(&self.config.api_version.to_string()).unwrap(),
-            )
-            .bearer_auth(self.api_token.as_str())
-            .send();
+        let response = self.http_client.get(url).send();
 
         match response {
             Ok(r) => {
@@ -207,7 +214,6 @@ impl<'a> Carbone<'a> {
         render_options: RenderOptions,
         payload: &str,
     ) -> Result<Bytes> {
-
         let template_id = template_file.generate_id(payload)?;
         let render_id = self.render_data(template_id, render_options)?;
         let report_content = self.get_report(&render_id)?;
@@ -251,17 +257,9 @@ impl<'a> Carbone<'a> {
     /// }
     /// ```
     pub fn get_report(&self, render_id: &RenderId) -> Result<Bytes> {
-        let client = reqwest::blocking::Client::new();
         let url = format!("{}/render/{}", self.config.api_url, render_id.as_str());
 
-        let response = client
-            .get(url)
-            .header(
-                "carbone-version",
-                HeaderValue::from_str(&self.config.api_version.to_string()).unwrap(),
-            )
-            .bearer_auth(self.api_token.as_str())
-            .send();
+        let response = self.http_client.get(url).send();
 
         match response {
             Ok(r) => {
@@ -385,17 +383,12 @@ impl<'a> Carbone<'a> {
         template_id: TemplateId,
         render_options: RenderOptions,
     ) -> Result<RenderId> {
-        let client = reqwest::blocking::Client::new();
         let url = format!("{}/render/{}", self.config.api_url, template_id.as_str());
 
-        let response = client
+        let response = self
+            .http_client
             .post(url)
-            .header(
-                "carbone-version",
-                HeaderValue::from_str(&self.config.api_version.to_string()).unwrap(),
-            )
             .header("Content-Type", "application/json")
-            .bearer_auth(self.api_token.as_str())
             .body(render_options.as_str().to_owned())
             .send();
 
@@ -450,24 +443,18 @@ impl<'a> Carbone<'a> {
     ///     Ok(())
     /// }
     /// ```
-    pub fn upload_template(&self, template_file: &TemplateFile, salt: String) -> Result<TemplateId> {
+    pub fn upload_template(
+        &self,
+        template_file: &TemplateFile,
+        salt: String,
+    ) -> Result<TemplateId> {
         let form = multipart::Form::new()
             .text("", salt)
             .file("template", template_file.path_as_str())?;
 
-        let client = reqwest::blocking::Client::new();
-
         let url = format!("{}/template", self.config.api_url);
 
-        let response = client
-            .post(url)
-            .multipart(form)
-            .header(
-                "carbone-version",
-                HeaderValue::from_str(&self.config.api_version.to_string()).unwrap(),
-            )
-            .bearer_auth(self.api_token.as_str())
-            .send();
+        let response = self.http_client.post(url).multipart(form).send();
 
         match response {
             Ok(response) => {

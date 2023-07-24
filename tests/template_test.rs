@@ -46,7 +46,6 @@ mod tests {
 
     #[test]
     fn test_generate_template_id_odt_1() -> Result<(), CarboneError> {
-
         let template_file_path = "tests/data/template.test.odt".to_string();
         let template_file = TemplateFile::new(template_file_path.to_string())?;
         let template_id = template_file.generate_id("")?;
@@ -62,10 +61,9 @@ mod tests {
 
     #[test]
     fn test_generate_template_id_odt_2_payload_1() -> Result<(), CarboneError> {
-    
         let file_name = "tests/data/template.test.odt".to_string();
         let template_file = TemplateFile::new(file_name.to_string())?;
-        let template_id = template_file.generate_id( "ThisIsAPayload")?;
+        let template_id = template_file.generate_id("ThisIsAPayload")?;
 
         let expected_template_id = TemplateId::new(
             "7de8d1d8676abb32291ea5119cb1f78fe37fdfdc75332fcdae28f1e30d064ac0".to_string(),
@@ -78,11 +76,9 @@ mod tests {
 
     #[test]
     fn test_generate_template_id_odt_3_payload_2() -> Result<(), CarboneError> {
-    
         let file_name = "tests/data/template.test.odt".to_string();
         let template_file = TemplateFile::new(file_name.to_string())?;
-        let template_id =
-            template_file.generate_id("8B5PmafbjdRqHuksjHNw83mvPiGj7WTE")?;
+        let template_id = template_file.generate_id("8B5PmafbjdRqHuksjHNw83mvPiGj7WTE")?;
 
         let expected_template_id = TemplateId::new(
             "a62eb407a5d5765ddf974636de8ab47bda7915cebd61197d7a2bb42ae70ffcd6".to_string(),
@@ -95,7 +91,6 @@ mod tests {
 
     #[test]
     fn test_generate_template_id_html_1() -> Result<(), CarboneError> {
-    
         let template_file = TemplateFile::new("tests/data/template.test.html".to_string())?;
         let template_id = template_file.generate_id("")?;
 
@@ -110,7 +105,6 @@ mod tests {
 
     #[test]
     fn test_generate_template_id_html_2_payload_1() -> Result<(), CarboneError> {
-        
         let template_file = TemplateFile::new("tests/data/template.test.html".to_string())?;
         let payload = "This is a long payload with different characters 1 *5 &*9 %$ 3%&@9 @(( 3992288282 29299 9299929";
         let template_id = template_file.generate_id(payload)?;

@@ -1,4 +1,3 @@
-
 use carbone_sdk_rs::errors::CarboneError;
 use carbone_sdk_rs::render::*;
 
@@ -10,7 +9,6 @@ mod tests {
 
     #[test]
     fn test_render_options_clone() -> Result<(), CarboneError> {
-
         let render_options_value = r#"
                                             "data" : {
                                                 "firstname" : "John",
