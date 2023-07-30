@@ -436,7 +436,7 @@ impl<'a> Carbone<'a> {
     ///     let template_file = TemplateFile::new("template.odt".to_string(), None)?;
     ///
     ///     let carbone = Carbone::new(&config, &api_token)?;
-    ///     let template_id = carbone.upload_template(&template_file, "".to_string())?;
+    ///     let template_id = carbone.upload_template(&template_file, None)?;
     ///
     ///     assert_eq!(template_id.as_str().is_empty(), false);
     ///
@@ -446,8 +446,14 @@ impl<'a> Carbone<'a> {
     pub fn upload_template(
         &self,
         template_file: &TemplateFile,
-        salt: String,
+        salt: Option<&str>,
     ) -> Result<TemplateId> {
+
+        let salt = match salt {
+            Some(s) => s.to_string(),
+            None => "".to_string(),
+        };
+        
         let form = multipart::Form::new()
             .text("", salt)
             .file("template", template_file.path_as_str())?;

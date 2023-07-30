@@ -540,7 +540,7 @@ mod tests {
         let template_file = TemplateFile::new("tests/data/template.odt".to_string(), None)?;
 
         let carbone = Carbone::new(&config, &api_token)?;
-        let template_id = carbone.upload_template(&template_file, "".to_string())?;
+        let template_id = carbone.upload_template(&template_file, None)?;
 
         // Assert
         mock_server.assert();
@@ -586,7 +586,7 @@ mod tests {
         let template_file = TemplateFile::new("tests/data/template.odt".to_string(), None)?;
 
         let carbone = Carbone::new(&config, &api_token)?;
-        let template_id = carbone.upload_template(&template_file, "salt1234".to_string())?;
+        let template_id = carbone.upload_template(&template_file, Some("salt1234"))?;
 
         // Assert
         m.assert();
@@ -625,7 +625,7 @@ mod tests {
         let template_file = TemplateFile::new("tests/data/template.test.txt".to_string(), None)?;
 
         let carbone = Carbone::new(&config, &api_token)?;
-        let result = carbone.upload_template(&template_file, "".to_string());
+        let result = carbone.upload_template(&template_file, None);
 
         let expected_error = CarboneError::Error(error_msg.to_string());
 
