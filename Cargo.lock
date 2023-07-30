@@ -276,6 +276,7 @@ dependencies = [
  "bytes",
  "data-encoding",
  "httpmock",
+ "mime_guess",
  "reqwest",
  "ring",
  "serde",

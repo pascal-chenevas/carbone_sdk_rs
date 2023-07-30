@@ -1,12 +1,13 @@
 use bytes::Bytes;
 
+use std::path::Path;
 use std::time::Duration;
 
-use reqwest::blocking::multipart;
-use reqwest::blocking::Client;
-use reqwest::blocking::ClientBuilder;
 use reqwest::header;
 use reqwest::header::HeaderValue;
+use reqwest::multipart;
+use reqwest::Client;
+use reqwest::ClientBuilder;
 use reqwest::StatusCode;
 
 use crate::carbone_response::ResponseBody;
@@ -85,23 +86,23 @@ impl<'a> Carbone<'a> {
     ///     Ok(())
     /// }
     /// ```
-    pub fn delete_template(&self, template_id: TemplateId) -> Result<bool> {
+    pub async fn delete_template(&self, template_id: TemplateId) -> Result<bool> {
         let url = format!("{}/template/{}", self.config.api_url, template_id.as_str());
 
-        let response = self.http_client.delete(url).send();
+        let response = self.http_client.delete(url).send().await?;
 
-        match response {
-            Ok(response) => {
-                let json = response.json::<ResponseBody>()?;
-                let error_msg = json.get_error_message();
+        let response_body = response.text().await?;
 
-                if json.success {
-                    Ok(true)
-                } else {
-                    Err(CarboneError::Error(error_msg))
-                }
-            }
-            Err(e) => Err(CarboneError::RequestError(e)),
+        let json: ResponseBody = match serde_json::from_str(response_body.as_str()) {
+            Ok(s) => s,
+            Err(e) => return Err(CarboneError::Error(e.to_string())),
+        };
+
+        if json.success {
+            Ok(true)
+        } else {
+            let error_msg = json.get_error_message();
+            Err(CarboneError::Error(error_msg))
         }
     }
 
@@ -142,22 +143,21 @@ impl<'a> Carbone<'a> {
     ///     Ok(())
     /// }
     /// ```
-    pub fn download_template(&self, template_id: TemplateId) -> Result<Bytes> {
+    pub async fn download_template(&self, template_id: TemplateId) -> Result<Bytes> {
         let url = format!("{}/template/{}", self.config.api_url, template_id.as_str());
 
-        let response = self.http_client.get(url).send();
+        let response = self.http_client.get(url).send().await?;
 
-        match response {
-            Ok(r) => {
-                if r.status() == StatusCode::OK {
-                    Ok(r.bytes()?)
-                } else {
-                    let json = r.json::<ResponseBody>()?;
-                    let error_msg = json.get_error_message();
-                    Err(CarboneError::Error(error_msg))
-                }
-            }
-            Err(e) => Err(CarboneError::RequestError(e)),
+        if response.status() == StatusCode::OK {
+            Ok(response.bytes().await?)
+        } else {
+            let response_body = response.text().await?;
+            let json: ResponseBody = match serde_json::from_str(response_body.as_str()) {
+                Ok(s) => s,
+                Err(e) => return Err(CarboneError::Error(e.to_string())),
+            };
+            let error_msg = json.get_error_message();
+            Err(CarboneError::Error(error_msg))
         }
     }
 
@@ -208,15 +208,15 @@ impl<'a> Carbone<'a> {
     ///     Ok(())
     /// }
     /// ```
-    pub fn generate_report_with_file(
+    pub async fn generate_report_with_file(
         &self,
         template_file: &TemplateFile,
         render_options: RenderOptions,
         payload: &str,
     ) -> Result<Bytes> {
         let template_id = template_file.generate_id(payload)?;
-        let render_id = self.render_data(template_id, render_options)?;
-        let report_content = self.get_report(&render_id)?;
+        let render_id = self.render_data(template_id, render_options).await?;
+        let report_content = self.get_report(&render_id).await?;
 
         Ok(report_content)
     }
@@ -256,22 +256,21 @@ impl<'a> Carbone<'a> {
     ///     Ok(())
     /// }
     /// ```
-    pub fn get_report(&self, render_id: &RenderId) -> Result<Bytes> {
+    pub async fn get_report(&self, render_id: &RenderId) -> Result<Bytes> {
         let url = format!("{}/render/{}", self.config.api_url, render_id.as_str());
 
-        let response = self.http_client.get(url).send();
+        let response = self.http_client.get(url).send().await?;
 
-        match response {
-            Ok(r) => {
-                if r.status() == StatusCode::OK {
-                    Ok(r.bytes()?)
-                } else {
-                    let json = r.json::<ResponseBody>()?;
-                    let error_msg = json.get_error_message();
-                    Err(CarboneError::Error(error_msg))
-                }
-            }
-            Err(e) => Err(CarboneError::RequestError(e)),
+        if response.status() == StatusCode::OK {
+            Ok(response.bytes().await?)
+        } else {
+            let response_body = response.text().await?;
+            let json: ResponseBody = match serde_json::from_str(response_body.as_str()) {
+                Ok(s) => s,
+                Err(e) => return Err(CarboneError::Error(e.to_string())),
+            };
+            let error_msg = json.get_error_message();
+            Err(CarboneError::Error(error_msg))
         }
     }
 
@@ -321,13 +320,13 @@ impl<'a> Carbone<'a> {
     ///     Ok(())
     /// }
     /// ```
-    pub fn generate_report_with_template_id(
+    pub async fn generate_report_with_template_id(
         &self,
         template_id: TemplateId,
         render_options: RenderOptions,
     ) -> Result<Bytes> {
-        let render_id = self.render_data(template_id, render_options)?;
-        let report_content = self.get_report(&render_id)?;
+        let render_id = self.render_data(template_id, render_options).await?;
+        let report_content = self.get_report(&render_id).await?;
 
         Ok(report_content)
     }
@@ -378,7 +377,7 @@ impl<'a> Carbone<'a> {
     ///     Ok(())
     /// }
     /// ```
-    pub fn render_data(
+    pub async fn render_data(
         &self,
         template_id: TemplateId,
         render_options: RenderOptions,
@@ -390,21 +389,22 @@ impl<'a> Carbone<'a> {
             .post(url)
             .header("Content-Type", "application/json")
             .body(render_options.as_str().to_owned())
-            .send();
+            .send()
+            .await?;
 
-        match response {
-            Ok(response) => {
-                let json = response.json::<ResponseBody>()?;
-                let error_msg = json.get_error_message();
+        let response_body = response.text().await?;
 
-                if json.success {
-                    let render_id = json.get_render_id()?;
-                    Ok(render_id)
-                } else {
-                    Err(CarboneError::Error(error_msg))
-                }
-            }
-            Err(e) => Err(CarboneError::RequestError(e)),
+        let json: ResponseBody = match serde_json::from_str(response_body.as_str()) {
+            Ok(s) => s,
+            Err(e) => return Err(CarboneError::Error(e.to_string())),
+        };
+
+        if json.success {
+            let render_id = json.get_render_id()?;
+            Ok(render_id)
+        } else {
+            let error_msg = json.get_error_message();
+            Err(CarboneError::Error(error_msg))
         }
     }
 
@@ -443,32 +443,52 @@ impl<'a> Carbone<'a> {
     ///     Ok(())
     /// }
     /// ```
-    pub fn upload_template(
+    pub async fn upload_template(
         &self,
-        template_file: &TemplateFile,
+        file_name: &str,
+        file_content: Vec<u8>,
         salt: String,
     ) -> Result<TemplateId> {
-        let form = multipart::Form::new()
-            .text("", salt)
-            .file("template", template_file.path_as_str())?;
+        let file_path = Path::new(file_name);
+
+        let file_name = file_path
+            .file_name()
+            .map(|filename| filename.to_string_lossy().into_owned());
+
+        let file_name = match file_name {
+            Some(s) => s,
+            None => return Err(CarboneError::Error("Failed to fetch file name".to_string())),
+        };
+
+        let ext = file_path
+            .extension()
+            .and_then(|ext| ext.to_str())
+            .unwrap_or("");
+        let mime = mime_guess::from_ext(ext).first_or_octet_stream();
+
+        let part = multipart::Part::bytes(file_content)
+            .file_name(file_name)
+            .mime_str(mime.as_ref())?;
+
+        let form: multipart::Form = multipart::Form::new().text("", salt).part("template", part);
 
         let url = format!("{}/template", self.config.api_url);
 
-        let response = self.http_client.post(url).multipart(form).send();
+        let response = self.http_client.post(url).multipart(form).send().await?;
 
-        match response {
-            Ok(response) => {
-                let json = response.json::<ResponseBody>()?;
-                let error_msg = json.get_error_message();
+        let response_body = response.text().await?;
 
-                if json.success {
-                    let template_id = json.get_template_id()?;
-                    Ok(template_id)
-                } else {
-                    Err(CarboneError::Error(error_msg))
-                }
-            }
-            Err(e) => Err(CarboneError::RequestError(e)),
+        let json: ResponseBody = match serde_json::from_str(response_body.as_str()) {
+            Ok(s) => s,
+            Err(e) => return Err(CarboneError::Error(e.to_string())),
+        };
+
+        if json.success {
+            let template_id = json.get_template_id()?;
+            Ok(template_id)
+        } else {
+            let error_msg = json.get_error_message();
+            Err(CarboneError::Error(error_msg))
         }
     }
 }

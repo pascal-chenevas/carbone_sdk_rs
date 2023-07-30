@@ -11,7 +11,7 @@ mod tests {
     #[test]
     fn test_template_file() -> Result<(), CarboneError> {
         let template_file_path = "tests/data/template.test.odt";
-        let template_file = TemplateFile::new(template_file_path.to_string())?;
+        let template_file = TemplateFile::new(template_file_path.to_string(), None)?;
 
         assert_eq!(template_file.path_as_str(), template_file_path);
 
@@ -21,7 +21,7 @@ mod tests {
     #[test]
     fn test_template_file_directory_given() -> Result<(), CarboneError> {
         let template_file_path = "tests/data/";
-        let result = TemplateFile::new(template_file_path.to_string());
+        let result = TemplateFile::new(template_file_path.to_string(), None);
 
         let expected_error = CarboneError::IsADirectory(template_file_path.to_string());
 
@@ -34,7 +34,7 @@ mod tests {
     #[test]
     fn test_template_file_not_exists_given() -> Result<(), CarboneError> {
         let template_file_path = "tests/data/unknown_template.test.docx";
-        let result = TemplateFile::new(template_file_path.to_string());
+        let result = TemplateFile::new(template_file_path.to_string(), None);
 
         let expected_error = CarboneError::TemplateFileNotFound(template_file_path.to_string());
 
@@ -47,7 +47,7 @@ mod tests {
     #[test]
     fn test_generate_template_id_odt_1() -> Result<(), CarboneError> {
         let template_file_path = "tests/data/template.test.odt".to_string();
-        let template_file = TemplateFile::new(template_file_path.to_string())?;
+        let template_file = TemplateFile::new(template_file_path.to_string(), None)?;
         let template_id = template_file.generate_id("")?;
 
         let expected_template_id = TemplateId::new(
@@ -62,7 +62,7 @@ mod tests {
     #[test]
     fn test_generate_template_id_odt_2_payload_1() -> Result<(), CarboneError> {
         let file_name = "tests/data/template.test.odt".to_string();
-        let template_file = TemplateFile::new(file_name.to_string())?;
+        let template_file = TemplateFile::new(file_name.to_string(), None)?;
         let template_id = template_file.generate_id("ThisIsAPayload")?;
 
         let expected_template_id = TemplateId::new(
@@ -77,7 +77,7 @@ mod tests {
     #[test]
     fn test_generate_template_id_odt_3_payload_2() -> Result<(), CarboneError> {
         let file_name = "tests/data/template.test.odt".to_string();
-        let template_file = TemplateFile::new(file_name.to_string())?;
+        let template_file = TemplateFile::new(file_name.to_string(), None)?;
         let template_id = template_file.generate_id("8B5PmafbjdRqHuksjHNw83mvPiGj7WTE")?;
 
         let expected_template_id = TemplateId::new(
@@ -91,7 +91,7 @@ mod tests {
 
     #[test]
     fn test_generate_template_id_html_1() -> Result<(), CarboneError> {
-        let template_file = TemplateFile::new("tests/data/template.test.html".to_string())?;
+        let template_file = TemplateFile::new("tests/data/template.test.html".to_string(), None)?;
         let template_id = template_file.generate_id("")?;
 
         let expected_template_id = TemplateId::new(
@@ -105,7 +105,7 @@ mod tests {
 
     #[test]
     fn test_generate_template_id_html_2_payload_1() -> Result<(), CarboneError> {
-        let template_file = TemplateFile::new("tests/data/template.test.html".to_string())?;
+        let template_file = TemplateFile::new("tests/data/template.test.html".to_string(), None)?;
         let payload = "This is a long payload with different characters 1 *5 &*9 %$ 3%&@9 @(( 3992288282 29299 9299929";
         let template_id = template_file.generate_id(payload)?;
 

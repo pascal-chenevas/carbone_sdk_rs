@@ -12,6 +12,7 @@ blocking = []
 default = ["blocking"]
 
 [dependencies]
+mime_guess = "2.0.4"
 data-encoding = "2.3.3"
 ring = "0.16.20"
 bytes = "1.4.0"

@@ -16,11 +16,12 @@ use crate::types::Result;
 #[derive(Debug, Clone)]
 pub struct TemplateFile {
     path: String,
+    pub content: Option<Vec<u8>>,
     pub metadata: Metadata,
 }
 
 impl TemplateFile {
-    pub fn new(path: String) -> Result<Self> {
+    pub fn new(path: String, content: Option<Vec<u8>>) -> Result<Self> {
         if Path::new(path.as_str()).is_dir() {
             return Err(CarboneError::IsADirectory(path));
         }
@@ -31,11 +32,18 @@ impl TemplateFile {
 
         let metadata = fs::metadata(path.as_str())?;
 
-        Ok(Self { path, metadata })
+        Ok(Self {
+            path,
+            content,
+            metadata,
+        })
     }
 
     pub fn generate_id(&self, payload: &str) -> Result<TemplateId> {
-        let file_content = fs::read(self.path_as_str())?;
+        let file_content = match self.content.to_owned() {
+            Some(c) => c,
+            None => fs::read(self.path_as_str())?,
+        };
 
         let mut sha256 = Sha256::new();
 

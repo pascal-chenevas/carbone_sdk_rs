@@ -234,7 +234,7 @@ mod tests {
 
         let report_data = fs::read_to_string("tests/data/report_data.json")?;
 
-        let template_file = TemplateFile::new("tests/data/template.odt".to_string())?;
+        let template_file = TemplateFile::new("tests/data/template.odt".to_string(), None)?;
         let template_id = template_file.generate_id("")?;
 
         let render_options = RenderOptions::new(report_data)?;
@@ -288,7 +288,7 @@ mod tests {
 
         let report_data = fs::read_to_string("tests/data/report_data.json")?;
 
-        let template_file = TemplateFile::new("tests/data/template.odt".to_string())?;
+        let template_file = TemplateFile::new("tests/data/template.odt".to_string(), None)?;
         let template_id = template_file.generate_id("")?;
 
         let render_options = RenderOptions::new(report_data)?;
@@ -537,7 +537,7 @@ mod tests {
 
         let api_token = helper.create_api_token()?;
 
-        let template_file = TemplateFile::new("tests/data/template.odt".to_string())?;
+        let template_file = TemplateFile::new("tests/data/template.odt".to_string(), None)?;
 
         let carbone = Carbone::new(&config, &api_token)?;
         let template_id = carbone.upload_template(&template_file, "".to_string())?;
@@ -583,7 +583,7 @@ mod tests {
 
         let api_token = helper.create_api_token()?;
 
-        let template_file = TemplateFile::new("tests/data/template.odt".to_string())?;
+        let template_file = TemplateFile::new("tests/data/template.odt".to_string(), None)?;
 
         let carbone = Carbone::new(&config, &api_token)?;
         let template_id = carbone.upload_template(&template_file, "salt1234".to_string())?;
@@ -622,7 +622,7 @@ mod tests {
 
         let api_token = &helper.create_api_token()?;
 
-        let template_file = TemplateFile::new("tests/data/template.test.txt".to_string())?;
+        let template_file = TemplateFile::new("tests/data/template.test.txt".to_string(), None)?;
 
         let carbone = Carbone::new(&config, &api_token)?;
         let result = carbone.upload_template(&template_file, "".to_string());
