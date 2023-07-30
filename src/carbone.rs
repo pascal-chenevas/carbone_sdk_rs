@@ -60,7 +60,7 @@ impl<'a> Carbone<'a> {
     /// use std::env;
     ///
     /// use carbone_sdk_rs::config::Config;
-    /// use carbone_sdk_rs::blocking::Carbone;
+    /// use carbone_sdk_rs::carbone::Carbone;
     /// use carbone_sdk_rs::types::ApiJsonToken;
     /// use carbone_sdk_rs::template::TemplateId;
     /// use carbone_sdk_rs::errors::CarboneError;
@@ -115,7 +115,7 @@ impl<'a> Carbone<'a> {
     /// use std::env;
     ///
     /// use carbone_sdk_rs::config::Config;
-    /// use carbone_sdk_rs::blocking::Carbone;
+    /// use carbone_sdk_rs::carbone::Carbone;
     /// use carbone_sdk_rs::types::ApiJsonToken;
     /// use carbone_sdk_rs::template::TemplateId;
     /// use carbone_sdk_rs::errors::CarboneError;
@@ -171,7 +171,7 @@ impl<'a> Carbone<'a> {
     ///
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::render::*;
-    /// use carbone_sdk_rs::blocking::Carbone;
+    /// use carbone_sdk_rs::carbone::Carbone;
     /// use carbone_sdk_rs::types::ApiJsonToken;
     /// use carbone_sdk_rs::template::{TemplateFile,TemplateId};
     ///
@@ -231,7 +231,7 @@ impl<'a> Carbone<'a> {
     ///
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::render::RenderId;
-    /// use carbone_sdk_rs::blocking::Carbone;
+    /// use carbone_sdk_rs::carbone::Carbone;
     /// use carbone_sdk_rs::types::ApiJsonToken;
     /// use carbone_sdk_rs::errors::CarboneError;
     ///
@@ -284,7 +284,7 @@ impl<'a> Carbone<'a> {
     ///
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::render::*;
-    /// use carbone_sdk_rs::blocking::Carbone;
+    /// use carbone_sdk_rs::carbone::Carbone;
     /// use carbone_sdk_rs::types::ApiJsonToken;
     /// use carbone_sdk_rs::template::TemplateId;
     ///
@@ -339,7 +339,7 @@ impl<'a> Carbone<'a> {
     /// ```no_run
     /// use std::env;
     ///
-    /// use carbone_sdk_rs::blocking::Carbone;
+    /// use carbone_sdk_rs::carbone::Carbone;
     /// use carbone_sdk_rs::render::RenderOptions;
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::template::TemplateId;
@@ -417,7 +417,7 @@ impl<'a> Carbone<'a> {
     /// use std::env;
     ///
     /// use carbone_sdk_rs::config::Config;
-    /// use carbone_sdk_rs::blocking::Carbone;
+    /// use carbone_sdk_rs::carbone::Carbone;
     /// use carbone_sdk_rs::types::ApiJsonToken;
     /// use carbone_sdk_rs::template::TemplateFile;
     /// use carbone_sdk_rs::errors::CarboneError;
@@ -454,7 +454,7 @@ impl<'a> Carbone<'a> {
             Some(s) => s.to_string(),
             None => "".to_string(),
         };
-        
+
         let file_path = Path::new(file_name);
 
         let file_name = file_path
