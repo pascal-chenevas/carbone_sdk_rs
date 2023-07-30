@@ -65,7 +65,8 @@ impl<'a> Carbone<'a> {
     /// use carbone_sdk_rs::template::TemplateId;
     /// use carbone_sdk_rs::errors::CarboneError;
     ///
-    /// fn main() -> Result<(), CarboneError> {
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), CarboneError> {
     ///    
     ///     let token =  match env::var("CARBONE_TOKEN") {
     ///             Ok(v) => v,
@@ -79,7 +80,7 @@ impl<'a> Carbone<'a> {
     ///     let template_id = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
     ///
     ///     let carbone = Carbone::new(&config, &api_token)?;
-    ///     let is_deleted = carbone.delete_template(template_id)?;
+    ///     let is_deleted = carbone.delete_template(template_id).await.unwrap();
     ///
     ///     assert_eq!(is_deleted, true);
     ///
@@ -120,7 +121,8 @@ impl<'a> Carbone<'a> {
     /// use carbone_sdk_rs::template::TemplateId;
     /// use carbone_sdk_rs::errors::CarboneError;
     ///
-    /// fn main() -> Result<(), CarboneError> {
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), CarboneError> {
     ///    
     ///     let token = match env::var("CARBONE_TOKEN") {
     ///             Ok(v) => v,
@@ -136,7 +138,7 @@ impl<'a> Carbone<'a> {
     ///     let template_id = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
     ///     let carbone = Carbone::new(&config, &api_token)?;
     ///     
-    ///     let template_content = carbone.download_template(template_id)?;
+    ///     let template_content = carbone.download_template(template_id).await.unwrap();
     ///
     ///     assert_eq!(template_content.is_empty(), false);
     ///
@@ -177,7 +179,8 @@ impl<'a> Carbone<'a> {
     ///
     /// use carbone_sdk_rs::errors::CarboneError;
     ///
-    /// fn main() -> Result<(), CarboneError> {
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), CarboneError> {
     ///    
     ///     let token =  match env::var("CARBONE_TOKEN") {
     ///             Ok(v) => v,
@@ -201,7 +204,7 @@ impl<'a> Carbone<'a> {
     ///     let render_options = RenderOptions::new(render_options_value)?;
     ///
     ///     let template_file = &TemplateFile::new("/path/to/template.odf".to_string(), None)?;
-    ///     let report_content = carbone.generate_report_with_file(&template_file, render_options, None)?;
+    ///     let report_content = carbone.generate_report_with_file(&template_file, render_options, None).await.unwrap();
     ///
     ///     assert_eq!(report_content.is_empty(), false);
     ///
@@ -235,7 +238,8 @@ impl<'a> Carbone<'a> {
     /// use carbone_sdk_rs::types::ApiJsonToken;
     /// use carbone_sdk_rs::errors::CarboneError;
     ///
-    /// fn main() -> Result<(), CarboneError> {
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), CarboneError> {
     ///    
     ///     let token =  match env::var("CARBONE_TOKEN") {
     ///             Ok(v) => v,
@@ -249,7 +253,7 @@ impl<'a> Carbone<'a> {
     ///     let carbone = Carbone::new(&config, &api_token)?;
     ///
     ///     let render_id = &RenderId::new("MTAuMjAuMjEuMTAgICAg01E98H4R7PMC2H6XSE5Z6J8XYQ.pdf".to_string())?;
-    ///     let report_content = carbone.get_report(render_id)?;
+    ///     let report_content = carbone.get_report(render_id).await.unwrap();
     ///
     ///     assert_eq!(report_content.is_empty(), false);
     ///
@@ -290,7 +294,8 @@ impl<'a> Carbone<'a> {
     ///
     /// use carbone_sdk_rs::errors::CarboneError;
     ///
-    /// fn main() -> Result<(), CarboneError> {
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), CarboneError> {
     ///    
     ///     let token =  match env::var("CARBONE_TOKEN") {
     ///             Ok(v) => v,
@@ -313,7 +318,7 @@ impl<'a> Carbone<'a> {
     ///     "#);
     ///
     ///     let render_options = RenderOptions::new(render_options_value)?;
-    ///     let report_content = carbone.generate_report_with_template_id(template_id, render_options)?;
+    ///     let report_content = carbone.generate_report_with_template_id(template_id, render_options).await.unwrap();
     ///
     ///     assert_eq!(report_content.is_empty(), false);
     ///
@@ -346,7 +351,8 @@ impl<'a> Carbone<'a> {
     /// use carbone_sdk_rs::errors::CarboneError;
     /// use carbone_sdk_rs::types::ApiJsonToken;
     ///
-    /// fn main() -> Result<(), CarboneError> {
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), CarboneError> {
     ///
     ///     let token =  match env::var("CARBONE_TOKEN") {
     ///             Ok(v) => v,
@@ -370,7 +376,7 @@ impl<'a> Carbone<'a> {
     ///
     ///     let render_options = RenderOptions::new(render_options_value)?;
     ///
-    ///     let render_id = carbone.render_data(template_id, render_options)?;
+    ///     let render_id = carbone.render_data(template_id, render_options).await.unwrap();
     ///
     ///     assert_eq!(render_id.as_str().is_empty(), false);
     ///
@@ -415,14 +421,16 @@ impl<'a> Carbone<'a> {
     ///
     /// ```no_run
     /// use std::env;
-    ///
+    /// use std::fs;
+    /// 
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::carbone::Carbone;
     /// use carbone_sdk_rs::types::ApiJsonToken;
     /// use carbone_sdk_rs::template::TemplateFile;
     /// use carbone_sdk_rs::errors::CarboneError;
     ///
-    /// fn main() -> Result<(), CarboneError> {
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), CarboneError> {
     ///    
     ///     let token =  match env::var("CARBONE_TOKEN") {
     ///             Ok(v) => v,
@@ -433,10 +441,12 @@ impl<'a> Carbone<'a> {
     ///
     ///     let api_token = ApiJsonToken::new(token)?;
     ///
-    ///     let template_file = TemplateFile::new("template.odt".to_string(), None)?;
+    ///     let file_name = "template.odt";
+    ///     let file_path = format!("tests/data/{}", file_name);
+    ///     let filte_content = fs::read(file_path)?;
     ///
     ///     let carbone = Carbone::new(&config, &api_token)?;
-    ///     let template_id = carbone.upload_template(&template_file, None)?;
+    ///     let template_id = carbone.upload_template(file_name, filte_content, None).await.unwrap();
     ///
     ///     assert_eq!(template_id.as_str().is_empty(), false);
     ///
