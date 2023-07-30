@@ -39,7 +39,7 @@ impl TemplateFile {
         })
     }
 
-    pub fn generate_id(&self, payload: &str) -> Result<TemplateId> {
+    pub fn generate_id(&self, payload: Option<&str>) -> Result<TemplateId> {
         let file_content = match self.content.to_owned() {
             Some(c) => c,
             None => fs::read(self.path_as_str())?,
@@ -47,6 +47,10 @@ impl TemplateFile {
 
         let mut sha256 = Sha256::new();
 
+        let payload = match payload {
+            Some(p) => p,
+            None => ""
+        };
         sha256.update(payload);
         sha256.update(file_content);
 

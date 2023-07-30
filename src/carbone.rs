@@ -201,7 +201,7 @@ impl<'a> Carbone<'a> {
     ///     let render_options = RenderOptions::new(render_options_value)?;
     ///
     ///     let template_file = &TemplateFile::new("/path/to/template.odf".to_string(), None)?;
-    ///     let report_content = carbone.generate_report_with_file(&template_file, render_options, "")?;
+    ///     let report_content = carbone.generate_report_with_file(&template_file, render_options, None)?;
     ///
     ///     assert_eq!(report_content.is_empty(), false);
     ///
@@ -212,7 +212,7 @@ impl<'a> Carbone<'a> {
         &self,
         template_file: &TemplateFile,
         render_options: RenderOptions,
-        payload: &str,
+        payload: Option<&str>,
     ) -> Result<Bytes> {
         let template_id = template_file.generate_id(payload)?;
         let render_id = self.render_data(template_id, render_options).await?;
