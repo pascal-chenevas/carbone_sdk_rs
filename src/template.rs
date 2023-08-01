@@ -8,6 +8,8 @@ use std::ops::Deref;
 
 use sha2::{Digest, Sha256};
 
+use serde::{Deserialize, Serialize};
+
 use crate::errors::CarboneError;
 use crate::types::*;
 
@@ -47,10 +49,8 @@ impl TemplateFile {
 
         let mut sha256 = Sha256::new();
 
-        let payload = match payload {
-            Some(p) => p,
-            None => ""
-        };
+        let payload =  payload.unwrap_or("");
+
         sha256.update(payload);
         sha256.update(file_content);
 
@@ -65,7 +65,7 @@ impl TemplateFile {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]
 pub struct TemplateId(Id);
 
 impl TemplateId {

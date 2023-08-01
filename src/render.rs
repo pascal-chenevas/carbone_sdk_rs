@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use std::ops::Deref;
 
 use crate::errors::CarboneError;
@@ -51,7 +52,7 @@ impl RenderOptions {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]
 pub struct RenderId(Id);
 
 impl RenderId {

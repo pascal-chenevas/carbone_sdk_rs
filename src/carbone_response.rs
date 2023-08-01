@@ -1,18 +1,29 @@
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use serde_with::skip_serializing_none;
+
 use std::str;
 
 use crate::render::RenderId;
 use crate::template::TemplateId;
 
-use crate::types::Result;
+#[skip_serializing_none]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct APIResponseData {
+    #[serde(default, rename(deserialize = "templateId"))]
+    pub template_id: Option<TemplateId>,
+    #[serde(default, rename(deserialize = "renderId"))]
+    pub render_id: Option<RenderId>,
+    #[serde(default)]
+    pub template_file_extension: Option<String>,
+}
 
 // #[serde(rename_all = "camelCase")]
-#[derive(Debug, Deserialize, Serialize)]
-pub struct ResponseBody {
+#[skip_serializing_none]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]
+pub struct APIResponse {
     pub success: bool,
-    #[serde(default)]
-    pub data: Option<HashMap<String, String>>,
+    pub data: Option<APIResponseData>,
     #[serde(default)]
     pub error: Option<String>,
     #[serde(default)]
@@ -53,10 +64,10 @@ pub struct ResponseBody {
 /// }
 ///
 ///
-impl ResponseBody {
+impl APIResponse {
     pub fn new(
         success: bool,
-        data: Option<HashMap<String, String>>,
+        data: Option<APIResponseData>,
         error: Option<String>,
         code: Option<String>,
     ) -> Self {
@@ -68,52 +79,17 @@ impl ResponseBody {
         }
     }
 
-    pub fn get_template_id(&self) -> Result<TemplateId> {
-        let render_id = self.get_id_from_data("templateId".to_string());
-        TemplateId::new(render_id)
-    }
-
-    pub fn get_render_id(&self) -> Result<RenderId> {
-        let render_id = self.get_id_from_data("renderId".to_string());
-        RenderId::new(render_id)
-    }
-
     pub fn get_error_message(&self) -> String {
-        match self.error.clone() {
-            Some(error_msg) => error_msg,
+        match self.error.as_deref() {
+            Some(error_msg) => error_msg.to_string(),
             None => "".to_string(),
         }
     }
 
     pub fn get_error_code(&self) -> String {
-        match self.code.clone() {
-            Some(error_code) => error_code,
+        match self.code.as_deref() {
+            Some(code) => code.to_string(),
             None => "".to_string(),
-        }
-    }
-
-    fn get_id_from_data(&self, k: String) -> String {
-        match self.data.clone() {
-            Some(values) => {
-                if let Some(value) = values.get(k.as_str()) {
-                    value.clone()
-                } else {
-                    "".to_string()
-                }
-            }
-            None => "".to_string(),
-        }
-    }
-}
-
-impl PartialEq for ResponseBody {
-    fn eq(&self, other: &ResponseBody) -> bool {
-        if self.success && other.success {
-            self.data == other.data
-        } else if self.code.is_some() && other.code.is_some() {
-            self.error == other.error && self.code == other.code
-        } else {
-            self.error == other.error
         }
     }
 }

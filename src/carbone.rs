@@ -10,7 +10,7 @@ use reqwest::Client;
 use reqwest::ClientBuilder;
 use reqwest::StatusCode;
 
-use crate::carbone_response::ResponseBody;
+use crate::carbone_response::APIResponse;
 use crate::config::Config;
 use crate::errors::*;
 use crate::render::*;
@@ -94,7 +94,7 @@ impl<'a> Carbone<'a> {
 
         let response_body = response.text().await?;
 
-        let json: ResponseBody = match serde_json::from_str(response_body.as_str()) {
+        let json: APIResponse = match serde_json::from_str(response_body.as_str()) {
             Ok(s) => s,
             Err(e) => return Err(CarboneError::Error(e.to_string())),
         };
@@ -154,7 +154,7 @@ impl<'a> Carbone<'a> {
             Ok(response.bytes().await?)
         } else {
             let response_body = response.text().await?;
-            let json: ResponseBody = match serde_json::from_str(response_body.as_str()) {
+            let json: APIResponse = match serde_json::from_str(response_body.as_str()) {
                 Ok(s) => s,
                 Err(e) => return Err(CarboneError::Error(e.to_string())),
             };
@@ -269,7 +269,7 @@ impl<'a> Carbone<'a> {
             Ok(response.bytes().await?)
         } else {
             let response_body = response.text().await?;
-            let json: ResponseBody = match serde_json::from_str(response_body.as_str()) {
+            let json: APIResponse = match serde_json::from_str(response_body.as_str()) {
                 Ok(s) => s,
                 Err(e) => return Err(CarboneError::Error(e.to_string())),
             };
@@ -400,13 +400,27 @@ impl<'a> Carbone<'a> {
 
         let response_body = response.text().await?;
 
-        let json: ResponseBody = match serde_json::from_str(response_body.as_str()) {
+        let json: APIResponse = match serde_json::from_str(response_body.as_str()) {
             Ok(s) => s,
             Err(e) => return Err(CarboneError::Error(e.to_string())),
         };
 
         if json.success {
-            let render_id = json.get_render_id()?;
+            let render_id = match json.data {
+                Some(resp_data) => match resp_data.render_id {
+                    Some(id) => id,
+                    None => {
+                        return Err(CarboneError::Error(
+                            "template_id can not be extracted from API Response".to_string(),
+                        ))
+                    }
+                },
+                None => {
+                    return Err(CarboneError::Error(
+                        "template_id can not be extracted from API Response".to_string(),
+                    ))
+                }
+            };
             Ok(render_id)
         } else {
             let error_msg = json.get_error_message();
@@ -422,7 +436,7 @@ impl<'a> Carbone<'a> {
     /// ```no_run
     /// use std::env;
     /// use std::fs;
-    /// 
+    ///
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::carbone::Carbone;
     /// use carbone_sdk_rs::types::ApiJsonToken;
@@ -459,7 +473,6 @@ impl<'a> Carbone<'a> {
         file_content: Vec<u8>,
         salt: Option<&str>,
     ) -> Result<TemplateId> {
-
         let salt = match salt {
             Some(s) => s.to_string(),
             None => "".to_string(),
@@ -494,13 +507,27 @@ impl<'a> Carbone<'a> {
 
         let response_body = response.text().await?;
 
-        let json: ResponseBody = match serde_json::from_str(response_body.as_str()) {
+        let json: APIResponse = match serde_json::from_str(response_body.as_str()) {
             Ok(s) => s,
             Err(e) => return Err(CarboneError::Error(e.to_string())),
         };
 
         if json.success {
-            let template_id = json.get_template_id()?;
+            let template_id = match json.data {
+                Some(resp_data) => match resp_data.template_id {
+                    Some(id) => id,
+                    None => {
+                        return Err(CarboneError::Error(
+                            "template_id can not be extracted from API Response".to_string(),
+                        ))
+                    }
+                },
+                None => {
+                    return Err(CarboneError::Error(
+                        "template_id can not be extracted from API Response".to_string(),
+                    ))
+                }
+            };
             Ok(template_id)
         } else {
             let error_msg = json.get_error_message();

@@ -1,11 +1,10 @@
-use std::collections::HashMap;
 use std::fs;
 
 use httpmock::prelude::*;
 use serde_json::json;
 
 use carbone_sdk_rs::carbone::Carbone;
-use carbone_sdk_rs::carbone_response::ResponseBody;
+use carbone_sdk_rs::carbone_response::APIResponse;
 use carbone_sdk_rs::errors::CarboneError;
 use carbone_sdk_rs::render::*;
 
@@ -16,7 +15,9 @@ use helper::Helper;
 #[cfg(test)]
 mod tests {
 
-    use carbone_sdk_rs::{config::Config, template::*, types::ApiVersion};
+    use carbone_sdk_rs::{
+        carbone_response::APIResponseData, config::Config, template::*, types::ApiVersion,
+    };
 
     use super::*;
 
@@ -29,7 +30,7 @@ mod tests {
         // Start a lightweight mock server.
         let server = MockServer::start();
 
-        let body = ResponseBody {
+        let body = APIResponse {
             success: true,
             data: None,
             error: None,
@@ -87,7 +88,7 @@ mod tests {
 
         let error_msg = "Invalid or undefined TemplateId or RenderId in the URL".to_string();
 
-        let body = ResponseBody {
+        let body = APIResponse {
             success: false,
             data: None,
             error: Some(error_msg.clone()),
@@ -185,7 +186,7 @@ mod tests {
 
         let error_msg = "Invalid or undefined TemplateId or RenderId in the URL".to_string();
 
-        let body = ResponseBody {
+        let body = APIResponse {
             success: false,
             data: None,
             error: Some(error_msg.clone()),
@@ -264,7 +265,10 @@ mod tests {
             then.status(200).body(&expected_content);
         });
 
-        let result = carbone.generate_report_with_template_id(template_id, render_options).await.unwrap();
+        let result = carbone
+            .generate_report_with_template_id(template_id, render_options)
+            .await
+            .unwrap();
 
         mock_render_response.assert();
         mock_get_report_response.assert();
@@ -318,7 +322,10 @@ mod tests {
             then.status(200).body(&expected_content);
         });
 
-        let result = carbone.generate_report_with_file(&template_file, render_options, None).await.unwrap();
+        let result = carbone
+            .generate_report_with_file(&template_file, render_options, None)
+            .await
+            .unwrap();
 
         mock_render_response.assert();
         mock_get_report_response.assert();
@@ -398,7 +405,7 @@ mod tests {
 
         let error_msg = "Invalid or undefined TemplateId or RenderId in the URL".to_string();
 
-        let body = ResponseBody {
+        let body = APIResponse {
             success: false,
             data: None,
             error: Some(error_msg.clone()),
@@ -505,16 +512,17 @@ mod tests {
 
     #[tokio::test]
     async fn test_upload_template() -> Result<(), CarboneError> {
-        let mut data = HashMap::new();
         let template_id_expected = TemplateId::new(
             "0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string(),
         )?;
-        data.insert(
-            "templateId".to_string(),
-            template_id_expected.as_str().to_string(),
-        );
 
-        let body = ResponseBody {
+        let data = APIResponseData {
+            template_id: Some(template_id_expected.clone()),
+            render_id: None,
+            template_file_extension: None,
+        };
+
+        let body = APIResponse {
             success: true,
             data: Some(data),
             error: None,
@@ -542,7 +550,10 @@ mod tests {
         let filte_content = fs::read(file_path)?;
 
         let carbone = Carbone::new(&config, &api_token)?;
-        let template_id = carbone.upload_template(file_name, filte_content, None).await.unwrap();
+        let template_id = carbone
+            .upload_template(file_name, filte_content, None)
+            .await
+            .unwrap();
 
         // Assert
         mock_server.assert();
@@ -553,16 +564,17 @@ mod tests {
 
     #[tokio::test]
     async fn test_upload_template_with_payload() -> Result<(), CarboneError> {
-        let mut data = HashMap::new();
         let template_id_expected = TemplateId::new(
             "cb03f7676ef0fbe5d7824a64676166ac2c7c789d9e6da5b7c0c46794911ee7a7".to_string(),
         )?;
-        data.insert(
-            "templateId".to_string(),
-            template_id_expected.as_str().to_string(),
-        );
 
-        let body = ResponseBody {
+        let data = APIResponseData {
+            template_id: Some(template_id_expected.clone()),
+            render_id: None,
+            template_file_extension: None,
+        };
+
+        let body = APIResponse {
             success: true,
             data: Some(data),
             error: None,
@@ -590,7 +602,10 @@ mod tests {
         let filte_content = fs::read(file_path)?;
 
         let carbone = Carbone::new(&config, &api_token)?;
-        let template_id = carbone.upload_template(file_name, filte_content, Some("salt1234")).await.unwrap();
+        let template_id = carbone
+            .upload_template(file_name, filte_content, Some("salt1234"))
+            .await
+            .unwrap();
 
         // Assert
         m.assert();
@@ -603,7 +618,7 @@ mod tests {
     async fn test_upload_template_unsupported_file_format_given() -> Result<(), CarboneError> {
         let error_msg = "Template format not supported, it must be an XML-based document: DOCX, XLSX, PPTX, ODT, ODS, ODP, XHTML, HTML or an XML file";
 
-        let body = ResponseBody {
+        let body = APIResponse {
             success: false,
             data: None,
             error: Some(error_msg.to_string()),
@@ -631,7 +646,9 @@ mod tests {
         let filte_content = fs::read(file_path)?;
 
         let carbone = Carbone::new(&config, &api_token)?;
-        let result = carbone.upload_template(file_name, filte_content, None).await;
+        let result = carbone
+            .upload_template(file_name, filte_content, None)
+            .await;
 
         let expected_error = CarboneError::Error(error_msg.to_string());
 
