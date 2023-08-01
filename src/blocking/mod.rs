@@ -93,12 +93,11 @@ impl<'a> Carbone<'a> {
         match response {
             Ok(response) => {
                 let json = response.json::<APIResponse>()?;
-                let error_msg = json.get_error_message();
 
                 if json.success {
                     Ok(true)
                 } else {
-                    Err(CarboneError::Error(error_msg))
+                    Err(CarboneError::Error(json.error.unwrap()))
                 }
             }
             Err(e) => Err(CarboneError::RequestError(e)),
@@ -153,8 +152,7 @@ impl<'a> Carbone<'a> {
                     Ok(r.bytes()?)
                 } else {
                     let json = r.json::<APIResponse>()?;
-                    let error_msg = json.get_error_message();
-                    Err(CarboneError::Error(error_msg))
+                    Err(CarboneError::Error(json.error.unwrap()))
                 }
             }
             Err(e) => Err(CarboneError::RequestError(e)),
@@ -267,8 +265,7 @@ impl<'a> Carbone<'a> {
                     Ok(r.bytes()?)
                 } else {
                     let json = r.json::<APIResponse>()?;
-                    let error_msg = json.get_error_message();
-                    Err(CarboneError::Error(error_msg))
+                    Err(CarboneError::Error(json.error.unwrap()))
                 }
             }
             Err(e) => Err(CarboneError::RequestError(e)),
@@ -395,7 +392,6 @@ impl<'a> Carbone<'a> {
         match response {
             Ok(response) => {
                 let json = response.json::<APIResponse>()?;
-                let error_msg = json.get_error_message();
 
                 if json.success {
                     let render_id = match json.data {
@@ -416,7 +412,7 @@ impl<'a> Carbone<'a> {
                     };
                     Ok(render_id)
                 } else {
-                    Err(CarboneError::Error(error_msg))
+                    Err(CarboneError::Error(json.error.unwrap()))
                 }
             }
             Err(e) => Err(CarboneError::RequestError(e)),
@@ -503,8 +499,7 @@ impl<'a> Carbone<'a> {
                     };
                     Ok(template_id)
                 } else {
-                    let error_msg = json.get_error_message();
-                    Err(CarboneError::Error(error_msg))
+                    Err(CarboneError::Error(json.error.unwrap()))
                 }
             }
             Err(e) => Err(CarboneError::RequestError(e)),

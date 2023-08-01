@@ -161,23 +161,7 @@ mod tests {
 
         let deserialized: APIResponse = serde_json::from_str(&resp_boyd).unwrap();
 
-        assert_eq!(deserialized.get_error_code(), expected_error_code);
-    }
-
-    #[test]
-    fn test_get_error_code_is_empty() {
-        let resp_body = format!(
-            "
-        {{
-            \"success\": false,
-            \"error\": \"an error message\"
-        }}
-        "
-        );
-
-        let deserialized: APIResponse = serde_json::from_str(&resp_body).unwrap();
-
-        assert_eq!(deserialized.get_error_code().is_empty(), true);
+        assert_eq!(deserialized.code.unwrap(), expected_error_code);
     }
 
     #[test]

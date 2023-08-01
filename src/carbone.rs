@@ -102,8 +102,7 @@ impl<'a> Carbone<'a> {
         if json.success {
             Ok(true)
         } else {
-            let error_msg = json.get_error_message();
-            Err(CarboneError::Error(error_msg))
+            Err(CarboneError::Error(json.error.unwrap()))
         }
     }
 
@@ -158,8 +157,7 @@ impl<'a> Carbone<'a> {
                 Ok(s) => s,
                 Err(e) => return Err(CarboneError::Error(e.to_string())),
             };
-            let error_msg = json.get_error_message();
-            Err(CarboneError::Error(error_msg))
+            Err(CarboneError::Error(json.error.unwrap()))
         }
     }
 
@@ -273,8 +271,7 @@ impl<'a> Carbone<'a> {
                 Ok(s) => s,
                 Err(e) => return Err(CarboneError::Error(e.to_string())),
             };
-            let error_msg = json.get_error_message();
-            Err(CarboneError::Error(error_msg))
+            Err(CarboneError::Error(json.error.unwrap()))
         }
     }
 
@@ -423,8 +420,7 @@ impl<'a> Carbone<'a> {
             };
             Ok(render_id)
         } else {
-            let error_msg = json.get_error_message();
-            Err(CarboneError::Error(error_msg))
+            Err(CarboneError::Error(json.error.unwrap()))
         }
     }
 
@@ -530,8 +526,7 @@ impl<'a> Carbone<'a> {
             };
             Ok(template_id)
         } else {
-            let error_msg = json.get_error_message();
-            Err(CarboneError::Error(error_msg))
+            Err(CarboneError::Error(json.error.unwrap()))
         }
     }
 }

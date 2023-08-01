@@ -10,15 +10,14 @@ use crate::template::TemplateId;
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct APIResponseData {
-    #[serde(default, rename(deserialize = "templateId"))]
+    #[serde(default)]
     pub template_id: Option<TemplateId>,
-    #[serde(default, rename(deserialize = "renderId"))]
+    #[serde(default)]
     pub render_id: Option<RenderId>,
     #[serde(default)]
     pub template_file_extension: Option<String>,
 }
 
-// #[serde(rename_all = "camelCase")]
 #[skip_serializing_none]
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]
 pub struct APIResponse {
@@ -76,20 +75,6 @@ impl APIResponse {
             data,
             error,
             code,
-        }
-    }
-
-    pub fn get_error_message(&self) -> String {
-        match self.error.as_deref() {
-            Some(error_msg) => error_msg.to_string(),
-            None => "".to_string(),
-        }
-    }
-
-    pub fn get_error_code(&self) -> String {
-        match self.code.as_deref() {
-            Some(code) => code.to_string(),
-            None => "".to_string(),
         }
     }
 }
