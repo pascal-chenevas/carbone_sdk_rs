@@ -36,13 +36,14 @@ use std::env;
  
 use carbone_sdk_rs::config::Config;
 use carbone_sdk_rs::render::*;
-use carbone_sdk_rs::blocking::Carbone;
+use carbone_sdk_rs::carbone::Carbone;
 use carbone_sdk_rs::types::ApiJsonToken;
 use carbone_sdk_rs::template::TemplateId;
  
 use carbone_sdk_rs::errors::CarboneError;
 
-fn main() -> Result<(), CarboneError> {
+#[tokio::main]
+async fn main() -> Result<(), CarboneError> {
     
      let token =  match env::var("CARBONE_TOKEN") {
              Ok(v) => v,
@@ -67,7 +68,7 @@ fn main() -> Result<(), CarboneError> {
 
     let carbone = Carbone::new(&config, &api_token)?;
     
-    let _report_content = carbone.generate_report_with_template_id(template_id, render_options)?;
+    let _report_content = carbone.generate_report_with_template_id(template_id, render_options).await?;
 
     Ok(())
 }
