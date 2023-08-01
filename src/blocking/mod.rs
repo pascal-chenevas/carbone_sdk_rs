@@ -134,14 +134,14 @@ impl<'a> Carbone<'a> {
     ///     let template_id = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
     ///     let carbone = Carbone::new(&config, &api_token)?;
     ///     
-    ///     let template_content = carbone.download_template(template_id)?;
+    ///     let template_content = carbone.download_template(&template_id)?;
     ///
     ///     assert_eq!(template_content.is_empty(), false);
     ///
     ///     Ok(())
     /// }
     /// ```
-    pub fn download_template(&self, template_id: TemplateId) -> Result<Bytes> {
+    pub fn download_template(&self, template_id: &TemplateId) -> Result<Bytes> {
         let url = format!("{}/template/{}", self.config.api_url, template_id.as_str());
 
         let response = self.http_client.get(url).send();
@@ -212,7 +212,18 @@ impl<'a> Carbone<'a> {
         render_options: RenderOptions,
         payload: Option<&str>,
     ) -> Result<Bytes> {
-        let template_id = template_file.generate_id(payload)?;
+        let template_id_generated = template_file.generate_id(payload)?;
+
+        let template_data = self.download_template(&template_id_generated)?;
+
+        let template_id: TemplateId;
+
+        if template_data.is_empty() {
+            template_id = self.upload_template(&template_file, None)?;
+        } else {
+            template_id = template_id_generated; 
+        }
+
         let render_id = self.render_data(template_id, render_options)?;
         let report_content = self.get_report(&render_id)?;
 

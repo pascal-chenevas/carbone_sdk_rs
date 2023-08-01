@@ -145,7 +145,7 @@ mod tests {
 
         let carbone = Carbone::new(&config, &api_token)?;
 
-        let template_content = carbone.download_template(template_id)?;
+        let template_content = carbone.download_template(&template_id)?;
 
         mock_server.assert();
 
@@ -168,7 +168,7 @@ mod tests {
 
         let carbone = Carbone::new(&config, &api_token)?;
 
-        let result = carbone.download_template(template_id);
+        let result = carbone.download_template(&template_id);
 
         assert!(result.is_err());
 
@@ -207,7 +207,7 @@ mod tests {
 
         let carbone = Carbone::new(&config, &api_token)?;
 
-        let result = carbone.download_template(template_id);
+        let result = carbone.download_template(&template_id);
 
         let expected_error = CarboneError::Error(error_msg);
 
@@ -299,6 +299,12 @@ mod tests {
 
         let expected_content = fs::read(file_path)?;
 
+        let mock_template_response = server.mock(|when, then| {
+            when.method("GET")
+                .path(format!("/template/{}", template_id.as_str()));
+            then.status(200).body_from_file(template_file.path_as_str());
+        });
+
         let mock_render_response = server.mock(|when, then| {
             when.method("POST")
                 .path(format!("/render/{}", template_id.as_str()));
@@ -319,6 +325,7 @@ mod tests {
 
         let result = carbone.generate_report_with_file(&template_file, render_options, None)?;
 
+        mock_template_response.assert();
         mock_render_response.assert();
         mock_get_report_response.assert();
 
