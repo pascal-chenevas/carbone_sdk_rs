@@ -394,23 +394,7 @@ impl<'a> Carbone<'a> {
                 let json = response.json::<APIResponse>()?;
 
                 if json.success {
-                    let render_id = match json.data {
-                        Some(resp_data) => match resp_data.render_id {
-                            Some(id) => id,
-                            None => {
-                                return Err(CarboneError::Error(
-                                    "template_id can not be extracted from API Response"
-                                        .to_string(),
-                                ))
-                            }
-                        },
-                        None => {
-                            return Err(CarboneError::Error(
-                                "template_id can not be extracted from API Response".to_string(),
-                            ))
-                        }
-                    };
-                    Ok(render_id)
+                    Ok(json.data.unwrap().render_id.unwrap())
                 } else {
                     Err(CarboneError::Error(json.error.unwrap()))
                 }
@@ -474,30 +458,10 @@ impl<'a> Carbone<'a> {
 
         match response {
             Ok(response) => {
-                let response_body = response.text()?;
-                let json: APIResponse = match serde_json::from_str(response_body.as_str()) {
-                    Ok(s) => s,
-                    Err(e) => return Err(CarboneError::Error(e.to_string())),
-                };
+                let json = response.json::<APIResponse>()?;
 
                 if json.success {
-                    let template_id = match json.data {
-                        Some(resp_data) => match resp_data.template_id {
-                            Some(id) => id,
-                            None => {
-                                return Err(CarboneError::Error(
-                                    "template_id can not be extracted from API Response"
-                                        .to_string(),
-                                ))
-                            }
-                        },
-                        None => {
-                            return Err(CarboneError::Error(
-                                "template_id can not be extracted from API Response".to_string(),
-                            ))
-                        }
-                    };
-                    Ok(template_id)
+                    Ok(json.data.unwrap().template_id.unwrap())
                 } else {
                     Err(CarboneError::Error(json.error.unwrap()))
                 }
