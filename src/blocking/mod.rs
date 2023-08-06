@@ -221,7 +221,7 @@ impl<'a> Carbone<'a> {
         if template_data.is_empty() {
             template_id = self.upload_template(&template_file, None)?;
         } else {
-            template_id = template_id_generated; 
+            template_id = template_id_generated;
         }
 
         let render_id = self.render_data(template_id, render_options)?;

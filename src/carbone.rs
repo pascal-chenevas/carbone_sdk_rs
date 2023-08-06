@@ -208,15 +208,17 @@ impl<'a> Carbone<'a> {
     ) -> Result<Bytes> {
         let template_id_generated = template_file.generate_id(payload)?;
 
-        let template_data = self.download_template(&template_id_generated).await?;
+        let template_data = match self.download_template(&template_id_generated).await {
+            Ok(content) => content,
+            Err(_) => Bytes::new(),
+        };
 
-        let template_id: TemplateId;
-
-        if template_data.is_empty() {
-            template_id = self.upload_template(template_file.path_as_str(), template_data.to_vec(), None).await?;
+        let template_id = if template_data.is_empty() {
+            self.upload_template(template_file.path_as_str(), template_data.to_vec(), None)
+                .await?
         } else {
-            template_id = template_id_generated; 
-        }
+            template_id_generated
+        };
 
         let render_id = self.render_data(template_id, render_options).await?;
         let report_content = self.get_report(&render_id).await?;
@@ -463,6 +465,8 @@ impl<'a> Carbone<'a> {
             None => return Err(CarboneError::Error("Failed to fetch file name".to_string())),
         };
 
+        println!("file_name = {}", file_name);
+
         let ext = file_path
             .extension()
             .and_then(|ext| ext.to_str())
@@ -476,6 +480,9 @@ impl<'a> Carbone<'a> {
         let form: multipart::Form = multipart::Form::new().text("", salt).part("template", part);
 
         let url = format!("{}/template", self.config.api_url);
+
+        println!("url = {}", url);
+        println!("form = {:?}", form);
 
         let response = self.http_client.post(url).multipart(form).send().await?;
 

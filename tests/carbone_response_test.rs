@@ -18,7 +18,12 @@ mod tests {
             render_id: None,
             template_file_extension: None,
         };
-        let carbone_resp = APIResponse::new(true, Some(resp_data), None, None);
+        let carbone_resp = APIResponse {
+            success: true,
+            data: Some(resp_data),
+            error: None,
+            code: None,
+        };
 
         let resp_body = format!(
             "
@@ -49,7 +54,12 @@ mod tests {
             render_id: None,
             template_file_extension: None,
         };
-        let carbone_resp = APIResponse::new(true, Some(resp_data), None, None);
+        let carbone_resp = APIResponse {
+            success: true,
+            data: Some(resp_data),
+            error: None,
+            code: None,
+        };
 
         let resp_body = format!(
             "{{\"success\":true,\"data\":{{\"templateId\":\"{}\"}}}}",
@@ -66,12 +76,12 @@ mod tests {
     fn test_deserialize_response_failed() -> Result<(), CarboneError> {
         let error_msg = "an error message".to_string();
         let error_code = "W45".to_string();
-        let carbone_resp = APIResponse::new(
-            false,
-            None,
-            Some(error_msg.clone()),
-            Some(error_code.clone()),
-        );
+        let carbone_resp = APIResponse {
+            success: false,
+            data: None,
+            error: Some(error_msg.clone()),
+            code: Some(error_code.clone()),
+        };
 
         let resp_body = format!(
             "
@@ -179,7 +189,12 @@ mod tests {
             succeed, error_msg
         );
 
-        let carbone_resp = APIResponse::new(succeed, None, Some(error_msg.to_string()), None);
+        let carbone_resp = APIResponse {
+            success: succeed,
+            data: None,
+            error: Some(error_msg.to_string()),
+            code: None,
+        };
 
         let deserialized: APIResponse = serde_json::from_str(&resp_body).unwrap();
 

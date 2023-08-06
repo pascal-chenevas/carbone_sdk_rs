@@ -49,7 +49,7 @@ impl TemplateFile {
 
         let mut sha256 = Sha256::new();
 
-        let payload =  payload.unwrap_or("");
+        let payload = payload.unwrap_or("");
 
         sha256.update(payload);
         sha256.update(file_content);

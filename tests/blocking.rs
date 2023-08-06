@@ -520,7 +520,12 @@ mod tests {
             render_id: None,
             template_file_extension: None,
         };
-        let carbone_resp = APIResponse::new(true, Some(resp_data), None, None);
+        let carbone_resp = APIResponse {
+            success: true,
+            data: Some(resp_data),
+            error: None,
+            code: None,
+        };
 
         // Start a lightweight mock server.
         let server = MockServer::start();
