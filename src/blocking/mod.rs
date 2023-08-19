@@ -215,12 +215,9 @@ impl<'a> Carbone<'a> {
         
         let template_id_generated = template_file.generate_id(payload)?;
 
-        let template_data = match self.download_template(&template_id_generated) {
-            Ok(content) => content,
-            Err(_) => Bytes::new(),
-        };
+        let result = self.download_template(&template_id_generated);
 
-        let template_id = if template_data.is_empty() {
+        let template_id = if result.is_err() {
             self.upload_template(&template_file, None)?
         } else {
             template_id_generated
