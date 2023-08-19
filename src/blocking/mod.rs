@@ -188,7 +188,7 @@ impl<'a> Carbone<'a> {
     ///
     ///     let carbone = Carbone::new(&config, api_token)?;
     ///
-    ///     let render_options_value = String::from(r#"
+    ///     let json_data_value = String::from(r#"
     ///         "data" : {
     ///             "firstname" : "John",
     ///             "lastname" : "Wick"
@@ -196,10 +196,10 @@ impl<'a> Carbone<'a> {
     ///         "convertTo" : "odt"
     ///     "#);
     ///
-    ///     let render_options = RenderOptions::new(render_options_value)?;
+    ///     let json_data = JsonData::new(json_data_value)?;
     ///
     ///     let template_file = &TemplateFile::new("/path/to/template.odf".to_string(), None)?;
-    ///     let report_content = carbone.generate_report_with_file(&template_file, render_options, None)?;
+    ///     let report_content = carbone.generate_report_with_file(&template_file, json_data, None)?;
     ///
     ///     assert_eq!(report_content.is_empty(), false);
     ///
@@ -209,7 +209,7 @@ impl<'a> Carbone<'a> {
     pub fn generate_report_with_file(
         &self,
         template_file: &TemplateFile,
-        render_options: RenderOptions,
+        json_data: JsonData,
         payload: Option<&str>,
     ) -> Result<Bytes> {
         let template_id_generated = template_file.generate_id(payload)?;
@@ -224,7 +224,7 @@ impl<'a> Carbone<'a> {
             template_id = template_id_generated;
         }
 
-        let render_id = self.render_data(template_id, render_options)?;
+        let render_id = self.render_data(template_id, json_data)?;
         let report_content = self.get_report(&render_id)?;
 
         Ok(report_content)
@@ -313,7 +313,7 @@ impl<'a> Carbone<'a> {
     ///     let template_id = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
     ///     let carbone = Carbone::new(&config, &api_token)?;
     ///
-    ///     let render_options_value = String::from(r#"
+    ///     let json_data_value = String::from(r#"
     ///         "data" : {
     ///             "firstname" : "John",
     ///             "lastname" : "Wick"
@@ -321,8 +321,8 @@ impl<'a> Carbone<'a> {
     ///         "convertTo" : "odt"
     ///     "#);
     ///
-    ///     let render_options = RenderOptions::new(render_options_value)?;
-    ///     let report_content = carbone.generate_report_with_template_id(template_id, render_options)?;
+    ///     let json_data = JsonData::new(json_data_value)?;
+    ///     let report_content = carbone.generate_report_with_template_id(template_id, json_data)?;
     ///
     ///     assert_eq!(report_content.is_empty(), false);
     ///
@@ -332,9 +332,9 @@ impl<'a> Carbone<'a> {
     pub fn generate_report_with_template_id(
         &self,
         template_id: TemplateId,
-        render_options: RenderOptions,
+        json_data: JsonData,
     ) -> Result<Bytes> {
-        let render_id = self.render_data(template_id, render_options)?;
+        let render_id = self.render_data(template_id, json_data)?;
         let report_content = self.get_report(&render_id)?;
 
         Ok(report_content)
@@ -349,7 +349,7 @@ impl<'a> Carbone<'a> {
     /// use std::env;
     ///
     /// use carbone_sdk_rs::blocking::Carbone;
-    /// use carbone_sdk_rs::render::RenderOptions;
+    /// use carbone_sdk_rs::render::JsonData;
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::template::TemplateId;
     /// use carbone_sdk_rs::errors::CarboneError;
@@ -369,7 +369,7 @@ impl<'a> Carbone<'a> {
     ///
     ///     let carbone = Carbone::new(&config, &api_token)?;
     ///    
-    ///     let render_options_value = String::from(r#"
+    ///     let json_data_value = String::from(r#"
     ///         "data" : {
     ///             "firstname" : "John",
     ///             "lastname" : "Wick"
@@ -377,27 +377,23 @@ impl<'a> Carbone<'a> {
     ///         "convertTo" : "odt"
     ///     "#);
     ///
-    ///     let render_options = RenderOptions::new(render_options_value)?;
+    ///     let json_data = JsonData::new(json_data_value)?;
     ///
-    ///     let render_id = carbone.render_data(template_id, render_options)?;
+    ///     let render_id = carbone.render_data(template_id, json_data)?;
     ///
     ///     assert_eq!(render_id.as_str().is_empty(), false);
     ///
     ///     Ok(())
     /// }
     /// ```
-    pub fn render_data(
-        &self,
-        template_id: TemplateId,
-        render_options: RenderOptions,
-    ) -> Result<RenderId> {
+    pub fn render_data(&self, template_id: TemplateId, json_data: JsonData) -> Result<RenderId> {
         let url = format!("{}/render/{}", self.config.api_url, template_id.as_str());
 
         let response = self
             .http_client
             .post(url)
             .header("Content-Type", "application/json")
-            .body(render_options.as_str().to_owned())
+            .body(json_data.as_str().to_owned())
             .send();
 
         match response {
