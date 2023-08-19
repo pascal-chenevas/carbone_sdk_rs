@@ -54,7 +54,7 @@ async fn main() -> Result<(), CarboneError> {
  
     let api_token = ApiJsonToken::new(token)?;
 
-    let render_options_value = String::from(r#"
+    let json_data_value = String::from(r#"
          "data" : {
              "firstname" : "John",
              "lastname" : "Wick"
@@ -62,13 +62,13 @@ async fn main() -> Result<(), CarboneError> {
         "convertTo" : "odt"
     "#);
  
-    let render_options = RenderOptions::new(render_options_value)?;
+    let json_data = JsonData::new(json_data_value)?;
 
     let template_id = TemplateId::new("0545253258577a632a99065f0572720225f5165cc43db9515e9cef0e17b40114".to_string())?;
 
     let carbone = Carbone::new(&config, &api_token)?;
     
-    let _report_content = carbone.generate_report_with_template_id(template_id, render_options).await?;
+    let _report_content = carbone.generate_report_with_template_id(template_id, json_data).await?;
 
     Ok(())
 }
