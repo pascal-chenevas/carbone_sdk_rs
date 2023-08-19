@@ -212,17 +212,19 @@ impl<'a> Carbone<'a> {
         json_data: JsonData,
         payload: Option<&str>,
     ) -> Result<Bytes> {
+        
         let template_id_generated = template_file.generate_id(payload)?;
 
-        let template_data = self.download_template(&template_id_generated)?;
+        let template_data = match self.download_template(&template_id_generated) {
+            Ok(content) => content,
+            Err(_) => Bytes::new(),
+        };
 
-        let template_id: TemplateId;
-
-        if template_data.is_empty() {
-            template_id = self.upload_template(&template_file, None)?;
+        let template_id = if template_data.is_empty() {
+            self.upload_template(template_file.path_as_str(), template_data.to_vec(), None)?
         } else {
-            template_id = template_id_generated;
-        }
+            template_id_generated
+        };
 
         let render_id = self.render_data(template_id, json_data)?;
         let report_content = self.get_report(&render_id)?;
