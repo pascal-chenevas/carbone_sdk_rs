@@ -7,11 +7,11 @@ use crate::types::*;
 use crate::types::Result;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct RenderOptions {
+pub struct JsonData {
     render_options: String,
 }
 
-impl RenderOptions {
+impl JsonData {
     /// Create a new render_options.
     ///
     ///
@@ -20,7 +20,7 @@ impl RenderOptions {
     /// ```no_run
     /// use std::env;
     ///
-    /// use carbone_sdk_rs::render::RenderOptions;
+    /// use carbone_sdk_rs::render::JsonData;
     /// use carbone_sdk_rs::errors::CarboneError;
     ///
     /// fn main() -> Result<(), CarboneError> {
@@ -33,7 +33,7 @@ impl RenderOptions {
     ///        "convertTo" : "odt"
     ///    "#;    
     ///
-    ///    let render_options = RenderOptions::new(render_options_value.to_string())?;
+    ///    let render_options = JsonData::new(render_options_value.to_string())?;
     ///
     ///    assert_eq!(render_options.as_str(), render_options_value);
     ///
@@ -42,7 +42,7 @@ impl RenderOptions {
     /// ```
     pub fn new(s: String) -> Result<Self> {
         if s.is_empty() {
-            return Err(CarboneError::EmptyString("render_options".to_string()));
+            return Err(CarboneError::EmptyString("json_data".to_string()));
         }
         Ok(Self { render_options: s })
     }
