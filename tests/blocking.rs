@@ -236,7 +236,7 @@ mod tests {
         let template_file = TemplateFile::new("tests/data/template.odt".to_string(), None)?;
         let template_id = template_file.generate_id(None)?;
 
-        let render_options = RenderOptions::new(report_data)?;
+        let json_data = JsonData::new(report_data)?;
 
         let render_id_value = "MTAuMjAuMjEuNDAgICAgBY4OM11wQg11ekv6_R0n0wcmVwb3J0.pdf".to_string();
         let _render_id = &RenderId::new(&render_id_value)?;
@@ -263,7 +263,7 @@ mod tests {
             then.status(200).body(&expected_content);
         });
 
-        let result = carbone.generate_report_with_template_id(template_id, render_options)?;
+        let result = carbone.generate_report_with_template_id(template_id, json_data)?;
 
         mock_render_response.assert();
         mock_get_report_response.assert();
@@ -290,7 +290,7 @@ mod tests {
         let template_file = TemplateFile::new("tests/data/template.odt".to_string(), None)?;
         let template_id = template_file.generate_id(None)?;
 
-        let render_options = RenderOptions::new(report_data)?;
+        let json_data = JsonData::new(report_data)?;
 
         let render_id_value = "MTAuMjAuMjEuNDAgICAgBY4OM11wQg11ekv6_R0n0wcmVwb3J0.pdf".to_string();
         let render_id = &RenderId::new(&render_id_value)?;
@@ -323,7 +323,7 @@ mod tests {
             then.status(200).body(&expected_content);
         });
 
-        let result = carbone.generate_report_with_file(&template_file, render_options, None)?;
+        let result = carbone.generate_report_with_file(&template_file, json_data, None)?;
 
         mock_template_response.assert();
         mock_render_response.assert();
@@ -455,7 +455,7 @@ mod tests {
 
         let carbone = Carbone::new(&config, &api_token)?;
 
-        let render_options = String::from(
+        let json_data = String::from(
             r#"
             "data" : {
                 "firstname" : "John",
@@ -465,8 +465,8 @@ mod tests {
         "#,
         );
 
-        let render_options = RenderOptions::new(render_options)?;
-        let result = carbone.render_data(template_id, render_options);
+        let json_data = JsonData::new(json_data)?;
+        let result = carbone.render_data(template_id, json_data);
 
         let expected_error = CarboneError::Error(
             "Invalid or undefined TemplateId or RenderId in the URL".to_string(),
@@ -491,7 +491,7 @@ mod tests {
 
         let carbone = Carbone::new(&config, &api_token)?;
 
-        let render_options = String::from(
+        let json_data = String::from(
             r#"
             "data" : {
                 "firstname" : "John",
@@ -501,8 +501,8 @@ mod tests {
         "#,
         );
 
-        let render_options = RenderOptions::new(render_options)?;
-        let result = carbone.render_data(template_id, render_options);
+        let json_data = JsonData::new(json_data)?;
+        let result = carbone.render_data(template_id, json_data);
 
         assert!(result.is_err());
 
