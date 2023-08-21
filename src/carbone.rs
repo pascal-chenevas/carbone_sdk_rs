@@ -206,16 +206,13 @@ impl<'a> Carbone<'a> {
         json_data: JsonData,
         payload: Option<&str>,
     ) -> Result<Bytes> {
+         
         let template_id_generated = template_file.generate_id(payload)?;
 
-        let template_data = match self.download_template(&template_id_generated).await {
-            Ok(content) => content,
-            Err(_) => Bytes::new(),
-        };
+        let result = self.download_template(&template_id_generated).await;
 
-        let template_id = if template_data.is_empty() {
-            self.upload_template(template_file.path_as_str(), template_data.to_vec(), None)
-                .await?
+        let template_id = if result.is_err() {
+            self.upload_template(template_file.path_as_str(), template_data.to_vec()).await?
         } else {
             template_id_generated
         };
