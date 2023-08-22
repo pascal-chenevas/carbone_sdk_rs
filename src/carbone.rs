@@ -192,27 +192,29 @@ impl<'a> Carbone<'a> {
     ///
     ///     let json_data = JsonData::new(json_data_value)?;
     ///
-    ///     let template_file = &TemplateFile::new("/path/to/template.odf".to_string(), None)?;
-    ///     let report_content = carbone.generate_report_with_file(&template_file, json_data, None).await.unwrap();
+    ///     let template_data: Vec<u8> = = Vec::new(); // content of the template
+    ///     let report_content = carbone.generate_report("template.odt".to_string(), template_data, json_data, None, None).await.unwrap();
     ///
     ///     assert_eq!(report_content.is_empty(), false);
     ///
     ///     Ok(())
     /// }
     /// ```
-    pub async fn generate_report_with_file(
+    pub async fn generate_report(
         &self,
-        template_file: &TemplateFile,
+        template_name: String,
+        template_data: Vec<u8>,
         json_data: JsonData,
         payload: Option<&str>,
+        salt: Option<&str>
     ) -> Result<Bytes> {
-         
-        let template_id_generated = template_file.generate_id(payload)?;
+
+        let template_id_generated = TemplateId::from_bytes(template_data.to_owned(), payload)?;
 
         let result = self.download_template(&template_id_generated).await;
 
         let template_id = if result.is_err() {
-            self.upload_template(template_file.path_as_str(), template_data.to_vec()).await?
+            self.upload_template(template_name.as_str(), template_data, salt).await?
         } else {
             template_id_generated
         };

@@ -1,3 +1,5 @@
+use std::fs;
+
 use carbone_sdk_rs::errors::CarboneError;
 use carbone_sdk_rs::template::*;
 
@@ -12,6 +14,17 @@ mod tests {
     fn test_template_file() -> Result<(), CarboneError> {
         let template_file_path = "tests/data/template.test.odt";
         let template_file = TemplateFile::new(template_file_path.to_string(), None)?;
+
+        assert_eq!(template_file.path_as_str(), template_file_path);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_template_file_file_content_given() -> Result<(), CarboneError> {
+        let template_file_path = "tests/data/template.test.odt";
+        let file_content = fs::read(template_file_path.to_owned())?;
+        let template_file = TemplateFile::new(template_file_path.to_string(), Some(file_content))?;
 
         assert_eq!(template_file.path_as_str(), template_file_path);
 

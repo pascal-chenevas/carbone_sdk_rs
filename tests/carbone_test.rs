@@ -279,7 +279,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_generate_report_with_file() -> Result<(), CarboneError> {
+    async fn test_generate_report() -> Result<(), CarboneError> {
         // Start a lightweight mock server.
         let server = MockServer::start();
 
@@ -292,8 +292,11 @@ mod tests {
 
         let report_data = fs::read_to_string("tests/data/report_data.json")?;
 
-        let template_file = TemplateFile::new("tests/data/template.odt".to_string(), None)?;
+        let template_name = "template.odt".to_string();
+        let template_path = format!("tests/data/{}", template_name);
+        let template_data = fs::read(template_path.to_owned())?;
 
+        let template_file = TemplateFile::new(template_path, Some(template_data.to_owned()))?;
         let template_id = template_file.generate_id(None)?;
 
         let json_data = JsonData::new(report_data)?;
@@ -330,7 +333,7 @@ mod tests {
         });
 
         let result = carbone
-            .generate_report_with_file(&template_file, json_data, None)
+            .generate_report(template_name, template_data, json_data, None, None)
             .await
             .unwrap();
 

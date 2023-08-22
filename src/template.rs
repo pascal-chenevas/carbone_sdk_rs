@@ -47,17 +47,7 @@ impl TemplateFile {
             None => fs::read(self.path_as_str())?,
         };
 
-        let mut sha256 = Sha256::new();
-
-        let payload = payload.unwrap_or("");
-
-        sha256.update(payload);
-        sha256.update(file_content);
-
-        // convert [u8] to String
-        let result: String = format!("{:X}", sha256.finalize());
-
-        TemplateId::new(result.to_lowercase())
+        TemplateId::from_bytes(file_content, payload)
     }
 
     pub fn path_as_str(&self) -> &str {
@@ -92,6 +82,22 @@ impl TemplateId {
     pub fn new<T: Into<String>>(id: T) -> Result<Self> {
         let id = Id::new(id, "template_id")?;
         Ok(TemplateId(id))
+    }
+
+    pub fn from_bytes(data: Vec<u8>, payload: Option<&str>) -> Result<Self> {
+
+        let mut sha256 = Sha256::new();
+
+        let payload = payload.unwrap_or("");
+
+        sha256.update(payload);
+        sha256.update(data);
+
+        // convert [u8] to String
+        let result: String = format!("{:X}", sha256.finalize());
+
+        Self::new(result.to_lowercase())
+
     }
 }
 
