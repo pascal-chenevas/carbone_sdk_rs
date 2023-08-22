@@ -192,7 +192,7 @@ impl<'a> Carbone<'a> {
     ///
     ///     let json_data = JsonData::new(json_data_value)?;
     ///
-    ///     let template_data: Vec<u8> = = Vec::new(); // content of the template
+    ///     let template_data: Vec<u8> = Vec::new(); // content of the template
     ///     let report_content = carbone.generate_report("template.odt".to_string(), template_data, json_data, None, None).await.unwrap();
     ///
     ///     assert_eq!(report_content.is_empty(), false);
