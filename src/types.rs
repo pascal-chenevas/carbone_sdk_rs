@@ -60,3 +60,49 @@ impl AsRef<str> for Id {
         &self.0
     }
 }
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct JsonData {
+    render_options: String,
+}
+
+impl JsonData {
+    /// Create a new render_options.
+    ///
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use std::env;
+    ///
+    /// use carbone_sdk_rs::types::JsonData;
+    /// use carbone_sdk_rs::errors::CarboneError;
+    ///
+    /// fn main() -> Result<(), CarboneError> {
+    ///
+    ///  let render_options_value = r#"
+    ///        "data" : {
+    ///            "firstname" : "John",
+    ///            "lastname" : "Wick"
+    ///        },
+    ///        "convertTo" : "odt"
+    ///    "#;
+    ///
+    ///    let render_options = JsonData::new(render_options_value.to_string())?;
+    ///
+    ///    assert_eq!(render_options.as_str(), render_options_value);
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
+    pub fn new(s: String) -> Result<Self> {
+        if s.is_empty() {
+            return Err(CarboneError::EmptyString("json_data".to_string()));
+        }
+        Ok(Self { render_options: s })
+    }
+
+    pub fn as_str(&self) -> &str {
+        &self.render_options
+    }
+}

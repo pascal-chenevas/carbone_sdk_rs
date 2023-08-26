@@ -15,7 +15,7 @@ use crate::config::Config;
 use crate::errors::*;
 use crate::render::*;
 use crate::template::*;
-use crate::types::ApiJsonToken;
+use crate::types::{ApiJsonToken, JsonData};
 
 use crate::types::Result;
 
@@ -163,7 +163,7 @@ impl<'a> Carbone<'a> {
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::render::*;
     /// use carbone_sdk_rs::carbone::Carbone;
-    /// use carbone_sdk_rs::types::ApiJsonToken;
+    /// use carbone_sdk_rs::types::{ApiJsonToken, JsonData};
     /// use carbone_sdk_rs::template::{TemplateFile,TemplateId};
     ///
     /// use carbone_sdk_rs::errors::CarboneError;
@@ -284,6 +284,7 @@ impl<'a> Carbone<'a> {
     ///
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::render::*;
+    /// use carbone_sdk_rs::types::JsonData;
     /// use carbone_sdk_rs::carbone::Carbone;
     /// use carbone_sdk_rs::types::ApiJsonToken;
     /// use carbone_sdk_rs::template::TemplateId;
@@ -341,11 +342,10 @@ impl<'a> Carbone<'a> {
     /// use std::env;
     ///
     /// use carbone_sdk_rs::carbone::Carbone;
-    /// use carbone_sdk_rs::render::JsonData;
     /// use carbone_sdk_rs::config::Config;
     /// use carbone_sdk_rs::template::TemplateId;
     /// use carbone_sdk_rs::errors::CarboneError;
-    /// use carbone_sdk_rs::types::ApiJsonToken;
+    /// use carbone_sdk_rs::types::{ApiJsonToken, JsonData};
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), CarboneError> {
@@ -468,8 +468,7 @@ impl<'a> Carbone<'a> {
 
         let ext = file_path
             .extension()
-            .and_then(|ext| ext.to_str())
-            .unwrap_or("");
+            .and_then(|ext| ext.to_str()) .unwrap_or("");
         let mime = mime_guess::from_ext(ext).first_or_octet_stream();
 
         let part = multipart::Part::bytes(file_content)

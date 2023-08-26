@@ -65,4 +65,53 @@ mod tests {
 
         Ok(())
     }
+
+    #[test]
+    fn test_json_data_clone() -> Result<(), CarboneError> {
+        let json_data_value = r#"
+                                            "data" : {
+                                                "firstname" : "John",
+                                                "lastname" : "Wick"
+                                        },
+                                        "convertTo" : "odt"
+                                        "#;
+        let json_data = JsonData::new(json_data_value.to_string())?;
+
+        let cloned = json_data.clone();
+
+        assert_eq!(json_data, cloned);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_json_data() -> Result<(), CarboneError> {
+        let json_data_value = r#"
+            "data" : {
+                "firstname" : "John",
+                "lastname" : "Wick"
+            },
+            "convertTo" : "odt"
+        "#;
+
+        let json_data = JsonData::new(json_data_value.to_string())?;
+
+        assert_eq!(json_data.as_str(), json_data_value);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_json_data_value_not_given() -> Result<(), CarboneError> {
+        let json_data = "";
+        let result = JsonData::new(json_data.to_string());
+
+        let exepected_error = CarboneError::EmptyString("json_data".to_string());
+
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().to_string(), exepected_error.to_string());
+
+        Ok(())
+    }
+
 }
