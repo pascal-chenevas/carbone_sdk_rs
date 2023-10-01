@@ -9,6 +9,11 @@ carbone_sdk_rs is a Library that supplies functionalities to communicate with th
 
 # State of development
 
+This repo is not maintained anymore.
+The project has been moved to: https://github.com/carboneio/carbone-sdk-rust
+
+----
+
 This Library is in the early stage of active development and doesn't reach the status of a stable release.
 Therefore it can not be used in a production environment.
 
